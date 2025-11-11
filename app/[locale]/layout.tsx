@@ -3,6 +3,8 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { locales } from '@/i18n';
 import { ThemeProvider } from '@/components/layout/ThemeProvider';
+import { AuthProvider } from '@/hooks/useAuth';
+import { Toaster } from '@/components/ui/sonner';
 import '../globals.css';
 
 export function generateStaticParams() {
@@ -37,7 +39,10 @@ export default async function LocaleLayout({
           disableTransitionOnChange
         >
           <NextIntlClientProvider messages={messages}>
-            {children}
+            <AuthProvider>
+              {children}
+              <Toaster />
+            </AuthProvider>
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

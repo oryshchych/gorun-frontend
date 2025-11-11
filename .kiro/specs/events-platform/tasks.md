@@ -41,8 +41,8 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Test theme persistence across page navigation
   - _Requirements: 6.1, 6.2_
 
-- [ ] 6. Set up API client and authentication
-- [ ] 6.1 Create axios API client
+- [x] 6. Set up API client and authentication
+- [x] 6.1 Create axios API client
   - Implement lib/api/client.ts with configured axios instance
   - Add request interceptor to attach JWT tokens from localStorage
   - Add response interceptor for error handling and token refresh
@@ -50,7 +50,7 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Implement error response formatting
   - _Requirements: 1.4, 7.3, 7.4_
 
-- [ ] 6.2 Implement authentication service
+- [x] 6.2 Implement authentication service
   - Create lib/api/auth.ts with login, register, logout functions
   - Implement token storage in localStorage/cookies
   - Create hooks/useAuth.ts for authentication state management
@@ -58,7 +58,7 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Implement session persistence across page reloads
   - _Requirements: 1.1, 1.2, 1.4_
 
-- [ ] 6.3 Create authentication UI components
+- [x] 6.3 Create authentication UI components
   - Implement components/auth/LoginForm.tsx with email/password fields
   - Implement components/auth/RegisterForm.tsx with name, email, password fields
   - Create lib/validations/auth.ts with zod schemas for login and registration
@@ -66,7 +66,7 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Add form validation error display with inline messages
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2, 5.4_
 
-- [ ] 6.4 Create authentication pages
+- [x] 6.4 Create authentication pages
   - Create app/[locale]/(auth)/login/page.tsx with LoginForm
   - Create app/[locale]/(auth)/register/page.tsx with RegisterForm
   - Implement authentication layout with centered form design
