@@ -1,0 +1,113 @@
+'use client';
+
+import { Event } from '@/types/event';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Calendar, MapPin, Users } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
+import { format } from 'date-fns';
+import { enUS } from 'date-fns/locale/en-US';
+import { uk } from 'date-fns/locale/uk';
+import { useLocale } from 'next-intl';
+import Link from 'next/link';
+import Image from 'next/image';
+
+interface EventCardProps {
+  event: Event;
+}
+
+export function EventCard({ event }: EventCardProps) {
+  const t = useTranslations('events');
+  const locale = useLocale();
+  const dateLocale = locale === 'uk' ? uk : enUS;
+
+  const availableSpots = event.capacity - event.registeredCount;
+  const isFull = availableSpots <= 0;
+  const isAlmostFull = availableSpots > 0 && availableSpots <= event.capacity * 0.2;
+
+  const formattedDate = format(new Date(event.date), 'PPP', { locale: dateLocale });
+
+  return (
+    <Link href={`/${locale}/events/${event.id}`}>
+      <motion.div
+        whileHover={{ scale: 1.02, y: -4 }}
+        transition={{ duration: 0.2 }}
+        className="h-full"
+      >
+        <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-200 cursor-pointer">
+          {/* Event Image */}
+          <div className="relative w-full h-48 bg-muted">
+            {event.imageUrl ? (
+              <Image
+                src={event.imageUrl}
+                alt={event.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-primary/10 to-primary/5">
+                <Calendar className="w-16 h-16 text-muted-foreground/30" />
+              </div>
+            )}
+            
+            {/* Capacity Badge */}
+            <div className="absolute top-3 right-3">
+              {isFull ? (
+                <Badge variant="destructive" className="shadow-md">
+                  {t('eventFull')}
+                </Badge>
+              ) : isAlmostFull ? (
+                <Badge variant="secondary" className="shadow-md">
+                  {availableSpots} {t('availableSpots')}
+                </Badge>
+              ) : (
+                <Badge variant="default" className="shadow-md">
+                  {availableSpots} {t('availableSpots')}
+                </Badge>
+              )}
+            </div>
+          </div>
+
+          <CardContent className="p-4">
+            {/* Event Title */}
+            <h3 className="font-semibold text-lg line-clamp-2 mb-3">
+              {event.title}
+            </h3>
+
+            {/* Event Details */}
+            <div className="space-y-2 text-sm text-muted-foreground">
+              {/* Date */}
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 shrink-0" />
+                <span className="truncate">{formattedDate}</span>
+              </div>
+
+              {/* Location */}
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 shrink-0" />
+                <span className="truncate">{event.location}</span>
+              </div>
+
+              {/* Capacity */}
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 shrink-0" />
+                <span>
+                  {event.registeredCount} / {event.capacity}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+
+          <CardFooter className="p-4 pt-0">
+            {/* Organizer */}
+            <div className="text-xs text-muted-foreground">
+              {t('organizer')}: {event.organizer.name}
+            </div>
+          </CardFooter>
+        </Card>
+      </motion.div>
+    </Link>
+  );
+}

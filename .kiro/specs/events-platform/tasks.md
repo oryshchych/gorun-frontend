@@ -100,15 +100,15 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Add optimistic updates for registration actions
   - _Requirements: 3.3, 3.4, 7.2, 7.5_
 
-- [ ] 11. Build event management components
-- [ ] 11.1 Create event display components
+- [x] 11. Build event management components
+- [x] 11.1 Create event display components
   - Implement components/events/EventCard.tsx with image, title, date, location, capacity badge
   - Implement components/events/EventList.tsx with grid layout and responsive design
   - Add framer-motion animations for card hover effects
   - Display event capacity status (available spots or full)
   - _Requirements: 3.1, 3.2, 6.1, 6.3, 8.2, 8.4_
 
-- [ ] 11.2 Create event form component
+- [x] 11.2 Create event form component
   - Implement components/events/EventForm.tsx with all event fields
   - Integrate react-hook-form with event zod schema
   - Add date picker using shadcn/ui calendar component
@@ -116,7 +116,7 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Add image URL input with preview
   - _Requirements: 2.1, 2.2, 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 11.3 Create event details component
+- [x] 11.3 Create event details component
   - Implement components/events/EventDetails.tsx with full event information
   - Add registration button with capacity check
   - Display organizer information

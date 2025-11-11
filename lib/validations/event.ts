@@ -9,8 +9,9 @@ export const eventSchema = z.object({
     .string()
     .min(10, 'Description must be at least 10 characters')
     .max(2000, 'Description must not exceed 2000 characters'),
-  date: z.coerce
-    .date()
+  date: z
+    .union([z.string(), z.date()])
+    .transform((val) => (typeof val === 'string' ? new Date(val) : val))
     .refine((date) => date > new Date(), {
       message: 'Event date must be in the future',
     }),
@@ -41,8 +42,9 @@ export const updateEventSchema = z.object({
     .min(10, 'Description must be at least 10 characters')
     .max(2000, 'Description must not exceed 2000 characters')
     .optional(),
-  date: z.coerce
-    .date()
+  date: z
+    .union([z.string(), z.date()])
+    .transform((val) => (typeof val === 'string' ? new Date(val) : val))
     .refine((date) => date > new Date(), {
       message: 'Event date must be in the future',
     })
