@@ -23,7 +23,7 @@
   - Implement LanguageSwitcher component with locale persistence
   - _Requirements: 4.1, 4.2, 4.3, 4.5_
 
-- [ ] 4. Install and configure shadcn/ui components
+- [x] 4. Install and configure shadcn/ui components
   - Install shadcn/ui components: button, card, input, label, form, select, dialog, dropdown-menu, badge, toast
   - Create components/ui directory with installed components
   - Customize component styles in components.json configuration
