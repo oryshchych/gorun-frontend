@@ -15,7 +15,7 @@
   - Create i18n.ts configuration file for Ukrainian and English locales
   - _Requirements: 4.1, 4.2, 6.1_
 
-- [ ] 3. Implement internationalization foundation
+- [x] 3. Implement internationalization foundation
   - Create messages/uk.json with Ukrainian translations for common UI elements
   - Create messages/en.json with English translations
   - Implement middleware.ts with next-intl locale detection and routing
