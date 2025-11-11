@@ -83,8 +83,8 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Create lib/validations/registration.ts with registration zod schema
   - _Requirements: 5.2, 7.1, 7.2_
 
-- [ ] 8. Implement event API service layer
-- [ ] 8.1 Create events API service
+- [x] 8. Implement event API service layer
+- [x] 8.1 Create events API service
   - Implement lib/api/events.ts with functions to fetch, create, update, delete events
   - Create hooks/useEvents.ts with React Query integration for events data
   - Add optimistic updates for better UX
@@ -92,7 +92,7 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Add pagination support for event lists
   - _Requirements: 2.1, 2.2, 2.3, 2.5, 7.1, 7.4_
 
-- [ ] 8.2 Create registrations API service
+- [x] 8.2 Create registrations API service
   - Implement lib/api/registrations.ts with functions to fetch and create registrations
   - Create hooks/useRegistrations.ts with React Query integration
   - Add capacity check validation before registration

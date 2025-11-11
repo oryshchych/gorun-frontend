@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { locales } from '@/i18n';
 import { ThemeProvider } from '@/components/layout/ThemeProvider';
 import { AuthProvider } from '@/hooks/useAuth';
+import { QueryProvider } from '@/components/providers/QueryProvider';
 import { Toaster } from '@/components/ui/sonner';
 import '../globals.css';
 
@@ -38,12 +39,14 @@ export default async function LocaleLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <NextIntlClientProvider messages={messages}>
-            <AuthProvider>
-              {children}
-              <Toaster />
-            </AuthProvider>
-          </NextIntlClientProvider>
+          <QueryProvider>
+            <NextIntlClientProvider messages={messages}>
+              <AuthProvider>
+                {children}
+                <Toaster />
+              </AuthProvider>
+            </NextIntlClientProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>
