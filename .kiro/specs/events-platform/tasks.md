@@ -124,7 +124,7 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Add edit and delete buttons for event owners
   - _Requirements: 3.2, 3.3, 3.4_
 
-- [ ] 12. Create event management pages
+- [x] 12. Create event management pages
   - Create app/[locale]/(dashboard)/events/page.tsx to display all events
   - Create app/[locale]/(dashboard)/events/create/page.tsx with EventForm
   - Create app/[locale]/(dashboard)/events/[id]/page.tsx with EventDetails

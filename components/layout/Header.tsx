@@ -16,45 +16,48 @@ import { ThemeToggle } from './ThemeToggle';
 import LanguageSwitcher from './LanguageSwitcher';
 import { User, LogOut, Calendar, CalendarPlus } from 'lucide-react';
 import { toast } from 'sonner';
+import { useLocale, useTranslations } from 'next-intl';
 
-export function Header() {
+export default function Header() {
   const { user, isAuthenticated, logout, isLoading } = useAuth();
   const router = useRouter();
+  const locale = useLocale();
+  const tNav = useTranslations('nav');
 
   const handleLogout = async () => {
     try {
       await logout();
       toast.success('Logged out successfully');
-      router.push('/login');
+      router.push(`/${locale}/login`);
     } catch (error) {
       toast.error('Failed to logout');
     }
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href={`/${locale}`} className="flex items-center space-x-2">
             <Calendar className="h-6 w-6" />
             <span className="font-bold text-xl">Events Platform</span>
           </Link>
 
           {isAuthenticated && (
             <nav className="hidden md:flex items-center gap-4">
-              <Link href="/events">
+              <Link href={`/${locale}/events`}>
                 <Button variant="ghost" size="sm">
-                  Events
+                  {tNav('events')}
                 </Button>
               </Link>
-              <Link href="/my-events">
+              <Link href={`/${locale}/my-events`}>
                 <Button variant="ghost" size="sm">
-                  My Events
+                  {tNav('myEvents')}
                 </Button>
               </Link>
-              <Link href="/my-registrations">
+              <Link href={`/${locale}/my-registrations`}>
                 <Button variant="ghost" size="sm">
-                  My Registrations
+                  {tNav('myRegistrations')}
                 </Button>
               </Link>
             </nav>
@@ -84,33 +87,33 @@ export function Header() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/events/create" className="cursor-pointer">
+                  <Link href={`/${locale}/events/create`} className="cursor-pointer">
                     <CalendarPlus className="mr-2 h-4 w-4" />
-                    Create Event
+                    {tNav('createEvent')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/my-events" className="cursor-pointer">
+                  <Link href={`/${locale}/my-events`} className="cursor-pointer">
                     <Calendar className="mr-2 h-4 w-4" />
-                    My Events
+                    {tNav('myEvents')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />
-                  Logout
+                  {tNav('logout')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <div className="flex items-center gap-2">
-              <Link href="/login">
+              <Link href={`/${locale}/login`}>
                 <Button variant="ghost" size="sm">
-                  Login
+                  {tNav('login')}
                 </Button>
               </Link>
-              <Link href="/register">
-                <Button size="sm">Sign Up</Button>
+              <Link href={`/${locale}/register`}>
+                <Button size="sm">{tNav('register')}</Button>
               </Link>
             </div>
           )}
