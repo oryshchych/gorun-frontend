@@ -33,7 +33,7 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Create shared LoadingSpinner component using lucide-react icons
   - _Requirements: 6.4, 6.5_
 
-- [ ] 5. Implement theme switching (dark/light mode)
+- [x] 5. Implement theme switching (dark/light mode)
   - Install and configure next-themes for theme management
   - Create components/layout/ThemeToggle.tsx with sun/moon icons
   - Integrate ThemeProvider in root layout
