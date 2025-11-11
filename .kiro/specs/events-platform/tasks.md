@@ -74,7 +74,7 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Implement logout functionality in header
   - _Requirements: 1.1, 1.2, 1.5_
 
-- [ ] 7. Create type definitions and validation schemas
+- [x] 7. Create type definitions and validation schemas
   - Create types/auth.ts with User, LoginRequest, RegisterRequest interfaces
   - Create types/event.ts with Event, CreateEventRequest, UpdateEventRequest interfaces
   - Create types/registration.ts with Registration, CreateRegistrationRequest interfaces
