@@ -1,8 +1,11 @@
 # Implementation Plan
 
+## Frontend-Only Architecture
+This is a frontend Next.js application that consumes a separate backend API (MongoDB-based). The backend will be shared with Telegram bot and mobile applications.
+
 - [x] 1. Initialize Next.js project and install dependencies
   - Create Next.js 15 app with TypeScript and Tailwind CSS using `npx create-next-app@latest`
-  - Install core dependencies: next-intl, next-auth, axios, zod, react-hook-form, framer-motion, lucide-react
+  - Install core dependencies: next-intl, axios, zod, react-hook-form, framer-motion, lucide-react, next-themes
   - Install shadcn/ui CLI and initialize with default configuration
   - Configure TypeScript with strict mode in tsconfig.json
   - _Requirements: 1.1, 1.4, 4.2, 5.2, 6.4, 8.2_
@@ -11,7 +14,7 @@
   - Create folder structure: app/[locale], components, lib, hooks, types, messages
   - Configure Tailwind CSS with custom theme colors and shadcn/ui integration
   - Create next.config.js with next-intl plugin configuration
-  - Set up environment variables template (.env.example)
+  - Set up environment variables template (.env.example) with NEXT_PUBLIC_API_URL
   - Create i18n.ts configuration file for Ukrainian and English locales
   - _Requirements: 4.1, 4.2, 6.1_
 
@@ -24,38 +27,46 @@
   - _Requirements: 4.1, 4.2, 4.3, 4.5_
 
 - [x] 4. Install and configure shadcn/ui components
-  - Install shadcn/ui components: button, card, input, label, form, select, dialog, dropdown-menu, badge, toast
+  - Install shadcn/ui components: button, card, input, label, form, select, dialog, dropdown-menu, badge, sonner
   - Create components/ui directory with installed components
   - Customize component styles in components.json configuration
   - Create shared LoadingSpinner component using lucide-react icons
   - _Requirements: 6.4, 6.5_
 
-- [ ] 5. Set up database schema and client
-  - Choose and configure database (PostgreSQL recommended with Prisma or Drizzle ORM)
-  - Create database schema for Users, Events, and Registrations tables
-  - Implement lib/db.ts with database client initialization
-  - Create migration files for initial schema
-  - Run migrations to set up database tables
-  - _Requirements: 7.1, 7.2, 7.3, 7.4_
+- [ ] 5. Implement theme switching (dark/light mode)
+  - Install and configure next-themes for theme management
+  - Create components/layout/ThemeToggle.tsx with sun/moon icons
+  - Integrate ThemeProvider in root layout
+  - Add theme toggle to header/navigation
+  - Test theme persistence across page navigation
+  - _Requirements: 6.1, 6.2_
 
-- [ ] 6. Implement authentication with NextAuth.js
-- [ ] 6.1 Configure NextAuth.js
-  - Create lib/auth.ts with NextAuth configuration
-  - Set up credentials provider with email/password authentication
-  - Configure Google OAuth provider with client ID and secret
-  - Implement JWT strategy with custom session callbacks
-  - Create app/api/auth/[...nextauth]/route.ts
+- [ ] 6. Set up API client and authentication
+- [ ] 6.1 Create axios API client
+  - Implement lib/api/client.ts with configured axios instance
+  - Add request interceptor to attach JWT tokens from localStorage
+  - Add response interceptor for error handling and token refresh
+  - Configure base URL from environment variables
+  - Implement error response formatting
+  - _Requirements: 1.4, 7.3, 7.4_
+
+- [ ] 6.2 Implement authentication service
+  - Create lib/api/auth.ts with login, register, logout functions
+  - Implement token storage in localStorage/cookies
+  - Create hooks/useAuth.ts for authentication state management
+  - Add automatic token refresh logic
+  - Implement session persistence across page reloads
   - _Requirements: 1.1, 1.2, 1.4_
 
-- [ ] 6.2 Create authentication UI components
-  - Implement components/auth/LoginForm.tsx with email/password fields and Google button
+- [ ] 6.3 Create authentication UI components
+  - Implement components/auth/LoginForm.tsx with email/password fields
   - Implement components/auth/RegisterForm.tsx with name, email, password fields
   - Create lib/validations/auth.ts with zod schemas for login and registration
   - Integrate react-hook-form with zod resolver in auth forms
   - Add form validation error display with inline messages
   - _Requirements: 1.1, 1.2, 1.3, 5.1, 5.2, 5.4_
 
-- [ ] 6.3 Create authentication pages
+- [ ] 6.4 Create authentication pages
   - Create app/[locale]/(auth)/login/page.tsx with LoginForm
   - Create app/[locale]/(auth)/register/page.tsx with RegisterForm
   - Implement authentication layout with centered form design
@@ -64,44 +75,30 @@
   - _Requirements: 1.1, 1.2, 1.5_
 
 - [ ] 7. Create type definitions and validation schemas
-  - Create types/auth.ts with User interface
-  - Create types/event.ts with Event interface
-  - Create types/registration.ts with Registration interface
+  - Create types/auth.ts with User, LoginRequest, RegisterRequest interfaces
+  - Create types/event.ts with Event, CreateEventRequest, UpdateEventRequest interfaces
+  - Create types/registration.ts with Registration, CreateRegistrationRequest interfaces
+  - Create types/api.ts with ApiResponse, ApiError, PaginatedResponse interfaces
   - Create lib/validations/event.ts with event creation/edit zod schema
   - Create lib/validations/registration.ts with registration zod schema
   - _Requirements: 5.2, 7.1, 7.2_
 
-- [ ] 8. Implement event API routes
-- [ ] 8.1 Create events CRUD endpoints
-  - Implement app/api/events/route.ts with GET (list events) and POST (create event)
-  - Implement app/api/events/[id]/route.ts with GET (single event), PUT (update), DELETE
-  - Add authentication middleware to protect create, update, delete operations
-  - Validate request bodies using zod schemas
-  - Implement error handling with appropriate status codes
+- [ ] 8. Implement event API service layer
+- [ ] 8.1 Create events API service
+  - Implement lib/api/events.ts with functions to fetch, create, update, delete events
+  - Create hooks/useEvents.ts with React Query integration for events data
+  - Add optimistic updates for better UX
+  - Implement error handling and loading states
+  - Add pagination support for event lists
   - _Requirements: 2.1, 2.2, 2.3, 2.5, 7.1, 7.4_
 
-- [ ] 8.2 Add event ownership authorization
-  - Verify user owns event before allowing updates or deletes
-  - Return 403 Forbidden for unauthorized access attempts
-  - Add organizerId to event responses
-  - _Requirements: 2.3, 2.4, 2.5_
-
-- [ ] 9. Implement registration API routes
-  - Create app/api/registrations/route.ts with GET (user's registrations) and POST (create registration)
-  - Create app/api/registrations/[id]/route.ts with DELETE (cancel registration)
-  - Implement capacity check before creating registration
-  - Update event's registeredCount when registration is created or cancelled
-  - Add unique constraint validation for user-event registration pairs
-  - Return 409 Conflict when event is at capacity or user already registered
+- [ ] 8.2 Create registrations API service
+  - Implement lib/api/registrations.ts with functions to fetch and create registrations
+  - Create hooks/useRegistrations.ts with React Query integration
+  - Add capacity check validation before registration
+  - Implement error handling for full events and duplicate registrations
+  - Add optimistic updates for registration actions
   - _Requirements: 3.3, 3.4, 7.2, 7.5_
-
-- [ ] 10. Create axios client and API hooks
-  - Implement lib/axios.ts with configured axios instance and interceptors
-  - Create hooks/useEvents.ts with functions to fetch, create, update, delete events
-  - Create hooks/useRegistrations.ts with functions to fetch and create registrations
-  - Add error handling and loading states in hooks
-  - Implement request/response interceptors for authentication tokens
-  - _Requirements: 1.4, 7.3, 7.4_
 
 - [ ] 11. Build event management components
 - [ ] 11.1 Create event display components
@@ -137,7 +134,7 @@
   - _Requirements: 2.1, 2.3, 2.4, 3.1, 3.5_
 
 - [ ] 13. Implement layout components
-  - Create components/layout/Header.tsx with navigation, auth status, and LanguageSwitcher
+  - Create components/layout/Header.tsx with navigation, auth status, ThemeToggle, and LanguageSwitcher
   - Create components/layout/Footer.tsx with basic information
   - Create app/[locale]/(dashboard)/layout.tsx with Header and protected route logic
   - Add responsive mobile navigation menu
@@ -186,8 +183,8 @@
 
 - [ ] 19. Configure deployment for Vercel
   - Create vercel.json with build configuration
-  - Set up environment variables in Vercel dashboard
-  - Configure database connection for production
+  - Set up environment variables in Vercel dashboard (NEXT_PUBLIC_API_URL)
+  - Configure CORS settings with backend API
   - Test build process locally with `next build`
   - Set up preview deployments for pull requests
   - _Requirements: 7.3_
@@ -206,9 +203,10 @@
   - Test LanguageSwitcher functionality
   - _Requirements: 1.1, 4.2, 5.1, 6.4_
 
-- [ ] 20.3 Write API route tests
-  - Test authentication endpoints with valid and invalid credentials
-  - Test event CRUD operations with authorization
-  - Test registration creation with capacity checks
-  - Test error responses and status codes
+- [ ] 20.3 Write API service tests
+  - Test API client request/response interceptors
+  - Test authentication service with token management
+  - Test event service CRUD operations
+  - Test registration service with error handling
+  - Mock API responses for consistent testing
   - _Requirements: 1.1, 2.1, 3.3, 3.4, 7.4_
