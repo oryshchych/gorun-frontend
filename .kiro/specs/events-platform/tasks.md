@@ -141,7 +141,7 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Implement user dropdown menu with profile and logout options
   - _Requirements: 1.5, 4.2, 6.2, 6.3_
 
-- [ ] 14. Add animations and transitions
+- [x] 14. Add animations and transitions
   - Implement page transition animations using framer-motion in layout
   - Add card hover animations with scale and shadow effects
   - Create loading skeleton components for event cards

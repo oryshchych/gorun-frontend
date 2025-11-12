@@ -31,11 +31,15 @@ export function EventCard({ event }: EventCardProps) {
   return (
     <Link href={`/${locale}/events/${event.id}`}>
       <motion.div
-        whileHover={{ scale: 1.02, y: -4 }}
-        transition={{ duration: 0.2 }}
+        whileHover={{ 
+          scale: 1.03, 
+          y: -8,
+          transition: { duration: 0.2, ease: 'easeOut' }
+        }}
+        whileTap={{ scale: 0.98 }}
         className="h-full"
       >
-        <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-200 cursor-pointer">
+        <Card className="h-full overflow-hidden hover:shadow-2xl transition-shadow duration-300 cursor-pointer">
           {/* Event Image */}
           <div className="relative w-full h-48 bg-muted">
             {event.imageUrl ? (

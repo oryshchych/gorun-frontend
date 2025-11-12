@@ -2,6 +2,7 @@
 
 import { Event } from '@/types/event';
 import { EventCard } from './EventCard';
+import { EventCardSkeleton } from '@/components/shared/EventCardSkeleton';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 
@@ -17,10 +18,7 @@ export function EventList({ events, isLoading = false }: EventListProps) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[...Array(6)].map((_, i) => (
-          <div
-            key={i}
-            className="h-[400px] rounded-lg bg-muted animate-pulse"
-          />
+          <EventCardSkeleton key={i} />
         ))}
       </div>
     );
@@ -34,20 +32,37 @@ export function EventList({ events, isLoading = false }: EventListProps) {
     );
   }
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.4,
+        ease: [0.4, 0, 0.2, 1] as const,
+      },
+    },
+  };
+
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
       className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
     >
-      {events.map((event, index) => (
-        <motion.div
-          key={event.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: index * 0.05 }}
-        >
+      {events.map((event) => (
+        <motion.div key={event.id} variants={itemVariants}>
           <EventCard event={event} />
         </motion.div>
       ))}

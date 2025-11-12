@@ -11,19 +11,20 @@ import { enUS } from 'date-fns/locale/en-US';
 import { uk } from 'date-fns/locale/uk';
 import { useLocale } from 'next-intl';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { useCreateRegistration, useCancelRegistration, useCheckRegistration, useEventRegistrations } from '@/hooks/useRegistrations';
 import { useDeleteEvent } from '@/hooks/useEvents';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  AnimatedDialog as Dialog,
+  AnimatedDialogContent as DialogContent,
+  AnimatedDialogDescription as DialogDescription,
+  AnimatedDialogFooter as DialogFooter,
+  AnimatedDialogHeader as DialogHeader,
+  AnimatedDialogTitle as DialogTitle,
+} from '@/components/ui/animated-dialog';
 
 interface EventDetailsProps {
   event: Event;
@@ -107,10 +108,20 @@ export function EventDetails({ event }: EventDetailsProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+      className="space-y-6"
+    >
       {/* Event Image */}
       {event.imageUrl && (
-        <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="relative w-full h-[400px] rounded-lg overflow-hidden"
+        >
           <Image
             src={event.imageUrl}
             alt={event.title}
@@ -119,7 +130,7 @@ export function EventDetails({ event }: EventDetailsProps) {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
             priority
           />
-        </div>
+        </motion.div>
       )}
 
       <Card>
@@ -305,6 +316,6 @@ export function EventDetails({ event }: EventDetailsProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </motion.div>
   );
 }

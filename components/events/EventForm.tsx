@@ -14,6 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { AnimatedFormField } from '@/components/shared/AnimatedFormField';
 import { useTranslations } from 'next-intl';
 import { Event } from '@/types/event';
 import { useState, useEffect } from 'react';
@@ -90,18 +91,20 @@ export function EventForm({
         <FormField
           control={form.control}
           name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('eventTitle')}</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder={t('eventTitle')}
-                  {...field}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          render={({ field, fieldState }) => (
+            <AnimatedFormField error={fieldState.error?.message}>
+              <FormItem>
+                <FormLabel>{t('eventTitle')}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={t('eventTitle')}
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </AnimatedFormField>
           )}
         />
 
@@ -109,19 +112,21 @@ export function EventForm({
         <FormField
           control={form.control}
           name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('description')}</FormLabel>
-              <FormControl>
-                <textarea
-                  placeholder={t('description')}
-                  className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-                  {...field}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          render={({ field, fieldState }) => (
+            <AnimatedFormField error={fieldState.error?.message}>
+              <FormItem>
+                <FormLabel>{t('description')}</FormLabel>
+                <FormControl>
+                  <textarea
+                    placeholder={t('description')}
+                    className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </AnimatedFormField>
           )}
         />
 
@@ -129,27 +134,29 @@ export function EventForm({
         <FormField
           control={form.control}
           name="date"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('date')}</FormLabel>
-              <FormControl>
-                <Input
-                  type="datetime-local"
-                  {...field}
-                  value={
-                    field.value instanceof Date
-                      ? formatDateForInput(field.value)
-                      : field.value
-                  }
-                  onChange={(e) => {
-                    const date = new Date(e.target.value);
-                    field.onChange(date);
-                  }}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          render={({ field, fieldState }) => (
+            <AnimatedFormField error={fieldState.error?.message}>
+              <FormItem>
+                <FormLabel>{t('date')}</FormLabel>
+                <FormControl>
+                  <Input
+                    type="datetime-local"
+                    {...field}
+                    value={
+                      field.value instanceof Date
+                        ? formatDateForInput(field.value)
+                        : field.value
+                    }
+                    onChange={(e) => {
+                      const date = new Date(e.target.value);
+                      field.onChange(date);
+                    }}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </AnimatedFormField>
           )}
         />
 
@@ -157,18 +164,20 @@ export function EventForm({
         <FormField
           control={form.control}
           name="location"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('location')}</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder={t('location')}
-                  {...field}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          render={({ field, fieldState }) => (
+            <AnimatedFormField error={fieldState.error?.message}>
+              <FormItem>
+                <FormLabel>{t('location')}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={t('location')}
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </AnimatedFormField>
           )}
         />
 
@@ -176,20 +185,22 @@ export function EventForm({
         <FormField
           control={form.control}
           name="capacity"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('capacity')}</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder={t('capacity')}
-                  {...field}
-                  onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          render={({ field, fieldState }) => (
+            <AnimatedFormField error={fieldState.error?.message}>
+              <FormItem>
+                <FormLabel>{t('capacity')}</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    placeholder={t('capacity')}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </AnimatedFormField>
           )}
         />
 
@@ -197,19 +208,21 @@ export function EventForm({
         <FormField
           control={form.control}
           name="imageUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('imageUrl')}</FormLabel>
-              <FormControl>
-                <Input
-                  type="url"
-                  placeholder="https://example.com/image.jpg"
-                  {...field}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          render={({ field, fieldState }) => (
+            <AnimatedFormField error={fieldState.error?.message}>
+              <FormItem>
+                <FormLabel>{t('imageUrl')}</FormLabel>
+                <FormControl>
+                  <Input
+                    type="url"
+                    placeholder="https://example.com/image.jpg"
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            </AnimatedFormField>
           )}
         />
 
