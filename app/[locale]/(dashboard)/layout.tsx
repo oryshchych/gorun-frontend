@@ -6,6 +6,7 @@ import { useLocale } from 'next-intl';
 import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 
 export default function DashboardLayout({
   children,
@@ -35,9 +36,10 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="flex flex-col min-h-screen">
       <Header />
-      <main>{children}</main>
+      <main className="flex-1">{children}</main>
+      <Footer />
     </div>
   );
 }

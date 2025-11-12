@@ -133,7 +133,7 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Create app/[locale]/(dashboard)/my-registrations/page.tsx for user's registrations
   - _Requirements: 2.1, 2.3, 2.4, 3.1, 3.5_
 
-- [ ] 13. Implement layout components
+- [x] 13. Implement layout components
   - Create components/layout/Header.tsx with navigation, auth status, ThemeToggle, and LanguageSwitcher
   - Create components/layout/Footer.tsx with basic information
   - Create app/[locale]/(dashboard)/layout.tsx with Header and protected route logic
