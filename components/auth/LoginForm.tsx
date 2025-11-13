@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { AnimatedFormField } from '@/components/shared/AnimatedFormField';
-import { toast } from 'sonner';
+import { handleApiError, showSuccessToast } from '@/lib/error-handler';
 
 export function LoginForm() {
   const router = useRouter();
@@ -36,10 +36,10 @@ export function LoginForm() {
     setIsLoading(true);
     try {
       await login(data);
-      toast.success('Successfully logged in!');
+      showSuccessToast('Welcome back!', 'Login Successful');
       router.push('/events');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to login. Please check your credentials.');
+      handleApiError(error, 'Login Failed');
     } finally {
       setIsLoading(false);
     }

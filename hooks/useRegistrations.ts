@@ -17,7 +17,7 @@ import {
 import { Registration, CreateRegistrationRequest } from '@/types/registration';
 import { PaginatedResponse } from '@/types/api';
 import { Event } from '@/types/event';
-import { toast } from 'sonner';
+import { handleApiError, showSuccessToast, showErrorToast } from '@/lib/error-handler';
 import { eventKeys } from './useEvents';
 
 // Query keys for cache management
@@ -134,14 +134,7 @@ export const useCreateRegistration = () => {
         );
       }
 
-      // Handle specific error cases
-      if (error.message.includes('full capacity')) {
-        toast.error('This event is at full capacity');
-      } else if (error.message.includes('already registered')) {
-        toast.error('You are already registered for this event');
-      } else {
-        toast.error(error.message || 'Failed to register for event');
-      }
+      handleApiError(error, 'Registration Failed');
     },
     onSuccess: (newRegistration) => {
       // Invalidate relevant queries
@@ -161,7 +154,7 @@ export const useCreateRegistration = () => {
         queryKey: eventKeys.lists() 
       });
 
-      toast.success('Successfully registered for event!');
+      showSuccessToast('You have been successfully registered for this event!', 'Registration Successful');
     },
   });
 };
@@ -203,7 +196,7 @@ export const useCancelRegistration = () => {
           context.previousEvent
         );
       }
-      toast.error(error.message || 'Failed to cancel registration');
+      handleApiError(error, 'Failed to Cancel Registration');
     },
     onSuccess: (_, { eventId }) => {
       // Invalidate relevant queries
@@ -223,7 +216,7 @@ export const useCancelRegistration = () => {
         queryKey: eventKeys.lists() 
       });
 
-      toast.success('Registration cancelled successfully');
+      showSuccessToast('Your registration has been cancelled successfully.', 'Registration Cancelled');
     },
   });
 };

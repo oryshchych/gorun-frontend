@@ -16,7 +16,7 @@ import {
 } from '@/lib/api/events';
 import { Event, CreateEventRequest, UpdateEventRequest } from '@/types/event';
 import { PaginatedResponse } from '@/types/api';
-import { toast } from 'sonner';
+import { handleApiError, showSuccessToast } from '@/lib/error-handler';
 
 // Query keys for cache management
 export const eventKeys = {
@@ -76,10 +76,10 @@ export const useCreateEvent = () => {
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
       queryClient.invalidateQueries({ queryKey: eventKeys.myEvents() });
       
-      toast.success('Event created successfully!');
+      showSuccessToast('Your event has been created successfully!', 'Event Created');
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to create event');
+      handleApiError(error, 'Failed to Create Event');
     },
   });
 };
@@ -114,7 +114,7 @@ export const useUpdateEvent = (id: string) => {
       if (context?.previousEvent) {
         queryClient.setQueryData(eventKeys.detail(id), context.previousEvent);
       }
-      toast.error(error.message || 'Failed to update event');
+      handleApiError(error, 'Failed to Update Event');
     },
     onSuccess: (updatedEvent) => {
       // Update cache with server response
@@ -124,7 +124,7 @@ export const useUpdateEvent = (id: string) => {
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
       queryClient.invalidateQueries({ queryKey: eventKeys.myEvents() });
       
-      toast.success('Event updated successfully!');
+      showSuccessToast('Your event has been updated successfully!', 'Event Updated');
     },
   });
 };
@@ -154,14 +154,14 @@ export const useDeleteEvent = () => {
       if (context?.previousEvent) {
         queryClient.setQueryData(eventKeys.detail(eventId), context.previousEvent);
       }
-      toast.error(error.message || 'Failed to delete event');
+      handleApiError(error, 'Failed to Delete Event');
     },
     onSuccess: () => {
       // Invalidate lists to refetch
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
       queryClient.invalidateQueries({ queryKey: eventKeys.myEvents() });
       
-      toast.success('Event deleted successfully!');
+      showSuccessToast('The event has been deleted successfully!', 'Event Deleted');
     },
   });
 };

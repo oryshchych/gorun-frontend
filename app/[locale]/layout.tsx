@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/layout/ThemeProvider';
 import { AuthProvider } from '@/hooks/useAuth';
 import { QueryProvider } from '@/components/providers/QueryProvider';
 import { Toaster } from '@/components/ui/sonner';
+import ErrorBoundary from '@/components/shared/ErrorBoundary';
 import '../globals.css';
 
 export function generateStaticParams() {
@@ -42,7 +43,9 @@ export default async function LocaleLayout({
           <QueryProvider>
             <NextIntlClientProvider messages={messages}>
               <AuthProvider>
-                {children}
+                <ErrorBoundary>
+                  {children}
+                </ErrorBoundary>
                 <Toaster />
               </AuthProvider>
             </NextIntlClientProvider>

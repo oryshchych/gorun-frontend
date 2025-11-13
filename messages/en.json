@@ -74,5 +74,21 @@
     "capacityPositive": "Capacity must be a positive number",
     "dateInFuture": "Date must be in the future",
     "urlInvalid": "Invalid URL"
+  },
+  "errors": {
+    "somethingWentWrong": "Something went wrong",
+    "unexpectedError": "An unexpected error occurred. Please try again.",
+    "tryAgain": "Try Again",
+    "goHome": "Go Home",
+    "networkError": "Unable to connect to the server. Please check your internet connection.",
+    "serverError": "Something went wrong on our end. Please try again later.",
+    "unauthorized": "You need to be logged in to perform this action.",
+    "forbidden": "You do not have permission to perform this action.",
+    "notFound": "The requested resource was not found.",
+    "eventNotFound": "The event you are looking for does not exist.",
+    "eventFull": "This event has reached maximum capacity.",
+    "alreadyRegistered": "You are already registered for this event.",
+    "invalidCredentials": "The email or password you entered is incorrect.",
+    "emailExists": "An account with this email already exists."
   }
 }

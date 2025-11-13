@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { AnimatedFormField } from '@/components/shared/AnimatedFormField';
-import { toast } from 'sonner';
+import { handleApiError, showSuccessToast } from '@/lib/error-handler';
 
 export function RegisterForm() {
   const router = useRouter();
@@ -42,10 +42,10 @@ export function RegisterForm() {
         email: data.email,
         password: data.password,
       });
-      toast.success('Account created successfully!');
+      showSuccessToast('Your account has been created successfully!', 'Registration Successful');
       router.push('/events');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create account. Please try again.');
+      handleApiError(error, 'Registration Failed');
     } finally {
       setIsLoading(false);
     }
