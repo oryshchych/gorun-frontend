@@ -84,11 +84,31 @@
     "serverError": "Something went wrong on our end. Please try again later.",
     "unauthorized": "You need to be logged in to perform this action.",
     "forbidden": "You do not have permission to perform this action.",
-    "notFound": "The requested resource was not found.",
+    "notFound": "Page Not Found",
+    "notFoundDescription": "The page you're looking for doesn't exist or has been moved.",
     "eventNotFound": "The event you are looking for does not exist.",
     "eventFull": "This event has reached maximum capacity.",
     "alreadyRegistered": "You are already registered for this event.",
     "invalidCredentials": "The email or password you entered is incorrect.",
-    "emailExists": "An account with this email already exists."
+    "emailExists": "An account with this email already exists.",
+    "helpfulLinks": "Here are some helpful links:",
+    "allEvents": "All Events",
+    "myEvents": "My Events",
+    "myRegistrations": "My Registrations",
+    "browseEvents": "Browse Events"
+  },
+  "home": {
+    "badge": "Discover Amazing Events",
+    "title": "Connect Through Events",
+    "subtitle": "Discover, create, and join events that matter to you. Build connections and create memorable experiences.",
+    "browseEvents": "Browse Events",
+    "createEvent": "Create Event",
+    "getStarted": "Get Started",
+    "activeEvents": "Active Events",
+    "community": "Community",
+    "availability": "Available",
+    "featuredEvents": "Featured Events",
+    "featuredEventsSubtitle": "Discover upcoming events happening in your area",
+    "viewAllEvents": "View All Events"
   }
 }

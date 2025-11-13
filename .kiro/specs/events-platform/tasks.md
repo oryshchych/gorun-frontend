@@ -165,7 +165,7 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Test color contrast for accessibility compliance
   - _Requirements: 6.1, 6.2, 6.3_
 
-- [ ] 17. Implement home page and routing
+- [x] 17. Implement home page and routing
   - Create app/[locale]/page.tsx as landing page with featured events
   - Add hero section with call-to-action buttons
   - Implement middleware for authentication redirects
