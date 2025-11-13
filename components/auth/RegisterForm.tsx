@@ -53,23 +53,28 @@ export function RegisterForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" aria-label="Registration form">
         <FormField
           control={form.control}
           name="name"
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel htmlFor="register-name">Name</FormLabel>
                 <FormControl>
                   <Input
+                    id="register-name"
                     type="text"
                     placeholder="John Doe"
                     disabled={isLoading}
+                    autoComplete="name"
+                    aria-required="true"
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "register-name-error" : undefined}
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="register-name-error" />
               </FormItem>
             </AnimatedFormField>
           )}
@@ -81,16 +86,21 @@ export function RegisterForm() {
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel htmlFor="register-email">Email</FormLabel>
                 <FormControl>
                   <Input
+                    id="register-email"
                     type="email"
                     placeholder="your@email.com"
                     disabled={isLoading}
+                    autoComplete="email"
+                    aria-required="true"
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "register-email-error" : undefined}
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="register-email-error" />
               </FormItem>
             </AnimatedFormField>
           )}
@@ -102,16 +112,21 @@ export function RegisterForm() {
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel htmlFor="register-password">Password</FormLabel>
                 <FormControl>
                   <Input
+                    id="register-password"
                     type="password"
                     placeholder="••••••••"
                     disabled={isLoading}
+                    autoComplete="new-password"
+                    aria-required="true"
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "register-password-error" : undefined}
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="register-password-error" />
               </FormItem>
             </AnimatedFormField>
           )}
@@ -123,22 +138,32 @@ export function RegisterForm() {
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
+                <FormLabel htmlFor="register-confirm-password">Confirm Password</FormLabel>
                 <FormControl>
                   <Input
+                    id="register-confirm-password"
                     type="password"
                     placeholder="••••••••"
                     disabled={isLoading}
+                    autoComplete="new-password"
+                    aria-required="true"
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "register-confirm-password-error" : undefined}
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="register-confirm-password-error" />
               </FormItem>
             </AnimatedFormField>
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button 
+          type="submit" 
+          className="w-full" 
+          disabled={isLoading}
+          aria-label={isLoading ? 'Creating account' : 'Create a new account'}
+        >
           {isLoading ? 'Creating account...' : 'Create Account'}
         </Button>
       </form>

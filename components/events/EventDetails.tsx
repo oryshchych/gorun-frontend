@@ -151,17 +151,18 @@ export function EventDetails({ event }: EventDetailsProps) {
 
             {/* Action Buttons for Organizer */}
             {isOrganizer && (
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={handleEdit}>
-                  <Edit className="w-4 h-4 mr-2" />
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={handleEdit} aria-label="Edit this event">
+                  <Edit className="w-4 h-4 mr-2" aria-hidden="true" />
                   {tCommon('edit')}
                 </Button>
                 <Button
                   variant="destructive"
                   size="sm"
                   onClick={() => setShowDeleteDialog(true)}
+                  aria-label="Delete this event"
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
+                  <Trash2 className="w-4 h-4 mr-2" aria-hidden="true" />
                   {tCommon('delete')}
                 </Button>
               </div>
@@ -171,38 +172,38 @@ export function EventDetails({ event }: EventDetailsProps) {
 
         <CardContent className="space-y-6">
           {/* Event Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex items-center gap-3">
-              <Calendar className="w-5 h-5 text-muted-foreground" />
-              <div>
+              <Calendar className="w-5 h-5 text-muted-foreground shrink-0" aria-hidden="true" />
+              <div className="min-w-0">
                 <p className="text-sm text-muted-foreground">{t('date')}</p>
-                <p className="font-medium">{formattedDate}</p>
+                <p className="font-medium break-words">{formattedDate}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <MapPin className="w-5 h-5 text-muted-foreground" />
-              <div>
+              <MapPin className="w-5 h-5 text-muted-foreground shrink-0" aria-hidden="true" />
+              <div className="min-w-0">
                 <p className="text-sm text-muted-foreground">{t('location')}</p>
-                <p className="font-medium">{event.location}</p>
+                <p className="font-medium break-words">{event.location}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <Users className="w-5 h-5 text-muted-foreground" />
-              <div>
+              <Users className="w-5 h-5 text-muted-foreground shrink-0" aria-hidden="true" />
+              <div className="min-w-0">
                 <p className="text-sm text-muted-foreground">{t('capacity')}</p>
-                <p className="font-medium">
+                <p className="font-medium" aria-label={`${event.registeredCount} registered out of ${event.capacity} capacity`}>
                   {event.registeredCount} / {event.capacity}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <User className="w-5 h-5 text-muted-foreground" />
-              <div>
+              <User className="w-5 h-5 text-muted-foreground shrink-0" aria-hidden="true" />
+              <div className="min-w-0">
                 <p className="text-sm text-muted-foreground">{t('organizer')}</p>
-                <p className="font-medium">{event.organizer.name}</p>
+                <p className="font-medium break-words">{event.organizer.name}</p>
               </div>
             </div>
           </div>
@@ -219,8 +220,8 @@ export function EventDetails({ event }: EventDetailsProps) {
           {!isOrganizer && isAuthenticated && (
             <div className="pt-4">
               {checkingRegistration ? (
-                <Button disabled className="w-full md:w-auto">
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Button disabled className="w-full md:w-auto" aria-label="Checking registration status">
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
                   {tCommon('loading')}
                 </Button>
               ) : isRegistered ? (
@@ -229,9 +230,10 @@ export function EventDetails({ event }: EventDetailsProps) {
                   onClick={handleCancelRegistration}
                   disabled={cancelRegistration.isPending}
                   className="w-full md:w-auto"
+                  aria-label="Cancel your registration for this event"
                 >
                   {cancelRegistration.isPending && (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
                   )}
                   {t('cancelRegistration')}
                 </Button>
@@ -240,9 +242,11 @@ export function EventDetails({ event }: EventDetailsProps) {
                   onClick={handleRegister}
                   disabled={isFull || createRegistration.isPending}
                   className="w-full md:w-auto"
+                  aria-label={isFull ? "Event is full" : "Register for this event"}
+                  aria-disabled={isFull}
                 >
                   {createRegistration.isPending && (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />
                   )}
                   {isFull ? t('eventFull') : t('register')}
                 </Button>
@@ -252,7 +256,7 @@ export function EventDetails({ event }: EventDetailsProps) {
 
           {!isAuthenticated && !isOrganizer && (
             <div className="pt-4">
-              <Button onClick={handleRegister} className="w-full md:w-auto">
+              <Button onClick={handleRegister} className="w-full md:w-auto" aria-label="Login to register for this event">
                 {t('register')}
               </Button>
             </div>
@@ -261,14 +265,18 @@ export function EventDetails({ event }: EventDetailsProps) {
           {/* Registered Attendees (for organizers) */}
           {isOrganizer && registrationsData && registrationsData.data.length > 0 && (
             <div className="pt-4 border-t">
-              <h3 className="font-semibold text-lg mb-4">
+              <h3 className="font-semibold text-lg mb-4" id="attendees-heading">
                 {t('registeredCount')}: {registrationsData.data.length}
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div 
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+                role="list"
+                aria-labelledby="attendees-heading"
+              >
                 {registrationsData.data.map((registration) => (
-                  <Card key={registration.id} className="p-3">
+                  <Card key={registration.id} className="p-3" role="listitem">
                     <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-muted-foreground" />
+                      <User className="w-4 h-4 text-muted-foreground shrink-0" aria-hidden="true" />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">
                           {registration.user.name}

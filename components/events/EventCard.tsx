@@ -29,7 +29,11 @@ export function EventCard({ event }: EventCardProps) {
   const formattedDate = format(new Date(event.date), 'PPP', { locale: dateLocale });
 
   return (
-    <Link href={`/${locale}/events/${event.id}`}>
+    <Link 
+      href={`/${locale}/events/${event.id}`}
+      aria-label={`View details for ${event.title}`}
+      className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg block"
+    >
       <motion.div
         whileHover={{ 
           scale: 1.03, 
@@ -39,35 +43,35 @@ export function EventCard({ event }: EventCardProps) {
         whileTap={{ scale: 0.98 }}
         className="h-full"
       >
-        <Card className="h-full overflow-hidden hover:shadow-2xl transition-shadow duration-300 cursor-pointer">
+        <Card className="h-full overflow-hidden hover:shadow-2xl transition-shadow duration-300 cursor-pointer" role="article">
           {/* Event Image */}
-          <div className="relative w-full h-48 bg-muted">
+          <div className="relative w-full h-48 bg-muted" role="img" aria-label={event.imageUrl ? `Event image for ${event.title}` : 'No event image'}>
             {event.imageUrl ? (
               <Image
                 src={event.imageUrl}
-                alt={event.title}
+                alt={`Event image for ${event.title}`}
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-primary/10 to-primary/5">
-                <Calendar className="w-16 h-16 text-muted-foreground/30" />
+                <Calendar className="w-16 h-16 text-muted-foreground/30" aria-hidden="true" />
               </div>
             )}
             
             {/* Capacity Badge */}
             <div className="absolute top-3 right-3">
               {isFull ? (
-                <Badge variant="destructive" className="shadow-md">
+                <Badge variant="destructive" className="shadow-md" aria-label="Event is full">
                   {t('eventFull')}
                 </Badge>
               ) : isAlmostFull ? (
-                <Badge variant="secondary" className="shadow-md">
+                <Badge variant="secondary" className="shadow-md" aria-label={`${availableSpots} spots available`}>
                   {availableSpots} {t('availableSpots')}
                 </Badge>
               ) : (
-                <Badge variant="default" className="shadow-md">
+                <Badge variant="default" className="shadow-md" aria-label={`${availableSpots} spots available`}>
                   {availableSpots} {t('availableSpots')}
                 </Badge>
               )}
@@ -84,20 +88,20 @@ export function EventCard({ event }: EventCardProps) {
             <div className="space-y-2 text-sm text-muted-foreground">
               {/* Date */}
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 shrink-0" />
-                <span className="truncate">{formattedDate}</span>
+                <Calendar className="w-4 h-4 shrink-0" aria-hidden="true" />
+                <span className="truncate" aria-label={`Event date: ${formattedDate}`}>{formattedDate}</span>
               </div>
 
               {/* Location */}
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 shrink-0" />
-                <span className="truncate">{event.location}</span>
+                <MapPin className="w-4 h-4 shrink-0" aria-hidden="true" />
+                <span className="truncate" aria-label={`Location: ${event.location}`}>{event.location}</span>
               </div>
 
               {/* Capacity */}
               <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 shrink-0" />
-                <span>
+                <Users className="w-4 h-4 shrink-0" aria-hidden="true" />
+                <span aria-label={`${event.registeredCount} registered out of ${event.capacity} capacity`}>
                   {event.registeredCount} / {event.capacity}
                 </span>
               </div>

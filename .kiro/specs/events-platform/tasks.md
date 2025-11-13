@@ -157,7 +157,7 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Implement loading states for all async operations
   - _Requirements: 1.3, 2.2, 7.4, 8.3_
 
-- [ ] 16. Add responsive design and accessibility
+- [x] 16. Add responsive design and accessibility
   - Ensure all pages are responsive using Tailwind breakpoints (sm, md, lg, xl)
   - Test mobile navigation and forms on small screens
   - Add proper ARIA labels to interactive elements

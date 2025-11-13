@@ -47,23 +47,28 @@ export function LoginForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" aria-label="Login form">
         <FormField
           control={form.control}
           name="email"
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel htmlFor="login-email">Email</FormLabel>
                 <FormControl>
                   <Input
+                    id="login-email"
                     type="email"
                     placeholder="your@email.com"
                     disabled={isLoading}
+                    autoComplete="email"
+                    aria-required="true"
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "login-email-error" : undefined}
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="login-email-error" />
               </FormItem>
             </AnimatedFormField>
           )}
@@ -75,22 +80,32 @@ export function LoginForm() {
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel htmlFor="login-password">Password</FormLabel>
                 <FormControl>
                   <Input
+                    id="login-password"
                     type="password"
                     placeholder="••••••••"
                     disabled={isLoading}
+                    autoComplete="current-password"
+                    aria-required="true"
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "login-password-error" : undefined}
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="login-password-error" />
               </FormItem>
             </AnimatedFormField>
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button 
+          type="submit" 
+          className="w-full" 
+          disabled={isLoading}
+          aria-label={isLoading ? 'Logging in' : 'Login to your account'}
+        >
           {isLoading ? 'Logging in...' : 'Login'}
         </Button>
       </form>

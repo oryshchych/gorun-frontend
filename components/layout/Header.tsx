@@ -43,28 +43,40 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-6">
-          <Link href={`/${locale}`} className="flex items-center space-x-2">
-            <Calendar className="h-6 w-6" />
+      {/* Skip to main content link for accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+      >
+        Skip to main content
+      </a>
+      
+      <div className="container flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-4 sm:gap-6">
+          <Link 
+            href={`/${locale}`} 
+            className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
+            aria-label="Events Platform Home"
+          >
+            <Calendar className="h-6 w-6" aria-hidden="true" />
             <span className="font-bold text-xl hidden sm:inline">Events Platform</span>
             <span className="font-bold text-lg sm:hidden">Events</span>
           </Link>
 
           {isAuthenticated && (
-            <nav className="hidden md:flex items-center gap-4">
+            <nav className="hidden md:flex items-center gap-4" aria-label="Main navigation">
               <Link href={`/${locale}/events`}>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" aria-label="View all events">
                   {tNav('events')}
                 </Button>
               </Link>
               <Link href={`/${locale}/my-events`}>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" aria-label="View my events">
                   {tNav('myEvents')}
                 </Button>
               </Link>
               <Link href={`/${locale}/my-registrations`}>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" aria-label="View my registrations">
                   {tNav('myRegistrations')}
                 </Button>
               </Link>
@@ -123,24 +135,26 @@ export default function Header() {
                 size="icon"
                 className="md:hidden"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label="Toggle mobile menu"
+                aria-label={mobileMenuOpen ? "Close mobile menu" : "Open mobile menu"}
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-navigation"
               >
                 {mobileMenuOpen ? (
-                  <X className="h-5 w-5" />
+                  <X className="h-5 w-5" aria-hidden="true" />
                 ) : (
-                  <Menu className="h-5 w-5" />
+                  <Menu className="h-5 w-5" aria-hidden="true" />
                 )}
               </Button>
             </>
           ) : (
             <div className="flex items-center gap-2">
               <Link href={`/${locale}/login`}>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" aria-label="Login to your account">
                   {tNav('login')}
                 </Button>
               </Link>
               <Link href={`/${locale}/register`} className="hidden sm:inline-block">
-                <Button size="sm">{tNav('register')}</Button>
+                <Button size="sm" aria-label="Create a new account">{tNav('register')}</Button>
               </Link>
             </div>
           )}
@@ -149,29 +163,29 @@ export default function Header() {
 
       {/* Mobile navigation menu */}
       {isAuthenticated && mobileMenuOpen && (
-        <div className="md:hidden border-t">
-          <nav className="container py-4 flex flex-col gap-2">
+        <div className="md:hidden border-t" id="mobile-navigation">
+          <nav className="container py-4 flex flex-col gap-2 px-4" aria-label="Mobile navigation">
             <Link href={`/${locale}/events`} onClick={closeMobileMenu}>
-              <Button variant="ghost" className="w-full justify-start" size="sm">
-                <Calendar className="mr-2 h-4 w-4" />
+              <Button variant="ghost" className="w-full justify-start" size="sm" aria-label="View all events">
+                <Calendar className="mr-2 h-4 w-4" aria-hidden="true" />
                 {tNav('events')}
               </Button>
             </Link>
             <Link href={`/${locale}/events/create`} onClick={closeMobileMenu}>
-              <Button variant="ghost" className="w-full justify-start" size="sm">
-                <CalendarPlus className="mr-2 h-4 w-4" />
+              <Button variant="ghost" className="w-full justify-start" size="sm" aria-label="Create new event">
+                <CalendarPlus className="mr-2 h-4 w-4" aria-hidden="true" />
                 {tNav('createEvent')}
               </Button>
             </Link>
             <Link href={`/${locale}/my-events`} onClick={closeMobileMenu}>
-              <Button variant="ghost" className="w-full justify-start" size="sm">
-                <Calendar className="mr-2 h-4 w-4" />
+              <Button variant="ghost" className="w-full justify-start" size="sm" aria-label="View my events">
+                <Calendar className="mr-2 h-4 w-4" aria-hidden="true" />
                 {tNav('myEvents')}
               </Button>
             </Link>
             <Link href={`/${locale}/my-registrations`} onClick={closeMobileMenu}>
-              <Button variant="ghost" className="w-full justify-start" size="sm">
-                <Calendar className="mr-2 h-4 w-4" />
+              <Button variant="ghost" className="w-full justify-start" size="sm" aria-label="View my registrations">
+                <Calendar className="mr-2 h-4 w-4" aria-hidden="true" />
                 {tNav('myRegistrations')}
               </Button>
             </Link>

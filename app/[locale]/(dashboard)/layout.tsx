@@ -42,12 +42,15 @@ export default function DashboardLayout({
       <Header />
       <AnimatePresence mode="wait">
         <motion.main
+          id="main-content"
           key={pathname}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3, ease: 'easeInOut' }}
           className="flex-1"
+          role="main"
+          aria-label="Main content"
         >
           {children}
         </motion.main>

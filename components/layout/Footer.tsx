@@ -10,13 +10,17 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t bg-background">
-      <div className="container py-8 md:py-12">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+    <footer className="border-t bg-background" role="contentinfo">
+      <div className="container py-8 md:py-12 px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {/* Brand section */}
           <div className="flex flex-col gap-4">
-            <Link href={`/${locale}`} className="flex items-center space-x-2">
-              <Calendar className="h-6 w-6" />
+            <Link 
+              href={`/${locale}`} 
+              className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
+              aria-label="Events Platform Home"
+            >
+              <Calendar className="h-6 w-6" aria-hidden="true" />
               <span className="font-bold text-xl">Events Platform</span>
             </Link>
             <p className="text-sm text-muted-foreground">
@@ -28,25 +32,31 @@ export default function Footer() {
 
           {/* Navigation links */}
           <div className="flex flex-col gap-4">
-            <h3 className="font-semibold">
+            <h3 className="font-semibold" id="footer-navigation-heading">
               {locale === 'uk' ? 'Навігація' : 'Navigation'}
             </h3>
-            <nav className="flex flex-col gap-2 text-sm">
+            <nav 
+              className="flex flex-col gap-2 text-sm"
+              aria-labelledby="footer-navigation-heading"
+            >
               <Link 
                 href={`/${locale}/events`} 
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
+                aria-label="View all events"
               >
                 {tNav('events')}
               </Link>
               <Link 
                 href={`/${locale}/my-events`} 
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
+                aria-label="View my events"
               >
                 {tNav('myEvents')}
               </Link>
               <Link 
                 href={`/${locale}/my-registrations`} 
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
+                aria-label="View my registrations"
               >
                 {tNav('myRegistrations')}
               </Link>

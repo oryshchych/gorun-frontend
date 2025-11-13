@@ -86,7 +86,7 @@ export function EventForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6" aria-label="Event form">
         {/* Title */}
         <FormField
           control={form.control}
@@ -94,15 +94,19 @@ export function EventForm({
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel>{t('eventTitle')}</FormLabel>
+                <FormLabel htmlFor="event-title">{t('eventTitle')}</FormLabel>
                 <FormControl>
                   <Input
+                    id="event-title"
                     placeholder={t('eventTitle')}
                     {...field}
                     disabled={isLoading}
+                    aria-required="true"
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "event-title-error" : undefined}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="event-title-error" />
               </FormItem>
             </AnimatedFormField>
           )}
@@ -115,16 +119,20 @@ export function EventForm({
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel>{t('description')}</FormLabel>
+                <FormLabel htmlFor="event-description">{t('description')}</FormLabel>
                 <FormControl>
                   <textarea
+                    id="event-description"
                     placeholder={t('description')}
                     className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                     {...field}
                     disabled={isLoading}
+                    aria-required="true"
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "event-description-error" : undefined}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="event-description-error" />
               </FormItem>
             </AnimatedFormField>
           )}
@@ -137,9 +145,10 @@ export function EventForm({
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel>{t('date')}</FormLabel>
+                <FormLabel htmlFor="event-date">{t('date')}</FormLabel>
                 <FormControl>
                   <Input
+                    id="event-date"
                     type="datetime-local"
                     {...field}
                     value={
@@ -152,9 +161,12 @@ export function EventForm({
                       field.onChange(date);
                     }}
                     disabled={isLoading}
+                    aria-required="true"
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "event-date-error" : undefined}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="event-date-error" />
               </FormItem>
             </AnimatedFormField>
           )}
@@ -167,15 +179,19 @@ export function EventForm({
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel>{t('location')}</FormLabel>
+                <FormLabel htmlFor="event-location">{t('location')}</FormLabel>
                 <FormControl>
                   <Input
+                    id="event-location"
                     placeholder={t('location')}
                     {...field}
                     disabled={isLoading}
+                    aria-required="true"
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "event-location-error" : undefined}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="event-location-error" />
               </FormItem>
             </AnimatedFormField>
           )}
@@ -188,17 +204,22 @@ export function EventForm({
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel>{t('capacity')}</FormLabel>
+                <FormLabel htmlFor="event-capacity">{t('capacity')}</FormLabel>
                 <FormControl>
                   <Input
+                    id="event-capacity"
                     type="number"
                     placeholder={t('capacity')}
                     {...field}
                     onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
                     disabled={isLoading}
+                    aria-required="true"
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "event-capacity-error" : undefined}
+                    min="1"
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="event-capacity-error" />
               </FormItem>
             </AnimatedFormField>
           )}
@@ -211,16 +232,19 @@ export function EventForm({
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel>{t('imageUrl')}</FormLabel>
+                <FormLabel htmlFor="event-image-url">{t('imageUrl')}</FormLabel>
                 <FormControl>
                   <Input
+                    id="event-image-url"
                     type="url"
                     placeholder="https://example.com/image.jpg"
                     {...field}
                     disabled={isLoading}
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={fieldState.error ? "event-image-url-error" : undefined}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage id="event-image-url-error" />
               </FormItem>
             </AnimatedFormField>
           )}
@@ -234,10 +258,12 @@ export function EventForm({
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
             className="relative w-full h-48 rounded-lg overflow-hidden border"
+            role="img"
+            aria-label="Event image preview"
           >
             <Image
               src={imagePreview}
-              alt="Preview"
+              alt="Event image preview"
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 600px"
@@ -246,8 +272,13 @@ export function EventForm({
         )}
 
         {/* Submit Button */}
-        <Button type="submit" disabled={isLoading} className="w-full">
-          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <Button 
+          type="submit" 
+          disabled={isLoading} 
+          className="w-full"
+          aria-label={submitLabel || tCommon('submit')}
+        >
+          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
           {submitLabel || tCommon('submit')}
         </Button>
       </form>
