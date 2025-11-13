@@ -11,7 +11,22 @@
     "back": "Назад",
     "next": "Далі",
     "submit": "Надіслати",
-    "search": "Пошук"
+    "search": "Пошук",
+    "close": "Закрити",
+    "confirm": "Підтвердити",
+    "yes": "Так",
+    "no": "Ні",
+    "ok": "Гаразд",
+    "apply": "Застосувати",
+    "reset": "Скинути",
+    "clear": "Очистити",
+    "filter": "Фільтр",
+    "sort": "Сортувати",
+    "view": "Переглянути",
+    "download": "Завантажити",
+    "upload": "Вивантажити",
+    "refresh": "Оновити",
+    "retry": "Повторити"
   },
   "nav": {
     "home": "Головна",
@@ -22,7 +37,17 @@
     "login": "Увійти",
     "register": "Зареєструватися",
     "logout": "Вийти",
-    "profile": "Профіль"
+    "profile": "Профіль",
+    "settings": "Налаштування",
+    "help": "Допомога",
+    "about": "Про нас",
+    "contact": "Контакти",
+    "skipToMainContent": "Перейти до основного вмісту",
+    "openMenu": "Відкрити меню",
+    "closeMenu": "Закрити меню",
+    "userMenu": "Меню користувача",
+    "mainNavigation": "Головна навігація",
+    "mobileNavigation": "Мобільна навігація"
   },
   "auth": {
     "login": "Вхід",
@@ -36,11 +61,27 @@
     "dontHaveAccount": "Немає акаунту?",
     "loginError": "Помилка входу",
     "registerError": "Помилка реєстрації",
-    "invalidCredentials": "Невірні облікові дані"
+    "invalidCredentials": "Невірні облікові дані",
+    "loggingIn": "Вхід...",
+    "creatingAccount": "Створення акаунту...",
+    "createAccount": "Створити акаунт",
+    "welcomeBack": "З поверненням!",
+    "loginSuccessful": "Вхід успішний",
+    "registrationSuccessful": "Реєстрація успішна",
+    "accountCreated": "Ваш акаунт успішно створено!",
+    "loginFailed": "Помилка входу",
+    "registrationFailed": "Помилка реєстрації",
+    "loggedOutSuccessfully": "Ви успішно вийшли",
+    "failedToLogout": "Не вдалося вийти",
+    "emailPlaceholder": "ваша@пошта.com",
+    "passwordPlaceholder": "••••••••",
+    "namePlaceholder": "Іван Іваненко"
   },
   "events": {
     "title": "Події",
     "noEvents": "Немає подій",
+    "noEventsFound": "Події не знайдено",
+    "noEventsDescription": "Наразі немає доступних подій. Перевірте пізніше або створіть власну подію!",
     "eventDetails": "Деталі події",
     "createEvent": "Створити подію",
     "editEvent": "Редагувати подію",
@@ -59,7 +100,28 @@
     "eventFull": "Подія заповнена",
     "registrationSuccess": "Реєстрація успішна",
     "registrationError": "Помилка реєстрації",
-    "alreadyRegistered": "Ви вже зареєстровані"
+    "alreadyRegistered": "Ви вже зареєстровані",
+    "eventCreated": "Подію успішно створено",
+    "eventUpdated": "Подію успішно оновлено",
+    "eventDeleted": "Подію успішно видалено",
+    "eventCreationFailed": "Не вдалося створити подію",
+    "eventUpdateFailed": "Не вдалося оновити подію",
+    "eventDeletionFailed": "Не вдалося видалити подію",
+    "confirmDelete": "Ви впевнені, що хочете видалити цю подію? Цю дію не можна скасувати.",
+    "deleteEventTitle": "Видалити подію",
+    "registeredSuccessfully": "Ви успішно зареєструвалися на цю подію!",
+    "registrationCancelled": "Вашу реєстрацію скасовано",
+    "failedToRegister": "Не вдалося зареєструватися на подію",
+    "failedToCancelRegistration": "Не вдалося скасувати реєстрацію",
+    "loadingEvents": "Завантаження подій...",
+    "loadingEventDetails": "Завантаження деталей події...",
+    "checkingRegistration": "Перевірка статусу реєстрації...",
+    "imagePreview": "Попередній перегляд зображення",
+    "noImageProvided": "Зображення не надано",
+    "attendees": "Учасники",
+    "viewDetails": "Переглянути деталі",
+    "spotsLeft": "місць залишилось",
+    "almostFull": "Майже заповнено"
   },
   "validation": {
     "required": "Це поле обов'язкове",
@@ -71,9 +133,14 @@
     "descriptionMin": "Опис має містити мінімум 10 символів",
     "descriptionMax": "Опис має містити максимум 2000 символів",
     "locationMin": "Місце має містити мінімум 3 символи",
+    "locationMax": "Місце має містити максимум 200 символів",
     "capacityPositive": "Місткість має бути позитивним числом",
+    "capacityMax": "Місткість має бути не більше 10000",
     "dateInFuture": "Дата має бути в майбутньому",
-    "urlInvalid": "Невірний URL"
+    "urlInvalid": "Невірний URL",
+    "nameMin": "Ім'я має містити мінімум 2 символи",
+    "nameMax": "Ім'я має містити максимум 50 символів",
+    "passwordMax": "Пароль має містити максимум 100 символів"
   },
   "errors": {
     "somethingWentWrong": "Щось пішло не так",
@@ -95,7 +162,11 @@
     "allEvents": "Всі події",
     "myEvents": "Мої події",
     "myRegistrations": "Мої реєстрації",
-    "browseEvents": "Переглянути події"
+    "browseEvents": "Переглянути події",
+    "badRequest": "Невірний запит. Будь ласка, перевірте введені дані.",
+    "conflict": "Виникла конфліктна ситуація. Будь ласка, спробуйте ще раз.",
+    "tooManyRequests": "Забагато запитів. Будь ласка, зачекайте.",
+    "serviceUnavailable": "Сервіс тимчасово недоступний. Будь ласка, спробуйте пізніше."
   },
   "home": {
     "badge": "Відкрийте для себе дивовижні події",
@@ -109,6 +180,64 @@
     "availability": "Доступно",
     "featuredEvents": "Рекомендовані події",
     "featuredEventsSubtitle": "Відкрийте для себе майбутні події у вашому районі",
-    "viewAllEvents": "Переглянути всі події"
+    "viewAllEvents": "Переглянути всі події",
+    "welcomeTo": "Ласкаво просимо до",
+    "platformName": "Платформи подій"
+  },
+  "accessibility": {
+    "skipToMainContent": "Перейти до основного вмісту",
+    "openMobileMenu": "Відкрити мобільне меню",
+    "closeMobileMenu": "Закрити мобільне меню",
+    "userMenu": "Меню користувача",
+    "viewAllEvents": "Переглянути всі події",
+    "viewMyEvents": "Переглянути мої події",
+    "viewMyRegistrations": "Переглянути мої реєстрації",
+    "createNewEvent": "Створити нову подію",
+    "editThisEvent": "Редагувати цю подію",
+    "deleteThisEvent": "Видалити цю подію",
+    "loginToAccount": "Увійти до акаунту",
+    "createNewAccount": "Створити новий акаунт",
+    "registerForEvent": "Зареєструватися на подію",
+    "cancelEventRegistration": "Скасувати реєстрацію на подію",
+    "eventImage": "Зображення події",
+    "eventImagePreview": "Попередній перегляд зображення події",
+    "noEventImage": "Немає зображення події",
+    "loading": "Завантаження",
+    "checkingRegistrationStatus": "Перевірка статусу реєстрації",
+    "eventIsFull": "Подія заповнена",
+    "loginToRegister": "Увійдіть, щоб зареєструватися на подію"
+  },
+  "theme": {
+    "light": "Світла",
+    "dark": "Темна",
+    "system": "Системна",
+    "toggleTheme": "Перемкнути тему",
+    "switchToLight": "Перемкнути на світлу тему",
+    "switchToDark": "Перемкнути на темну тему"
+  },
+  "language": {
+    "english": "Англійська",
+    "ukrainian": "Українська",
+    "switchLanguage": "Змінити мову",
+    "selectLanguage": "Виберіть мову"
+  },
+  "date": {
+    "today": "Сьогодні",
+    "tomorrow": "Завтра",
+    "yesterday": "Вчора",
+    "thisWeek": "Цього тижня",
+    "nextWeek": "Наступного тижня",
+    "thisMonth": "Цього місяця",
+    "nextMonth": "Наступного місяця",
+    "past": "Минулі",
+    "upcoming": "Майбутні"
+  },
+  "footer": {
+    "allRightsReserved": "Всі права захищені",
+    "madeWith": "Зроблено з",
+    "by": "від",
+    "privacyPolicy": "Політика конфіденційності",
+    "termsOfService": "Умови використання",
+    "contactUs": "Зв'яжіться з нами"
   }
 }

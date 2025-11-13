@@ -11,7 +11,22 @@
     "back": "Back",
     "next": "Next",
     "submit": "Submit",
-    "search": "Search"
+    "search": "Search",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "apply": "Apply",
+    "reset": "Reset",
+    "clear": "Clear",
+    "filter": "Filter",
+    "sort": "Sort",
+    "view": "View",
+    "download": "Download",
+    "upload": "Upload",
+    "refresh": "Refresh",
+    "retry": "Retry"
   },
   "nav": {
     "home": "Home",
@@ -22,7 +37,17 @@
     "login": "Login",
     "register": "Register",
     "logout": "Logout",
-    "profile": "Profile"
+    "profile": "Profile",
+    "settings": "Settings",
+    "help": "Help",
+    "about": "About",
+    "contact": "Contact",
+    "skipToMainContent": "Skip to main content",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "userMenu": "User menu",
+    "mainNavigation": "Main navigation",
+    "mobileNavigation": "Mobile navigation"
   },
   "auth": {
     "login": "Login",
@@ -36,11 +61,27 @@
     "dontHaveAccount": "Don't have an account?",
     "loginError": "Login error",
     "registerError": "Registration error",
-    "invalidCredentials": "Invalid credentials"
+    "invalidCredentials": "Invalid credentials",
+    "loggingIn": "Logging in...",
+    "creatingAccount": "Creating account...",
+    "createAccount": "Create Account",
+    "welcomeBack": "Welcome back!",
+    "loginSuccessful": "Login Successful",
+    "registrationSuccessful": "Registration Successful",
+    "accountCreated": "Your account has been created successfully!",
+    "loginFailed": "Login Failed",
+    "registrationFailed": "Registration Failed",
+    "loggedOutSuccessfully": "Logged out successfully",
+    "failedToLogout": "Failed to logout",
+    "emailPlaceholder": "your@email.com",
+    "passwordPlaceholder": "••••••••",
+    "namePlaceholder": "John Doe"
   },
   "events": {
     "title": "Events",
     "noEvents": "No events",
+    "noEventsFound": "No events found",
+    "noEventsDescription": "There are no events available at the moment. Check back later or create your own event!",
     "eventDetails": "Event Details",
     "createEvent": "Create Event",
     "editEvent": "Edit Event",
@@ -59,7 +100,28 @@
     "eventFull": "Event Full",
     "registrationSuccess": "Registration successful",
     "registrationError": "Registration error",
-    "alreadyRegistered": "Already registered"
+    "alreadyRegistered": "Already registered",
+    "eventCreated": "Event created successfully",
+    "eventUpdated": "Event updated successfully",
+    "eventDeleted": "Event deleted successfully",
+    "eventCreationFailed": "Failed to create event",
+    "eventUpdateFailed": "Failed to update event",
+    "eventDeletionFailed": "Failed to delete event",
+    "confirmDelete": "Are you sure you want to delete this event? This action cannot be undone.",
+    "deleteEventTitle": "Delete Event",
+    "registeredSuccessfully": "You have successfully registered for this event!",
+    "registrationCancelled": "Your registration has been cancelled",
+    "failedToRegister": "Failed to register for event",
+    "failedToCancelRegistration": "Failed to cancel registration",
+    "loadingEvents": "Loading events...",
+    "loadingEventDetails": "Loading event details...",
+    "checkingRegistration": "Checking registration status...",
+    "imagePreview": "Image Preview",
+    "noImageProvided": "No image provided",
+    "attendees": "Attendees",
+    "viewDetails": "View Details",
+    "spotsLeft": "spots left",
+    "almostFull": "Almost Full"
   },
   "validation": {
     "required": "This field is required",
@@ -71,9 +133,14 @@
     "descriptionMin": "Description must be at least 10 characters",
     "descriptionMax": "Description must be at most 2000 characters",
     "locationMin": "Location must be at least 3 characters",
+    "locationMax": "Location must be at most 200 characters",
     "capacityPositive": "Capacity must be a positive number",
+    "capacityMax": "Capacity must be at most 10000",
     "dateInFuture": "Date must be in the future",
-    "urlInvalid": "Invalid URL"
+    "urlInvalid": "Invalid URL",
+    "nameMin": "Name must be at least 2 characters",
+    "nameMax": "Name must be at most 50 characters",
+    "passwordMax": "Password must be at most 100 characters"
   },
   "errors": {
     "somethingWentWrong": "Something went wrong",
@@ -95,7 +162,11 @@
     "allEvents": "All Events",
     "myEvents": "My Events",
     "myRegistrations": "My Registrations",
-    "browseEvents": "Browse Events"
+    "browseEvents": "Browse Events",
+    "badRequest": "Bad request. Please check your input.",
+    "conflict": "A conflict occurred. Please try again.",
+    "tooManyRequests": "Too many requests. Please slow down.",
+    "serviceUnavailable": "Service temporarily unavailable. Please try again later."
   },
   "home": {
     "badge": "Discover Amazing Events",
@@ -109,6 +180,64 @@
     "availability": "Available",
     "featuredEvents": "Featured Events",
     "featuredEventsSubtitle": "Discover upcoming events happening in your area",
-    "viewAllEvents": "View All Events"
+    "viewAllEvents": "View All Events",
+    "welcomeTo": "Welcome to",
+    "platformName": "Events Platform"
+  },
+  "accessibility": {
+    "skipToMainContent": "Skip to main content",
+    "openMobileMenu": "Open mobile menu",
+    "closeMobileMenu": "Close mobile menu",
+    "userMenu": "User menu",
+    "viewAllEvents": "View all events",
+    "viewMyEvents": "View my events",
+    "viewMyRegistrations": "View my registrations",
+    "createNewEvent": "Create new event",
+    "editThisEvent": "Edit this event",
+    "deleteThisEvent": "Delete this event",
+    "loginToAccount": "Login to your account",
+    "createNewAccount": "Create a new account",
+    "registerForEvent": "Register for this event",
+    "cancelEventRegistration": "Cancel your registration for this event",
+    "eventImage": "Event image",
+    "eventImagePreview": "Event image preview",
+    "noEventImage": "No event image",
+    "loading": "Loading",
+    "checkingRegistrationStatus": "Checking registration status",
+    "eventIsFull": "Event is full",
+    "loginToRegister": "Login to register for this event"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "toggleTheme": "Toggle theme",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode"
+  },
+  "language": {
+    "english": "English",
+    "ukrainian": "Ukrainian",
+    "switchLanguage": "Switch language",
+    "selectLanguage": "Select language"
+  },
+  "date": {
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "yesterday": "Yesterday",
+    "thisWeek": "This week",
+    "nextWeek": "Next week",
+    "thisMonth": "This month",
+    "nextMonth": "Next month",
+    "past": "Past",
+    "upcoming": "Upcoming"
+  },
+  "footer": {
+    "allRightsReserved": "All rights reserved",
+    "madeWith": "Made with",
+    "by": "by",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "contactUs": "Contact Us"
   }
 }

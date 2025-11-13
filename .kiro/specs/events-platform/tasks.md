@@ -173,7 +173,7 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Add 404 page with navigation back to home
   - _Requirements: 3.1, 4.2_
 
-- [ ] 18. Add translation content for all UI elements
+- [x] 18. Add translation content for all UI elements
   - Complete messages/uk.json with all Ukrainian translations
   - Complete messages/en.json with all English translations
   - Translate form labels, buttons, error messages, and navigation items
