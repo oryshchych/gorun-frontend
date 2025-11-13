@@ -181,7 +181,7 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Test language switching across all pages
   - _Requirements: 4.1, 4.2, 4.3, 4.5_
 
-- [ ] 19. Configure deployment for Vercel
+- [x] 19. Configure deployment for Vercel
   - Create vercel.json with build configuration
   - Set up environment variables in Vercel dashboard (NEXT_PUBLIC_API_URL)
   - Configure CORS settings with backend API
