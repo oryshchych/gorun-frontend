@@ -189,21 +189,21 @@ This is a frontend Next.js application that consumes a separate backend API (Mon
   - Set up preview deployments for pull requests
   - _Requirements: 7.3_
 
-- [ ] 20. Testing and quality assurance
-- [ ] 20.1 Write unit tests for validation schemas
+- [x] 20. Testing and quality assurance
+- [x] 20.1 Write unit tests for validation schemas
   - Test auth validation schemas with valid and invalid inputs
   - Test event validation schemas with edge cases
   - Test registration validation schemas
   - _Requirements: 5.2, 5.4_
 
-- [ ] 20.2 Write component tests
+- [x] 20.2 Write component tests
   - Test LoginForm and RegisterForm rendering and validation
   - Test EventCard and EventList rendering
   - Test EventForm with react-hook-form integration
   - Test LanguageSwitcher functionality
   - _Requirements: 1.1, 4.2, 5.1, 6.4_
 
-- [ ] 20.3 Write API service tests
+- [x] 20.3 Write API service tests
   - Test API client request/response interceptors
   - Test authentication service with token management
   - Test event service CRUD operations
