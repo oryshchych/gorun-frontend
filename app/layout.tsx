@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Events Platform",
+  title: "GoRun",
   description: "Events registration and management platform",
 };
 

@@ -28,7 +28,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href={`/${locale}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <Calendar className="w-6 h-6 text-primary" aria-hidden="true" />
-            <h2 className="text-xl font-semibold">Events Platform</h2>
+            <h2 className="text-xl font-semibold">GoRun</h2>
           </Link>
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
