@@ -5,6 +5,7 @@ import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import LanguageSwitcher from '@/components/layout/LanguageSwitcher';
 import { Button } from '@/components/ui/button';
 import { Calendar, Users, Sparkles, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useEvents } from '@/hooks/useEvents';
@@ -26,9 +27,14 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href={`/${locale}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <Calendar className="w-6 h-6 text-primary" aria-hidden="true" />
-            <h2 className="text-xl font-semibold">GoRun</h2>
+          <Link href={`/${locale}`} className="flex items-center hover:opacity-80 transition-opacity">
+            <Image 
+              src="/images/logos/logo.png" 
+              alt="GoRun Events Platform"
+              width={60}
+              height={20}
+              priority
+            />
           </Link>
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
