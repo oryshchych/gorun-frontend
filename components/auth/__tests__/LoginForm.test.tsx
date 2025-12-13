@@ -10,6 +10,23 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
+vi.mock('next-intl', () => ({
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      email: 'Email',
+      password: 'Password',
+      emailPlaceholder: 'your@email.com',
+      passwordPlaceholder: '••••••••',
+      login: 'Login',
+      loggingIn: 'Logging in...',
+      welcomeBack: 'Welcome back!',
+      loginSuccessful: 'Login Successful',
+      loginFailed: 'Login Failed',
+    };
+    return translations[key] || key;
+  },
+}));
+
 vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({
     login: vi.fn(),
@@ -31,14 +48,14 @@ describe('LoginForm', () => {
 
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /login to your account/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
   });
 
   it('should display validation errors for empty fields', async () => {
     const user = userEvent.setup();
     render(<LoginForm />);
 
-    const submitButton = screen.getByRole('button', { name: /login to your account/i });
+    const submitButton = screen.getByRole('button', { name: /login/i });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -70,7 +87,7 @@ describe('LoginForm', () => {
     await user.type(emailInput, 'test@example.com');
     await user.type(passwordInput, 'short');
     
-    const submitButton = screen.getByRole('button', { name: /login to your account/i });
+    const submitButton = screen.getByRole('button', { name: /login/i });
     await user.click(submitButton);
 
     await waitFor(() => {

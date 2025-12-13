@@ -10,6 +10,26 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
+vi.mock('next-intl', () => ({
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      name: 'Name',
+      email: 'Email',
+      password: 'Password',
+      confirmPassword: 'Confirm Password',
+      namePlaceholder: 'John Doe',
+      emailPlaceholder: 'your@email.com',
+      passwordPlaceholder: '••••••••',
+      createAccount: 'Create Account',
+      creatingAccount: 'Creating account...',
+      accountCreated: 'Your account has been created successfully!',
+      registrationSuccessful: 'Registration Successful',
+      registrationFailed: 'Registration Failed',
+    };
+    return translations[key] || key;
+  },
+}));
+
 vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({
     register: vi.fn(),
@@ -33,14 +53,14 @@ describe('RegisterForm', () => {
     expect(screen.getByLabelText(/^email$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /create a new account/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /create account/i })).toBeInTheDocument();
   });
 
   it('should display validation errors for empty fields', async () => {
     const user = userEvent.setup();
     render(<RegisterForm />);
 
-    const submitButton = screen.getByRole('button', { name: /create a new account/i });
+    const submitButton = screen.getByRole('button', { name: /create account/i });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -57,7 +77,7 @@ describe('RegisterForm', () => {
     const nameInput = screen.getByLabelText(/^name$/i);
     await user.type(nameInput, 'A');
     
-    const submitButton = screen.getByRole('button', { name: /create a new account/i });
+    const submitButton = screen.getByRole('button', { name: /create account/i });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -95,7 +115,7 @@ describe('RegisterForm', () => {
     await user.type(passwordInput, 'password123');
     await user.type(confirmPasswordInput, 'different123');
     
-    const submitButton = screen.getByRole('button', { name: /create a new account/i });
+    const submitButton = screen.getByRole('button', { name: /create account/i });
     await user.click(submitButton);
 
     await waitFor(() => {
