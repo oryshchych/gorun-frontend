@@ -7,7 +7,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "test": "vitest --run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui"
@@ -43,6 +44,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.3",
     "@tailwindcss/postcss": "^4.1.18",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
@@ -54,8 +56,8 @@
     "@vitest/ui": "^4.0.15",
     "autoprefixer": "^10.4.22",
     "axios-mock-adapter": "^2.1.0",
-    "eslint": "^9.39.2",
-    "eslint-config-next": "^16.0.1",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.5.9",
     "jsdom": "^27.3.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",
