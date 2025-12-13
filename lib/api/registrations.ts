@@ -18,7 +18,7 @@ export const getRegistrations = async (
   const { page = 1, limit = 10, ...filters } = params;
   
   const response = await apiClient.get<PaginatedResponse<Registration>>(
-    '/registrations',
+    '/api/registrations',
     {
       params: {
         page,
@@ -41,7 +41,7 @@ export const getEventRegistrations = async (
   const { page = 1, limit = 10 } = params;
   
   const response = await apiClient.get<PaginatedResponse<Registration>>(
-    `/events/${eventId}/registrations`,
+    `/api/events/${eventId}/registrations`,
     {
       params: {
         page,
@@ -62,7 +62,7 @@ export const getMyRegistrations = async (
   const { page = 1, limit = 10 } = params;
   
   const response = await apiClient.get<PaginatedResponse<Registration>>(
-    '/registrations/my',
+    '/api/registrations/my',
     {
       params: {
         page,
@@ -81,7 +81,7 @@ export const createRegistration = async (
   data: CreateRegistrationRequest
 ): Promise<Registration> => {
   const response = await apiClient.post<ApiResponse<Registration>>(
-    '/registrations',
+    '/api/registrations',
     data
   );
   return response.data.data;
@@ -91,7 +91,7 @@ export const createRegistration = async (
  * Cancel a registration
  */
 export const cancelRegistration = async (id: string): Promise<void> => {
-  await apiClient.delete(`/registrations/${id}`);
+  await apiClient.delete(`/api/registrations/${id}`);
 };
 
 /**
@@ -100,7 +100,7 @@ export const cancelRegistration = async (id: string): Promise<void> => {
 export const checkRegistration = async (eventId: string): Promise<boolean> => {
   try {
     const response = await apiClient.get<ApiResponse<{ isRegistered: boolean }>>(
-      `/events/${eventId}/check-registration`
+      `/api/events/${eventId}/check-registration`
     );
     return response.data.data.isRegistered;
   } catch (error) {
