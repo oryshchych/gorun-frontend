@@ -10,7 +10,6 @@ import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
 export default function MyEventsPage() {
-  const t = useTranslations('events');
   const tNav = useTranslations('nav');
   const locale = useLocale();
   const router = useRouter();
@@ -48,7 +47,7 @@ export default function MyEventsPage() {
       {!isLoading && data?.data.length === 0 && (
         <div className="text-center py-12">
           <p className="text-muted-foreground mb-4">
-            You haven't created any events yet
+            You haven&apos;t created any events yet
           </p>
           <Button onClick={handleCreateEvent}>
             <Plus className="w-4 h-4 mr-2" />
