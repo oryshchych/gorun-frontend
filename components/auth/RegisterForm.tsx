@@ -45,7 +45,7 @@ export function RegisterForm() {
         password: data.password,
       });
       showSuccessToast(t('accountCreated'), t('registrationSuccessful'));
-      router.push('/events');
+      router.push('/');
     } catch (error: any) {
       handleApiError(error, t('registrationFailed'));
     } finally {

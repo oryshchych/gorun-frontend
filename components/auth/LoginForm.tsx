@@ -39,7 +39,7 @@ export function LoginForm() {
     try {
       await login(data);
       showSuccessToast(t('welcomeBack'), t('loginSuccessful'));
-      router.push('/events');
+      router.push('/');
     } catch (error: any) {
       handleApiError(error, t('loginFailed'));
     } finally {
