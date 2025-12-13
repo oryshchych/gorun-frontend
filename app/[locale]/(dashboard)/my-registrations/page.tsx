@@ -4,12 +4,10 @@ import { useMyRegistrations } from '@/hooks/useRegistrations';
 import { EventCard } from '@/components/events/EventCard';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 export default function MyRegistrationsPage() {
-  const t = useTranslations('events');
   const tNav = useTranslations('nav');
   const [page, setPage] = useState(1);
 
@@ -56,7 +54,7 @@ export default function MyRegistrationsPage() {
       {registrations.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <p className="text-muted-foreground text-lg mb-4">
-            You haven't registered for any events yet
+            You haven&apos;t registered for any events yet
           </p>
           <p className="text-sm text-muted-foreground">
             Browse available events and register to get started
