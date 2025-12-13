@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/hooks/useAuth';
 import { registerSchema, type RegisterFormData } from '@/lib/validations/auth';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,7 @@ export function RegisterForm() {
   const router = useRouter();
   const { register } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const t = useTranslations('auth');
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -42,10 +44,10 @@ export function RegisterForm() {
         email: data.email,
         password: data.password,
       });
-      showSuccessToast('Your account has been created successfully!', 'Registration Successful');
+      showSuccessToast(t('accountCreated'), t('registrationSuccessful'));
       router.push('/events');
     } catch (error: any) {
-      handleApiError(error, 'Registration Failed');
+      handleApiError(error, t('registrationFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -60,12 +62,12 @@ export function RegisterForm() {
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel htmlFor="register-name">Name</FormLabel>
+                <FormLabel htmlFor="register-name">{t('name')}</FormLabel>
                 <FormControl>
                   <Input
                     id="register-name"
                     type="text"
-                    placeholder="John Doe"
+                    placeholder={t('namePlaceholder')}
                     disabled={isLoading}
                     autoComplete="name"
                     aria-required="true"
@@ -86,12 +88,12 @@ export function RegisterForm() {
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel htmlFor="register-email">Email</FormLabel>
+                <FormLabel htmlFor="register-email">{t('email')}</FormLabel>
                 <FormControl>
                   <Input
                     id="register-email"
                     type="email"
-                    placeholder="your@email.com"
+                    placeholder={t('emailPlaceholder')}
                     disabled={isLoading}
                     autoComplete="email"
                     aria-required="true"
@@ -112,12 +114,12 @@ export function RegisterForm() {
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel htmlFor="register-password">Password</FormLabel>
+                <FormLabel htmlFor="register-password">{t('password')}</FormLabel>
                 <FormControl>
                   <Input
                     id="register-password"
                     type="password"
-                    placeholder="••••••••"
+                    placeholder={t('passwordPlaceholder')}
                     disabled={isLoading}
                     autoComplete="new-password"
                     aria-required="true"
@@ -138,12 +140,12 @@ export function RegisterForm() {
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel htmlFor="register-confirm-password">Confirm Password</FormLabel>
+                <FormLabel htmlFor="register-confirm-password">{t('confirmPassword')}</FormLabel>
                 <FormControl>
                   <Input
                     id="register-confirm-password"
                     type="password"
-                    placeholder="••••••••"
+                    placeholder={t('passwordPlaceholder')}
                     disabled={isLoading}
                     autoComplete="new-password"
                     aria-required="true"
@@ -162,9 +164,9 @@ export function RegisterForm() {
           type="submit" 
           className="w-full" 
           disabled={isLoading}
-          aria-label={isLoading ? 'Creating account' : 'Create a new account'}
+          aria-label={isLoading ? t('creatingAccount') : t('createAccount')}
         >
-          {isLoading ? 'Creating account...' : 'Create Account'}
+          {isLoading ? t('creatingAccount') : t('createAccount')}
         </Button>
       </form>
     </Form>

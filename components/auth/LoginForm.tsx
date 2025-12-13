@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/hooks/useAuth';
 import { loginSchema, type LoginFormData } from '@/lib/validations/auth';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,7 @@ export function LoginForm() {
   const router = useRouter();
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const t = useTranslations('auth');
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -36,10 +38,10 @@ export function LoginForm() {
     setIsLoading(true);
     try {
       await login(data);
-      showSuccessToast('Welcome back!', 'Login Successful');
+      showSuccessToast(t('welcomeBack'), t('loginSuccessful'));
       router.push('/events');
     } catch (error: any) {
-      handleApiError(error, 'Login Failed');
+      handleApiError(error, t('loginFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -54,12 +56,12 @@ export function LoginForm() {
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel htmlFor="login-email">Email</FormLabel>
+                <FormLabel htmlFor="login-email">{t('email')}</FormLabel>
                 <FormControl>
                   <Input
                     id="login-email"
                     type="email"
-                    placeholder="your@email.com"
+                    placeholder={t('emailPlaceholder')}
                     disabled={isLoading}
                     autoComplete="email"
                     aria-required="true"
@@ -80,12 +82,12 @@ export function LoginForm() {
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel htmlFor="login-password">Password</FormLabel>
+                <FormLabel htmlFor="login-password">{t('password')}</FormLabel>
                 <FormControl>
                   <Input
                     id="login-password"
                     type="password"
-                    placeholder="••••••••"
+                    placeholder={t('passwordPlaceholder')}
                     disabled={isLoading}
                     autoComplete="current-password"
                     aria-required="true"
@@ -104,9 +106,9 @@ export function LoginForm() {
           type="submit" 
           className="w-full" 
           disabled={isLoading}
-          aria-label={isLoading ? 'Logging in' : 'Login to your account'}
+          aria-label={isLoading ? t('loggingIn') : t('login')}
         >
-          {isLoading ? 'Logging in...' : 'Login'}
+          {isLoading ? t('loggingIn') : t('login')}
         </Button>
       </form>
     </Form>
