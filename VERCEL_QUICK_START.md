@@ -29,6 +29,7 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
 ### Step 3: Deploy
 
 Click "Deploy" - Vercel will automatically:
+
 - Detect Next.js framework
 - Install dependencies
 - Build the project
@@ -41,9 +42,9 @@ Update your backend API to allow requests from Vercel:
 ```javascript
 // Add your Vercel domain to CORS origins
 const allowedOrigins = [
-  'https://your-app.vercel.app',
-  'https://your-app-*.vercel.app', // Preview deployments
-  'http://localhost:3000'
+  "https://your-app.vercel.app",
+  "https://your-app-*.vercel.app", // Preview deployments
+  "http://localhost:3000",
 ];
 ```
 
@@ -61,15 +62,18 @@ const allowedOrigins = [
 ## 🔧 Troubleshooting
 
 **Build fails?**
+
 - Check build logs in Vercel dashboard
 - Run `npm run build` locally to test
 
 **Can't connect to API?**
+
 - Verify `NEXT_PUBLIC_API_URL` is correct
 - Check backend CORS settings
 - Ensure backend is publicly accessible
 
 **Authentication not working?**
+
 - Verify `NEXTAUTH_SECRET` is set
 - Check `NEXTAUTH_URL` matches your domain
 - Update Google OAuth redirect URIs
@@ -81,6 +85,7 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment guide.
 ## 🌐 Preview Deployments
 
 Every pull request automatically gets a preview deployment:
+
 - Unique URL for testing
 - Same configuration as production
 - Perfect for reviewing changes before merge
@@ -88,12 +93,14 @@ Every pull request automatically gets a preview deployment:
 ## 🔄 Continuous Deployment
 
 Automatic deployments on:
+
 - **Production**: Push to `main` branch
 - **Preview**: Push to any branch or open PR
 
 ## 📊 Monitoring
 
 View logs and analytics:
+
 1. Go to Vercel Dashboard
 2. Select your project
 3. Click "Deployments" → Select deployment

@@ -1,4 +1,8 @@
-import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from "axios";
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  InternalAxiosRequestConfig,
+} from "axios";
 
 // Token storage keys
 const ACCESS_TOKEN_KEY = "access_token";
@@ -9,8 +13,8 @@ const apiClient: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api",
   timeout: 10000,
   headers: {
-    "Content-Type": "application/json"
-  }
+    "Content-Type": "application/json",
+  },
 });
 
 // Request interceptor to attach JWT tokens
@@ -39,7 +43,9 @@ apiClient.interceptors.response.use(
     return response;
   },
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
 
     // Handle 401 Unauthorized errors (token expired)
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -51,9 +57,12 @@ apiClient.interceptors.response.use(
         console.log("🚀 ~ refreshToken:", refreshToken);
 
         if (refreshToken) {
-          const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`, {
-            refreshToken
-          });
+          const response = await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+            {
+              refreshToken,
+            }
+          );
 
           const { accessToken, refreshToken: newRefreshToken } = response.data;
 
@@ -98,18 +107,18 @@ function formatErrorResponse(error: AxiosError): FormattedError {
     return {
       message: data?.message || data?.error || "An error occurred",
       statusCode: error.response.status,
-      errors: data?.errors
+      errors: data?.errors,
     };
   } else if (error.request) {
     // Request made but no response received
     return {
       message: "No response from server. Please check your connection.",
-      statusCode: 0
+      statusCode: 0,
     };
   } else {
     // Error in request setup
     return {
-      message: error.message || "An unexpected error occurred"
+      message: error.message || "An unexpected error occurred",
     };
   }
 }
@@ -174,7 +183,7 @@ export const tokenManager = {
   // Deprecated: Use hasToken() instead. This method doesn't validate the token, only checks existence.
   hasValidToken: (): boolean => {
     return hasToken();
-  }
+  },
 };
 
 export default apiClient;

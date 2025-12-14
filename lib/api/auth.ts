@@ -27,20 +27,32 @@ export interface AuthResponse {
 
 // Login function
 export async function login(credentials: LoginRequest): Promise<AuthResponse> {
-  const response = await apiClient.post<AuthResponse>("/api/auth/login", credentials);
+  const response = await apiClient.post<AuthResponse>(
+    "/api/auth/login",
+    credentials
+  );
 
   // Store tokens
-  tokenManager.setTokens(response.data.data.accessToken, response.data.data.refreshToken);
+  tokenManager.setTokens(
+    response.data.data.accessToken,
+    response.data.data.refreshToken
+  );
 
   return response.data;
 }
 
 // Register function
 export async function register(data: RegisterRequest): Promise<AuthResponse> {
-  const response = await apiClient.post<AuthResponse>("/api/auth/register", data);
+  const response = await apiClient.post<AuthResponse>(
+    "/api/auth/register",
+    data
+  );
 
   // Store tokens
-  tokenManager.setTokens(response.data.data.accessToken, response.data.data.refreshToken);
+  tokenManager.setTokens(
+    response.data.data.accessToken,
+    response.data.data.refreshToken
+  );
 
   return response.data;
 }
@@ -66,7 +78,9 @@ export async function getCurrentUser() {
 }
 
 // Refresh access token
-export async function refreshAccessToken(refreshToken: string): Promise<string> {
+export async function refreshAccessToken(
+  refreshToken: string
+): Promise<string> {
   const response = await apiClient.post("/api/auth/refresh", { refreshToken });
 
   const { accessToken, refreshToken: newRefreshToken } = response.data;

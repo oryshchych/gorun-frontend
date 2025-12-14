@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { motion } from 'framer-motion';
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { motion } from "framer-motion";
 
 export function EventCardSkeleton() {
   return (

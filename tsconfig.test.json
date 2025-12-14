@@ -11,7 +11,5 @@
     "vitest.setup.ts",
     "types/vitest.d.ts"
   ],
-  "exclude": [
-    "vitest.config.ts"
-  ]
+  "exclude": ["vitest.config.ts"]
 }

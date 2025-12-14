@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as DialogPrimitive from "@radix-ui/react-dialog"
-import { X } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import * as React from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-const AnimatedDialog = DialogPrimitive.Root
+const AnimatedDialog = DialogPrimitive.Root;
 
-const AnimatedDialogTrigger = DialogPrimitive.Trigger
+const AnimatedDialogTrigger = DialogPrimitive.Trigger;
 
-const AnimatedDialogPortal = DialogPrimitive.Portal
+const AnimatedDialogPortal = DialogPrimitive.Portal;
 
-const AnimatedDialogClose = DialogPrimitive.Close
+const AnimatedDialogClose = DialogPrimitive.Close;
 
 const AnimatedDialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
@@ -27,8 +27,8 @@ const AnimatedDialogOverlay = React.forwardRef<
     )}
     {...props}
   />
-))
-AnimatedDialogOverlay.displayName = DialogPrimitive.Overlay.displayName
+));
+AnimatedDialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 const AnimatedDialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
@@ -51,8 +51,8 @@ const AnimatedDialogContent = React.forwardRef<
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </AnimatedDialogPortal>
-))
-AnimatedDialogContent.displayName = DialogPrimitive.Content.displayName
+));
+AnimatedDialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const AnimatedDialogHeader = ({
   className,
@@ -65,8 +65,8 @@ const AnimatedDialogHeader = ({
     )}
     {...props}
   />
-)
-AnimatedDialogHeader.displayName = "AnimatedDialogHeader"
+);
+AnimatedDialogHeader.displayName = "AnimatedDialogHeader";
 
 const AnimatedDialogFooter = ({
   className,
@@ -79,8 +79,8 @@ const AnimatedDialogFooter = ({
     )}
     {...props}
   />
-)
-AnimatedDialogFooter.displayName = "AnimatedDialogFooter"
+);
+AnimatedDialogFooter.displayName = "AnimatedDialogFooter";
 
 const AnimatedDialogTitle = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Title>,
@@ -94,8 +94,8 @@ const AnimatedDialogTitle = React.forwardRef<
     )}
     {...props}
   />
-))
-AnimatedDialogTitle.displayName = DialogPrimitive.Title.displayName
+));
+AnimatedDialogTitle.displayName = DialogPrimitive.Title.displayName;
 
 const AnimatedDialogDescription = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Description>,
@@ -106,8 +106,8 @@ const AnimatedDialogDescription = React.forwardRef<
     className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
-))
-AnimatedDialogDescription.displayName = DialogPrimitive.Description.displayName
+));
+AnimatedDialogDescription.displayName = DialogPrimitive.Description.displayName;
 
 export {
   AnimatedDialog,
@@ -120,4 +120,4 @@ export {
   AnimatedDialogFooter,
   AnimatedDialogTitle,
   AnimatedDialogDescription,
-}
+};

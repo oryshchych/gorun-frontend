@@ -4,7 +4,7 @@ import {
   useQueryClient,
   UseQueryResult,
   UseMutationResult,
-} from '@tanstack/react-query';
+} from "@tanstack/react-query";
 import {
   getEvents,
   getEventById,
@@ -13,20 +13,21 @@ import {
   deleteEvent,
   getMyEvents,
   GetEventsParams,
-} from '@/lib/api/events';
-import { Event, CreateEventRequest, UpdateEventRequest } from '@/types/event';
-import { PaginatedResponse } from '@/types/api';
-import { handleApiError, showSuccessToast } from '@/lib/error-handler';
+} from "@/lib/api/events";
+import { Event, CreateEventRequest, UpdateEventRequest } from "@/types/event";
+import { PaginatedResponse } from "@/types/api";
+import { handleApiError, showSuccessToast } from "@/lib/error-handler";
 
 // Query keys for cache management
 export const eventKeys = {
-  all: ['events'] as const,
-  lists: () => [...eventKeys.all, 'list'] as const,
+  all: ["events"] as const,
+  lists: () => [...eventKeys.all, "list"] as const,
   list: (params: GetEventsParams) => [...eventKeys.lists(), params] as const,
-  details: () => [...eventKeys.all, 'detail'] as const,
+  details: () => [...eventKeys.all, "detail"] as const,
   detail: (id: string) => [...eventKeys.details(), id] as const,
-  myEvents: () => [...eventKeys.all, 'my'] as const,
-  myEventsList: (params: GetEventsParams) => [...eventKeys.myEvents(), params] as const,
+  myEvents: () => [...eventKeys.all, "my"] as const,
+  myEventsList: (params: GetEventsParams) =>
+    [...eventKeys.myEvents(), params] as const,
 };
 
 /**
@@ -75,11 +76,14 @@ export const useCreateEvent = () => {
       // Invalidate events lists to refetch
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
       queryClient.invalidateQueries({ queryKey: eventKeys.myEvents() });
-      
-      showSuccessToast('Your event has been created successfully!', 'Event Created');
+
+      showSuccessToast(
+        "Your event has been created successfully!",
+        "Event Created"
+      );
     },
     onError: (error) => {
-      handleApiError(error, 'Failed to Create Event');
+      handleApiError(error, "Failed to Create Event");
     },
   });
 };
@@ -90,14 +94,21 @@ export const useCreateEvent = () => {
 export const useUpdateEvent = (id: string) => {
   const queryClient = useQueryClient();
 
-  return useMutation<Event, Error, UpdateEventRequest, { previousEvent?: Event }>({
+  return useMutation<
+    Event,
+    Error,
+    UpdateEventRequest,
+    { previousEvent?: Event }
+  >({
     mutationFn: (data) => updateEvent(id, data),
     onMutate: async (updatedData) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: eventKeys.detail(id) });
 
       // Snapshot previous value
-      const previousEvent = queryClient.getQueryData<Event>(eventKeys.detail(id));
+      const previousEvent = queryClient.getQueryData<Event>(
+        eventKeys.detail(id)
+      );
 
       // Optimistically update the cache
       if (previousEvent) {
@@ -114,17 +125,20 @@ export const useUpdateEvent = (id: string) => {
       if (context?.previousEvent) {
         queryClient.setQueryData(eventKeys.detail(id), context.previousEvent);
       }
-      handleApiError(error, 'Failed to Update Event');
+      handleApiError(error, "Failed to Update Event");
     },
     onSuccess: (updatedEvent) => {
       // Update cache with server response
       queryClient.setQueryData(eventKeys.detail(id), updatedEvent);
-      
+
       // Invalidate lists to refetch
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
       queryClient.invalidateQueries({ queryKey: eventKeys.myEvents() });
-      
-      showSuccessToast('Your event has been updated successfully!', 'Event Updated');
+
+      showSuccessToast(
+        "Your event has been updated successfully!",
+        "Event Updated"
+      );
     },
   });
 };
@@ -135,14 +149,21 @@ export const useUpdateEvent = (id: string) => {
 export const useDeleteEvent = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<void, Error, string, { previousEvent?: Event; eventId: string }>({
+  return useMutation<
+    void,
+    Error,
+    string,
+    { previousEvent?: Event; eventId: string }
+  >({
     mutationFn: deleteEvent,
     onMutate: async (eventId) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: eventKeys.detail(eventId) });
 
       // Snapshot previous value
-      const previousEvent = queryClient.getQueryData<Event>(eventKeys.detail(eventId));
+      const previousEvent = queryClient.getQueryData<Event>(
+        eventKeys.detail(eventId)
+      );
 
       // Optimistically remove from cache
       queryClient.removeQueries({ queryKey: eventKeys.detail(eventId) });
@@ -152,16 +173,22 @@ export const useDeleteEvent = () => {
     onError: (error, eventId, context) => {
       // Rollback on error
       if (context?.previousEvent) {
-        queryClient.setQueryData(eventKeys.detail(eventId), context.previousEvent);
+        queryClient.setQueryData(
+          eventKeys.detail(eventId),
+          context.previousEvent
+        );
       }
-      handleApiError(error, 'Failed to Delete Event');
+      handleApiError(error, "Failed to Delete Event");
     },
     onSuccess: () => {
       // Invalidate lists to refetch
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
       queryClient.invalidateQueries({ queryKey: eventKeys.myEvents() });
-      
-      showSuccessToast('The event has been deleted successfully!', 'Event Deleted');
+
+      showSuccessToast(
+        "The event has been deleted successfully!",
+        "Event Deleted"
+      );
     },
   });
 };

@@ -84,18 +84,20 @@ Your backend API must allow requests from your Vercel domain. Configure CORS hea
 
 ```javascript
 // Example Express.js CORS configuration
-const cors = require('cors');
+const cors = require("cors");
 
-app.use(cors({
-  origin: [
-    'https://your-app.vercel.app',
-    'https://your-app-*.vercel.app', // Preview deployments
-    'http://localhost:3000' // Local development
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-}));
+app.use(
+  cors({
+    origin: [
+      "https://your-app.vercel.app",
+      "https://your-app-*.vercel.app", // Preview deployments
+      "http://localhost:3000", // Local development
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  })
+);
 ```
 
 ### Frontend CORS Headers
@@ -142,12 +144,15 @@ Visit http://localhost:3000 to test the production build.
 ### Common Build Issues
 
 **Issue**: Module not found errors
+
 - **Solution**: Ensure all dependencies are in `package.json`, not just `devDependencies`
 
 **Issue**: Environment variables not working
+
 - **Solution**: Prefix client-side variables with `NEXT_PUBLIC_`
 
 **Issue**: Build succeeds but runtime errors
+
 - **Solution**: Check browser console and Vercel function logs
 
 ## Monitoring and Logs
@@ -168,6 +173,7 @@ Visit http://localhost:3000 to test the production build.
 ### Analytics
 
 Enable Vercel Analytics:
+
 1. Go to Project Settings → Analytics
 2. Enable Web Analytics
 3. Add `<Analytics />` component to your app (optional)
@@ -184,6 +190,7 @@ Enable Vercel Analytics:
 ### Update Environment Variables
 
 After adding custom domain, update:
+
 - `NEXTAUTH_URL` to your custom domain
 - Backend CORS to allow your custom domain
 
@@ -252,9 +259,11 @@ If a deployment has issues:
 ## Continuous Deployment
 
 Vercel automatically deploys:
+
 - **Production**: Pushes to `main` or `master` branch
 - **Preview**: Pushes to other branches and pull requests
 
 To disable automatic deployments:
+
 1. Go to Project Settings → Git
 2. Disable "Production Branch" or "Preview Deployments"

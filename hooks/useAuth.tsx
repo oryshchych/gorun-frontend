@@ -1,14 +1,24 @@
 "use client";
 
-import { useState, useEffect, useCallback, createContext, useContext } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  createContext,
+  useContext,
+} from "react";
 import {
   login as apiLogin,
   register as apiRegister,
   logout as apiLogout,
-  getCurrentUser
+  getCurrentUser,
 } from "@/lib/api/auth";
 import { tokenManager } from "@/lib/api/client";
-import type { LoginRequest, RegisterRequest, AuthResponse } from "@/lib/api/auth";
+import type {
+  LoginRequest,
+  RegisterRequest,
+  AuthResponse,
+} from "@/lib/api/auth";
 
 interface User {
   id: string;
@@ -105,7 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     login,
     register,
     logout,
-    refreshUser
+    refreshUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

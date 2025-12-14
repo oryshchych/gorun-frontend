@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useTranslations, useLocale } from 'next-intl';
-import { Button } from '@/components/ui/button';
-import { Home, ArrowLeft, Search } from 'lucide-react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { useTranslations, useLocale } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { Home, ArrowLeft, Search } from "lucide-react";
+import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function NotFound() {
-  const t = useTranslations('errors');
+  const t = useTranslations("errors");
   const locale = useLocale();
 
   return (
@@ -30,7 +30,10 @@ export default function NotFound() {
               404
             </h1>
             <div className="absolute inset-0 flex items-center justify-center">
-              <Search className="w-20 h-20 sm:w-24 sm:h-24 text-muted-foreground/40" aria-hidden="true" />
+              <Search
+                className="w-20 h-20 sm:w-24 sm:h-24 text-muted-foreground/40"
+                aria-hidden="true"
+              />
             </div>
           </div>
         </motion.div>
@@ -42,10 +45,10 @@ export default function NotFound() {
           transition={{ delay: 0.3, duration: 0.6 }}
         >
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            {t('notFound')}
+            {t("notFound")}
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-md mx-auto">
-            {t('notFoundDescription')}
+            {t("notFoundDescription")}
           </p>
         </motion.div>
 
@@ -59,7 +62,7 @@ export default function NotFound() {
           <Button asChild size="lg" className="w-full sm:w-auto group">
             <Link href={`/${locale}`}>
               <Home className="mr-2 w-4 h-4" aria-hidden="true" />
-              {t('goHome')}
+              {t("goHome")}
             </Link>
           </Button>
           <Button
@@ -69,8 +72,11 @@ export default function NotFound() {
             className="w-full sm:w-auto group"
           >
             <Link href={`/${locale}/events`}>
-              <ArrowLeft className="mr-2 w-4 h-4 group-hover:-translate-x-1 transition-transform" aria-hidden="true" />
-              {t('browseEvents')}
+              <ArrowLeft
+                className="mr-2 w-4 h-4 group-hover:-translate-x-1 transition-transform"
+                aria-hidden="true"
+              />
+              {t("browseEvents")}
             </Link>
           </Button>
         </motion.div>
@@ -83,28 +89,28 @@ export default function NotFound() {
           className="mt-12 pt-8 border-t"
         >
           <p className="text-sm text-muted-foreground mb-4">
-            {t('helpfulLinks')}
+            {t("helpfulLinks")}
           </p>
           <div className="flex flex-wrap gap-4 justify-center text-sm">
             <Link
               href={`/${locale}/events`}
               className="text-primary hover:underline"
             >
-              {t('allEvents')}
+              {t("allEvents")}
             </Link>
             <span className="text-muted-foreground">•</span>
             <Link
               href={`/${locale}/my-events`}
               className="text-primary hover:underline"
             >
-              {t('myEvents')}
+              {t("myEvents")}
             </Link>
             <span className="text-muted-foreground">•</span>
             <Link
               href={`/${locale}/my-registrations`}
               className="text-primary hover:underline"
             >
-              {t('myRegistrations')}
+              {t("myRegistrations")}
             </Link>
           </div>
         </motion.div>

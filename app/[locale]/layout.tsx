@@ -1,13 +1,13 @@
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { notFound } from 'next/navigation';
-import { locales } from '@/i18n';
-import { ThemeProvider } from '@/components/layout/ThemeProvider';
-import { AuthProvider } from '@/hooks/useAuth';
-import { QueryProvider } from '@/components/providers/QueryProvider';
-import { Toaster } from '@/components/ui/sonner';
-import ErrorBoundary from '@/components/shared/ErrorBoundary';
-import '../globals.css';
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { locales } from "@/i18n";
+import { ThemeProvider } from "@/components/layout/ThemeProvider";
+import { AuthProvider } from "@/hooks/useAuth";
+import { QueryProvider } from "@/components/providers/QueryProvider";
+import { Toaster } from "@/components/ui/sonner";
+import ErrorBoundary from "@/components/shared/ErrorBoundary";
+import "../globals.css";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -43,9 +43,7 @@ export default async function LocaleLayout({
           <QueryProvider>
             <NextIntlClientProvider messages={messages}>
               <AuthProvider>
-                <ErrorBoundary>
-                  {children}
-                </ErrorBoundary>
+                <ErrorBoundary>{children}</ErrorBoundary>
                 <Toaster />
               </AuthProvider>
             </NextIntlClientProvider>

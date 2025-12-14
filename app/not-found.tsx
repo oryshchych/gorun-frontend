@@ -1,38 +1,38 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { Home, Search, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import './globals.css';
+import { Button } from "@/components/ui/button";
+import { Home, Search, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import "./globals.css";
 
 // Import translation files
-import ukMessages from '@/messages/uk.json';
-import enMessages from '@/messages/en.json';
+import ukMessages from "@/messages/uk.json";
+import enMessages from "@/messages/en.json";
 
 const translations = {
   uk: ukMessages,
-  en: enMessages
+  en: enMessages,
 };
 
-function detectLanguage(): 'uk' | 'en' {
-  if (typeof window === 'undefined') return 'uk';
-  
+function detectLanguage(): "uk" | "en" {
+  if (typeof window === "undefined") return "uk";
+
   // Check URL path for locale
   const path = window.location.pathname;
-  if (path.startsWith('/en')) return 'en';
-  if (path.startsWith('/uk')) return 'uk';
-  
+  if (path.startsWith("/en")) return "en";
+  if (path.startsWith("/uk")) return "uk";
+
   // Check browser language
   const browserLang = navigator.language.toLowerCase();
-  if (browserLang.startsWith('uk') || browserLang.startsWith('ru')) return 'uk';
-  
+  if (browserLang.startsWith("uk") || browserLang.startsWith("ru")) return "uk";
+
   // Default to Ukrainian
-  return 'uk';
+  return "uk";
 }
 
 export default function RootNotFound() {
-  const [locale, setLocale] = useState<'uk' | 'en'>('uk');
+  const [locale, setLocale] = useState<"uk" | "en">("uk");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function RootNotFound() {
     helpfulLinks: messages.errors.helpfulLinks,
     allEvents: messages.errors.allEvents,
     myEvents: messages.errors.myEvents,
-    myRegistrations: messages.errors.myRegistrations
+    myRegistrations: messages.errors.myRegistrations,
   };
 
   if (!mounted) {
@@ -77,7 +77,10 @@ export default function RootNotFound() {
                   404
                 </h1>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Search className="w-20 h-20 sm:w-24 sm:h-24 text-muted-foreground/40" aria-hidden="true" />
+                  <Search
+                    className="w-20 h-20 sm:w-24 sm:h-24 text-muted-foreground/40"
+                    aria-hidden="true"
+                  />
                 </div>
               </div>
             </div>
@@ -107,7 +110,10 @@ export default function RootNotFound() {
                 className="w-full sm:w-auto group"
               >
                 <Link href={`/${locale}/events`}>
-                  <ArrowLeft className="mr-2 w-4 h-4 group-hover:-translate-x-1 transition-transform" aria-hidden="true" />
+                  <ArrowLeft
+                    className="mr-2 w-4 h-4 group-hover:-translate-x-1 transition-transform"
+                    aria-hidden="true"
+                  />
                   {t.browseEvents}
                 </Link>
               </Button>
@@ -117,21 +123,21 @@ export default function RootNotFound() {
             <div className="mb-8">
               <div className="flex gap-2 justify-center">
                 <button
-                  onClick={() => setLocale('uk')}
+                  onClick={() => setLocale("uk")}
                   className={`px-3 py-1 rounded text-sm transition-colors ${
-                    locale === 'uk' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    locale === "uk"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
                   }`}
                 >
                   Українська
                 </button>
                 <button
-                  onClick={() => setLocale('en')}
+                  onClick={() => setLocale("en")}
                   className={`px-3 py-1 rounded text-sm transition-colors ${
-                    locale === 'en' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    locale === "en"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
                   }`}
                 >
                   English

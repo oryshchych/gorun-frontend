@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { EventForm } from '@/components/events/EventForm';
-import { useCreateEvent } from '@/hooks/useEvents';
-import { useTranslations } from 'next-intl';
-import { useLocale } from 'next-intl';
-import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
-import { EventFormData } from '@/lib/validations/event';
+import { EventForm } from "@/components/events/EventForm";
+import { useCreateEvent } from "@/hooks/useEvents";
+import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { EventFormData } from "@/lib/validations/event";
 
 export default function CreateEventPage() {
-  const t = useTranslations('events');
-  const tNav = useTranslations('nav');
+  const t = useTranslations("events");
+  const tNav = useTranslations("nav");
   const locale = useLocale();
   const router = useRouter();
   const createEvent = useCreateEvent();
@@ -32,24 +32,20 @@ export default function CreateEventPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
-      <Button
-        variant="ghost"
-        onClick={handleBack}
-        className="mb-6"
-      >
+      <Button variant="ghost" onClick={handleBack} className="mb-6">
         <ArrowLeft className="w-4 h-4 mr-2" />
         Back
       </Button>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">{t('createEvent')}</CardTitle>
+          <CardTitle className="text-2xl">{t("createEvent")}</CardTitle>
         </CardHeader>
         <CardContent>
           <EventForm
             onSubmit={handleSubmit}
             isLoading={createEvent.isPending}
-            submitLabel={tNav('createEvent')}
+            submitLabel={tNav("createEvent")}
           />
         </CardContent>
       </Card>

@@ -105,12 +105,14 @@ The events registration and management platform is a full-stack Next.js 15 appli
 ### Authentication System
 
 **NextAuth Configuration** (`lib/auth.ts`):
+
 - Credentials provider for email/password authentication
 - Google OAuth provider
 - JWT strategy for session management
 - Custom callbacks for session and JWT handling
 
 **Auth Components**:
+
 - `LoginForm`: Email/password login with Google OAuth button
 - `RegisterForm`: User registration with validation
 - `AuthProvider`: Client-side session provider wrapper
@@ -118,6 +120,7 @@ The events registration and management platform is a full-stack Next.js 15 appli
 ### Event Management
 
 **Event Data Model**:
+
 ```typescript
 interface Event {
   id: string;
@@ -136,6 +139,7 @@ interface Event {
 ```
 
 **Event Components**:
+
 - `EventCard`: Displays event summary with image, title, date, location
 - `EventList`: Grid/list view of events with filtering and pagination
 - `EventForm`: Create/edit event form with validation
@@ -145,6 +149,7 @@ interface Event {
 ### Registration System
 
 **Registration Data Model**:
+
 ```typescript
 interface Registration {
   id: string;
@@ -152,12 +157,13 @@ interface Registration {
   event: Event;
   userId: string;
   user: User;
-  status: 'confirmed' | 'cancelled';
+  status: "confirmed" | "cancelled";
   registeredAt: Date;
 }
 ```
 
 **Registration Flow**:
+
 1. User clicks "Register" on event details page
 2. System checks event capacity
 3. If available, creates registration record
@@ -168,6 +174,7 @@ interface Registration {
 ### Internationalization
 
 **Implementation with next-intl**:
+
 - Middleware intercepts requests and determines locale from URL
 - Messages loaded from JSON files (`messages/en.json`, `messages/uk.json`)
 - `useTranslations` hook provides translations in components
@@ -175,6 +182,7 @@ interface Registration {
 - Date/time formatting uses locale-specific formats
 
 **Language Switcher**:
+
 - Dropdown in header to switch between Ukrainian and English
 - Persists selection in cookie
 - Reloads current page with new locale
@@ -182,6 +190,7 @@ interface Registration {
 ### UI Components (shadcn/ui)
 
 **Core Components to Install**:
+
 - Button
 - Card
 - Input
@@ -196,6 +205,7 @@ interface Registration {
 - Toast/Sonner
 
 **Styling Approach**:
+
 - Tailwind CSS utility classes for layout and spacing
 - shadcn/ui components for consistent design system
 - Custom theme configuration in `tailwind.config.ts`
@@ -204,6 +214,7 @@ interface Registration {
 ### Animations (framer-motion)
 
 **Animation Patterns**:
+
 - Page transitions: Fade in with slide up
 - Card hover: Scale and shadow effects
 - Form validation: Shake animation on error
@@ -211,6 +222,7 @@ interface Registration {
 - Modal/dialog: Fade in backdrop with scale content
 
 **Performance Considerations**:
+
 - Use `layout` animations sparingly
 - Prefer `transform` and `opacity` for performance
 - Limit animation duration to 300ms
@@ -221,6 +233,7 @@ interface Registration {
 ### Database Schema
 
 **Users Table**:
+
 ```typescript
 {
   id: string (UUID, primary key)
@@ -236,6 +249,7 @@ interface Registration {
 ```
 
 **Events Table**:
+
 ```typescript
 {
   id: string (UUID, primary key)
@@ -253,6 +267,7 @@ interface Registration {
 ```
 
 **Registrations Table**:
+
 ```typescript
 {
   id: string (UUID, primary key)
@@ -267,6 +282,7 @@ interface Registration {
 ### Validation Schemas (Zod)
 
 **Event Schema**:
+
 ```typescript
 const eventSchema = z.object({
   title: z.string().min(3).max(100),
@@ -279,6 +295,7 @@ const eventSchema = z.object({
 ```
 
 **Registration Schema**:
+
 ```typescript
 const registrationSchema = z.object({
   eventId: z.string().uuid(),
@@ -286,21 +303,24 @@ const registrationSchema = z.object({
 ```
 
 **Auth Schemas**:
+
 ```typescript
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
 });
 
-const registerSchema = z.object({
-  name: z.string().min(2).max(50),
-  email: z.string().email(),
-  password: z.string().min(8).max(100),
-  confirmPassword: z.string(),
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const registerSchema = z
+  .object({
+    name: z.string().min(2).max(50),
+    email: z.string().email(),
+    password: z.string().min(8).max(100),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 ```
 
 ## Error Handling
@@ -308,18 +328,21 @@ const registerSchema = z.object({
 ### Client-Side Error Handling
 
 **Form Validation Errors**:
+
 - Display inline error messages below form fields
 - Use react-hook-form's error state
 - Show field-level errors immediately on blur
 - Show form-level errors on submit attempt
 
 **API Request Errors**:
+
 - Catch axios errors in try-catch blocks
 - Display toast notifications for user-facing errors
 - Log detailed errors to console in development
 - Show generic error messages in production
 
 **Error Boundary**:
+
 - Wrap app in ErrorBoundary component
 - Catch React rendering errors
 - Display fallback UI with retry option
@@ -328,6 +351,7 @@ const registerSchema = z.object({
 ### Server-Side Error Handling
 
 **API Route Error Responses**:
+
 ```typescript
 // Standard error response format
 {
@@ -338,6 +362,7 @@ const registerSchema = z.object({
 ```
 
 **Error Status Codes**:
+
 - 400: Bad Request (validation errors)
 - 401: Unauthorized (not authenticated)
 - 403: Forbidden (not authorized)
@@ -346,6 +371,7 @@ const registerSchema = z.object({
 - 500: Internal Server Error
 
 **Database Error Handling**:
+
 - Wrap database operations in try-catch
 - Handle unique constraint violations
 - Handle foreign key violations
@@ -358,11 +384,13 @@ const registerSchema = z.object({
 **Test Framework**: Jest + React Testing Library
 
 **Components to Test**:
+
 - Form components (LoginForm, RegisterForm, EventForm)
 - Event components (EventCard, EventList)
 - Utility functions (validation, formatting)
 
 **Test Coverage Goals**:
+
 - Form validation logic: 100%
 - Utility functions: 90%+
 - Component rendering: 80%+
@@ -370,6 +398,7 @@ const registerSchema = z.object({
 ### Integration Testing
 
 **API Route Testing**:
+
 - Test authentication flows
 - Test CRUD operations for events
 - Test registration creation and validation
@@ -378,6 +407,7 @@ const registerSchema = z.object({
 ### End-to-End Testing
 
 **Critical User Flows** (future enhancement):
+
 - User registration and login
 - Event creation and editing
 - Event registration process
@@ -441,6 +471,7 @@ const registerSchema = z.object({
 ### Vercel Deployment
 
 **Environment Variables**:
+
 - `DATABASE_URL`: Database connection string
 - `NEXTAUTH_SECRET`: NextAuth secret key
 - `NEXTAUTH_URL`: Application URL
@@ -448,12 +479,14 @@ const registerSchema = z.object({
 - `GOOGLE_CLIENT_SECRET`: Google OAuth client secret
 
 **Build Configuration**:
+
 - Output: Standalone
 - Node version: 18.x or higher
 - Build command: `next build`
 - Install command: `npm install`
 
 **Performance Settings**:
+
 - Enable Edge Runtime for API routes where possible
 - Configure caching headers
 - Enable compression

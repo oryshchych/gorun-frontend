@@ -1,5 +1,5 @@
-import { Event } from './event';
-import { User } from './auth';
+import { Event } from "./event";
+import { User } from "./auth";
 
 export interface Registration {
   id: string;
@@ -7,7 +7,7 @@ export interface Registration {
   event: Event;
   userId: string;
   user: User;
-  status: 'confirmed' | 'cancelled';
+  status: "confirmed" | "cancelled";
   registeredAt: Date;
 }
 
