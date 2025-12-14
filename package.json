@@ -11,6 +11,9 @@
     "type-check:tests": "tsc --noEmit --project tsconfig.test.json",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "format:staged": "prettier --write",
     "test": "vitest --run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui"
@@ -60,8 +63,10 @@
     "axios-mock-adapter": "^2.1.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "^15.5.9",
+    "eslint-config-prettier": "^10.1.8",
     "jsdom": "^27.3.0",
     "postcss": "^8.5.6",
+    "prettier": "^3.7.4",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
     "vitest": "^4.0.15"
