@@ -36,27 +36,32 @@ A modern, bilingual (Ukrainian/English) events registration and management platf
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd gorun-client
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Set up environment variables:
+
 ```bash
 cp .env.example .env.local
 ```
 
 Edit `.env.local` and configure:
+
 - `NEXT_PUBLIC_API_URL`: Your backend API URL
 - `NEXTAUTH_SECRET`: Generate with `openssl rand -base64 32`
 - Other variables as needed
 
 4. Run the development server:
+
 ```bash
 npm run dev
 ```
@@ -113,35 +118,41 @@ For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
 ### Environment Variables for Production
 
 Required variables:
+
 - `NEXT_PUBLIC_API_URL` - Backend API URL
 - `NEXTAUTH_SECRET` - Authentication secret
 - `NEXTAUTH_URL` - Your app URL (auto-set by Vercel)
 
 Optional variables:
+
 - `GOOGLE_CLIENT_ID` - For Google OAuth
 - `GOOGLE_CLIENT_SECRET` - For Google OAuth
 
 ## Features in Detail
 
 ### Event Management
+
 - Create events with title, description, date, location, and capacity
 - Upload event images
 - Edit and delete your events
 - View all your created events
 
 ### Registration System
+
 - Browse all available events
 - Register for events with one click
 - View your registered events
 - Automatic capacity tracking
 
 ### Internationalization
+
 - Switch between Ukrainian and English
 - Persistent language preference
 - Localized date and time formats
 - Translated UI elements
 
 ### Authentication
+
 - Email/password authentication
 - Google OAuth (optional)
 - Secure session management
@@ -162,6 +173,7 @@ This project is licensed under the ISC License.
 ## Support
 
 For issues and questions:
+
 - Open an issue on GitHub
 - Check [DEPLOYMENT.md](./DEPLOYMENT.md) for deployment help
 - Review [VERCEL_QUICK_START.md](./VERCEL_QUICK_START.md) for quick deployment

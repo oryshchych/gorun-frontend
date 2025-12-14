@@ -1,6 +1,7 @@
 # Implementation Plan
 
 ## Frontend-Only Architecture
+
 This is a frontend Next.js application that consumes a separate backend API (MongoDB-based). The backend will be shared with Telegram bot and mobile applications.
 
 - [x] 1. Initialize Next.js project and install dependencies

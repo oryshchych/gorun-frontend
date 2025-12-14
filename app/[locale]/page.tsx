@@ -1,23 +1,23 @@
-'use client';
+"use client";
 
-import { useTranslations, useLocale } from 'next-intl';
-import { ThemeToggle } from '@/components/layout/ThemeToggle';
-import LanguageSwitcher from '@/components/layout/LanguageSwitcher';
-import { Button } from '@/components/ui/button';
-import { Calendar, Users, Sparkles, ArrowRight } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { useEvents } from '@/hooks/useEvents';
-import { EventList } from '@/components/events/EventList';
-import { useAuth } from '@/hooks/useAuth';
-import Footer from '@/components/layout/Footer';
+import { useTranslations, useLocale } from "next-intl";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
+import { Button } from "@/components/ui/button";
+import { Calendar, Users, Sparkles, ArrowRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { useEvents } from "@/hooks/useEvents";
+import { EventList } from "@/components/events/EventList";
+import { useAuth } from "@/hooks/useAuth";
+import Footer from "@/components/layout/Footer";
 
 export default function HomePage() {
   const t = useTranslations();
   const locale = useLocale();
   const { isAuthenticated } = useAuth();
-  
+
   // Fetch featured events (first 6 upcoming events)
   const { data: eventsData, isLoading } = useEvents({ limit: 6 });
   const featuredEvents = eventsData?.data || [];
@@ -27,9 +27,12 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href={`/${locale}`} className="flex items-center hover:opacity-80 transition-opacity">
-            <Image 
-              src="/images/logos/logo.png" 
+          <Link
+            href={`/${locale}`}
+            className="flex items-center hover:opacity-80 transition-opacity"
+          >
+            <Image
+              src="/images/logos/logo.png"
               alt="GoRun Events Platform"
               width={60}
               height={20}
@@ -41,15 +44,11 @@ export default function HomePage() {
             <ThemeToggle />
             {isAuthenticated ? (
               <Button asChild variant="default" className="ml-2">
-                <Link href={`/${locale}/events`}>
-                  {t('nav.events')}
-                </Link>
+                <Link href={`/${locale}/events`}>{t("nav.events")}</Link>
               </Button>
             ) : (
               <Button asChild variant="default" className="ml-2">
-                <Link href={`/${locale}/login`}>
-                  {t('nav.login')}
-                </Link>
+                <Link href={`/${locale}/login`}>{t("nav.login")}</Link>
               </Button>
             )}
           </div>
@@ -74,7 +73,7 @@ export default function HomePage() {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6"
               >
                 <Sparkles className="w-4 h-4" aria-hidden="true" />
-                <span>{t('home.badge')}</span>
+                <span>{t("home.badge")}</span>
               </motion.div>
 
               {/* Main Heading */}
@@ -84,7 +83,7 @@ export default function HomePage() {
                 transition={{ delay: 0.3, duration: 0.6 }}
                 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6"
               >
-                {t('home.title')}
+                {t("home.title")}
               </motion.h1>
 
               {/* Subtitle */}
@@ -94,7 +93,7 @@ export default function HomePage() {
                 transition={{ delay: 0.4, duration: 0.6 }}
                 className="text-lg sm:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto"
               >
-                {t('home.subtitle')}
+                {t("home.subtitle")}
               </motion.p>
 
               {/* CTA Buttons */}
@@ -106,31 +105,53 @@ export default function HomePage() {
               >
                 {isAuthenticated ? (
                   <>
-                    <Button asChild size="lg" className="w-full sm:w-auto group">
+                    <Button
+                      asChild
+                      size="lg"
+                      className="w-full sm:w-auto group"
+                    >
                       <Link href={`/${locale}/events`}>
-                        {t('home.browseEvents')}
-                        <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+                        {t("home.browseEvents")}
+                        <ArrowRight
+                          className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
+                          aria-hidden="true"
+                        />
                       </Link>
                     </Button>
-                    <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
+                    <Button
+                      asChild
+                      size="lg"
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                    >
                       <Link href={`/${locale}/events/create`}>
                         <Calendar className="mr-2 w-4 h-4" aria-hidden="true" />
-                        {t('home.createEvent')}
+                        {t("home.createEvent")}
                       </Link>
                     </Button>
                   </>
                 ) : (
                   <>
-                    <Button asChild size="lg" className="w-full sm:w-auto group">
+                    <Button
+                      asChild
+                      size="lg"
+                      className="w-full sm:w-auto group"
+                    >
                       <Link href={`/${locale}/register`}>
-                        {t('home.getStarted')}
-                        <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+                        {t("home.getStarted")}
+                        <ArrowRight
+                          className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
+                          aria-hidden="true"
+                        />
                       </Link>
                     </Button>
-                    <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
-                      <Link href={`/${locale}/login`}>
-                        {t('nav.login')}
-                      </Link>
+                    <Button
+                      asChild
+                      size="lg"
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                    >
+                      <Link href={`/${locale}/login`}>{t("nav.login")}</Link>
                     </Button>
                   </>
                 )}
@@ -147,17 +168,25 @@ export default function HomePage() {
                   <div className="text-3xl sm:text-4xl font-bold text-primary mb-2">
                     {featuredEvents.length}+
                   </div>
-                  <div className="text-sm text-muted-foreground">{t('home.activeEvents')}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("home.activeEvents")}
+                  </div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl sm:text-4xl font-bold text-primary mb-2">
                     <Users className="w-8 h-8 mx-auto" aria-hidden="true" />
                   </div>
-                  <div className="text-sm text-muted-foreground">{t('home.community')}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("home.community")}
+                  </div>
                 </div>
                 <div className="text-center col-span-2 sm:col-span-1">
-                  <div className="text-3xl sm:text-4xl font-bold text-primary mb-2">24/7</div>
-                  <div className="text-sm text-muted-foreground">{t('home.availability')}</div>
+                  <div className="text-3xl sm:text-4xl font-bold text-primary mb-2">
+                    24/7
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("home.availability")}
+                  </div>
                 </div>
               </motion.div>
             </motion.div>
@@ -176,10 +205,10 @@ export default function HomePage() {
                 className="text-center mb-12"
               >
                 <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-                  {t('home.featuredEvents')}
+                  {t("home.featuredEvents")}
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  {t('home.featuredEventsSubtitle')}
+                  {t("home.featuredEventsSubtitle")}
                 </p>
               </motion.div>
 
@@ -202,8 +231,11 @@ export default function HomePage() {
                 >
                   <Button asChild size="lg" variant="outline" className="group">
                     <Link href={`/${locale}/events`}>
-                      {t('home.viewAllEvents')}
-                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+                      {t("home.viewAllEvents")}
+                      <ArrowRight
+                        className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
+                        aria-hidden="true"
+                      />
                     </Link>
                   </Button>
                 </motion.div>

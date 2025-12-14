@@ -3,7 +3,7 @@ export interface User {
   email: string;
   name: string;
   image?: string;
-  provider: 'credentials' | 'google';
+  provider: "credentials" | "google";
   providerId?: string;
   createdAt: Date;
   updatedAt: Date;

@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { Event } from '@/types/event';
-import { EventCard } from './EventCard';
-import { EventCardSkeleton } from '@/components/shared/EventCardSkeleton';
-import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
+import { Event } from "@/types/event";
+import { EventCard } from "./EventCard";
+import { EventCardSkeleton } from "@/components/shared/EventCardSkeleton";
+import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
 
 interface EventListProps {
   events: Event[];
@@ -12,11 +12,11 @@ interface EventListProps {
 }
 
 export function EventList({ events, isLoading = false }: EventListProps) {
-  const t = useTranslations('events');
+  const t = useTranslations("events");
 
   if (isLoading) {
     return (
-      <div 
+      <div
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
         role="status"
         aria-label="Loading events"
@@ -30,12 +30,12 @@ export function EventList({ events, isLoading = false }: EventListProps) {
 
   if (!events || events.length === 0) {
     return (
-      <div 
+      <div
         className="flex flex-col items-center justify-center py-12 text-center"
         role="status"
         aria-live="polite"
       >
-        <p className="text-muted-foreground text-lg">{t('noEvents')}</p>
+        <p className="text-muted-foreground text-lg">{t("noEvents")}</p>
       </div>
     );
   }

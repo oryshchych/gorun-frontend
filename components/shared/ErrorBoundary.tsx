@@ -1,9 +1,16 @@
-'use client';
+"use client";
 
-import React, { Component, ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertCircle } from 'lucide-react';
+import React, { Component, ReactNode } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { AlertCircle } from "lucide-react";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -32,7 +39,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
   }
 
   handleReset = () => {
@@ -61,7 +68,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+              {process.env.NODE_ENV === "development" && this.state.error && (
                 <div className="mt-4 p-4 bg-muted rounded-md">
                   <p className="text-sm font-mono text-muted-foreground break-all">
                     {this.state.error.message}
@@ -73,7 +80,10 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
               <Button onClick={this.handleReset} variant="default">
                 Try Again
               </Button>
-              <Button onClick={() => window.location.href = '/'} variant="outline">
+              <Button
+                onClick={() => (window.location.href = "/")}
+                variant="outline"
+              >
                 Go Home
               </Button>
             </CardFooter>

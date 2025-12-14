@@ -1,6 +1,6 @@
-import apiClient from './client';
-import { Event, CreateEventRequest, UpdateEventRequest } from '@/types/event';
-import { ApiResponse, PaginatedResponse } from '@/types/api';
+import apiClient from "./client";
+import { Event, CreateEventRequest, UpdateEventRequest } from "@/types/event";
+import { ApiResponse, PaginatedResponse } from "@/types/api";
 
 export interface GetEventsParams {
   page?: number;
@@ -18,15 +18,15 @@ export const getEvents = async (
   params: GetEventsParams = {}
 ): Promise<PaginatedResponse<Event>> => {
   const { page = 1, limit = 10, ...filters } = params;
-  
-  const response = await apiClient.get<PaginatedResponse<Event>>('/events', {
+
+  const response = await apiClient.get<PaginatedResponse<Event>>("/events", {
     params: {
       page,
       limit,
       ...filters,
     },
   });
-  
+
   return response.data;
 };
 
@@ -41,10 +41,8 @@ export const getEventById = async (id: string): Promise<Event> => {
 /**
  * Create a new event
  */
-export const createEvent = async (
-  data: CreateEventRequest
-): Promise<Event> => {
-  const response = await apiClient.post<ApiResponse<Event>>('/events', data);
+export const createEvent = async (data: CreateEventRequest): Promise<Event> => {
+  const response = await apiClient.post<ApiResponse<Event>>("/events", data);
   return response.data.data;
 };
 
@@ -76,13 +74,13 @@ export const getMyEvents = async (
   params: GetEventsParams = {}
 ): Promise<PaginatedResponse<Event>> => {
   const { page = 1, limit = 10 } = params;
-  
-  const response = await apiClient.get<PaginatedResponse<Event>>('/events/my', {
+
+  const response = await apiClient.get<PaginatedResponse<Event>>("/events/my", {
     params: {
       page,
       limit,
     },
   });
-  
+
   return response.data;
 };

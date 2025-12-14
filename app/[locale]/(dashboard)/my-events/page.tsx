@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useMyEvents } from '@/hooks/useEvents';
-import { EventList } from '@/components/events/EventList';
-import { Button } from '@/components/ui/button';
-import { useTranslations } from 'next-intl';
-import { useLocale } from 'next-intl';
-import { useRouter } from 'next/navigation';
-import { Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useMyEvents } from "@/hooks/useEvents";
+import { EventList } from "@/components/events/EventList";
+import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
+import { useState } from "react";
 
 export default function MyEventsPage() {
-  const tNav = useTranslations('nav');
+  const tNav = useTranslations("nav");
   const locale = useLocale();
   const router = useRouter();
   const [page, setPage] = useState(1);
@@ -25,20 +25,20 @@ export default function MyEventsPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold mb-2">{tNav('myEvents')}</h1>
+          <h1 className="text-3xl font-bold mb-2">{tNav("myEvents")}</h1>
           <p className="text-muted-foreground">
             Manage events you have created
           </p>
         </div>
         <Button onClick={handleCreateEvent}>
           <Plus className="w-4 h-4 mr-2" />
-          {tNav('createEvent')}
+          {tNav("createEvent")}
         </Button>
       </div>
 
       {error && (
         <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-lg mb-6">
-          {error.message || 'Failed to load your events'}
+          {error.message || "Failed to load your events"}
         </div>
       )}
 
@@ -51,7 +51,7 @@ export default function MyEventsPage() {
           </p>
           <Button onClick={handleCreateEvent}>
             <Plus className="w-4 h-4 mr-2" />
-            {tNav('createEvent')}
+            {tNav("createEvent")}
           </Button>
         </div>
       )}
@@ -71,7 +71,9 @@ export default function MyEventsPage() {
           </span>
           <Button
             variant="outline"
-            onClick={() => setPage((p) => Math.min(data.pagination.totalPages, p + 1))}
+            onClick={() =>
+              setPage((p) => Math.min(data.pagination.totalPages, p + 1))
+            }
             disabled={page === data.pagination.totalPages || isLoading}
           >
             Next

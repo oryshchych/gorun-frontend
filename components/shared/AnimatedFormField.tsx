@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { ReactNode, useEffect, useState } from 'react';
+import { motion } from "framer-motion";
+import { ReactNode, useEffect, useState } from "react";
 
 interface AnimatedFormFieldProps {
   children: ReactNode;
@@ -21,10 +21,14 @@ export function AnimatedFormField({ children, error }: AnimatedFormFieldProps) {
 
   return (
     <motion.div
-      animate={shake ? {
-        x: [0, -10, 10, -10, 10, 0],
-        transition: { duration: 0.4 }
-      } : {}}
+      animate={
+        shake
+          ? {
+              x: [0, -10, 10, -10, 10, 0],
+              transition: { duration: 0.4 },
+            }
+          : {}
+      }
     >
       {children}
     </motion.div>

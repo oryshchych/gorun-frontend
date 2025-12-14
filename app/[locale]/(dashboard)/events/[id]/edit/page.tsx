@@ -1,24 +1,24 @@
-'use client';
+"use client";
 
-import { useEvent, useUpdateEvent } from '@/hooks/useEvents';
-import { EventForm } from '@/components/events/EventForm';
-import { useTranslations } from 'next-intl';
-import { useLocale } from 'next-intl';
-import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2 } from 'lucide-react';
-import { EventFormData } from '@/lib/validations/event';
-import { use } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import { useEvent, useUpdateEvent } from "@/hooks/useEvents";
+import { EventForm } from "@/components/events/EventForm";
+import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { EventFormData } from "@/lib/validations/event";
+import { use } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 interface EditEventPageProps {
   params: Promise<{ id: string; locale: string }>;
 }
 
 export default function EditEventPage({ params }: EditEventPageProps) {
-  const t = useTranslations('events');
-  const tCommon = useTranslations('common');
+  const t = useTranslations("events");
+  const tCommon = useTranslations("common");
   const locale = useLocale();
   const router = useRouter();
   const resolvedParams = use(params);
@@ -56,10 +56,10 @@ export default function EditEventPage({ params }: EditEventPageProps) {
       <div className="container mx-auto px-4 py-8">
         <Button variant="ghost" onClick={handleBack} className="mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
-          {tCommon('back')}
+          {tCommon("back")}
         </Button>
         <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-lg">
-          {error?.message || 'Event not found'}
+          {error?.message || "Event not found"}
         </div>
       </div>
     );
@@ -71,7 +71,7 @@ export default function EditEventPage({ params }: EditEventPageProps) {
       <div className="container mx-auto px-4 py-8">
         <Button variant="ghost" onClick={handleBack} className="mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
-          {tCommon('back')}
+          {tCommon("back")}
         </Button>
         <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-lg">
           You are not authorized to edit this event
@@ -84,19 +84,19 @@ export default function EditEventPage({ params }: EditEventPageProps) {
     <div className="container mx-auto px-4 py-8 max-w-3xl">
       <Button variant="ghost" onClick={handleBack} className="mb-6">
         <ArrowLeft className="w-4 h-4 mr-2" />
-        {tCommon('back')}
+        {tCommon("back")}
       </Button>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">{t('editEvent')}</CardTitle>
+          <CardTitle className="text-2xl">{t("editEvent")}</CardTitle>
         </CardHeader>
         <CardContent>
           <EventForm
             onSubmit={handleSubmit}
             defaultValues={event}
             isLoading={updateEvent.isPending}
-            submitLabel={tCommon('save')}
+            submitLabel={tCommon("save")}
           />
         </CardContent>
       </Card>

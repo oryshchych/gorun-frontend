@@ -1,6 +1,15 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { format, formatDistance, formatRelative, isToday, isTomorrow, isYesterday, isThisWeek, isThisMonth } from "date-fns";
+import {
+  format,
+  formatDistance,
+  formatRelative,
+  isToday,
+  isTomorrow,
+  isYesterday,
+  isThisWeek,
+  isThisMonth,
+} from "date-fns";
 import { enUS } from "date-fns/locale/en-US";
 import { uk } from "date-fns/locale/uk";
 
@@ -12,7 +21,7 @@ export function cn(...inputs: ClassValue[]) {
  * Get the date-fns locale object based on the locale string
  */
 export function getDateLocale(locale: string) {
-  return locale === 'uk' ? uk : enUS;
+  return locale === "uk" ? uk : enUS;
 }
 
 /**
@@ -21,8 +30,15 @@ export function getDateLocale(locale: string) {
  * @param formatStr - The format string (e.g., 'PPP', 'PPPp', 'dd/MM/yyyy')
  * @param locale - The locale string ('en' or 'uk')
  */
-export function formatDate(date: Date | string | number, formatStr: string = 'PPP', locale: string = 'en'): string {
-  const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+export function formatDate(
+  date: Date | string | number,
+  formatStr: string = "PPP",
+  locale: string = "en"
+): string {
+  const dateObj =
+    typeof date === "string" || typeof date === "number"
+      ? new Date(date)
+      : date;
   const dateLocale = getDateLocale(locale);
   return format(dateObj, formatStr, { locale: dateLocale });
 }
@@ -32,8 +48,11 @@ export function formatDate(date: Date | string | number, formatStr: string = 'PP
  * @param date - The date to format
  * @param locale - The locale string ('en' or 'uk')
  */
-export function formatDateTime(date: Date | string | number, locale: string = 'en'): string {
-  return formatDate(date, 'PPPp', locale);
+export function formatDateTime(
+  date: Date | string | number,
+  locale: string = "en"
+): string {
+  return formatDate(date, "PPPp", locale);
 }
 
 /**
@@ -41,8 +60,11 @@ export function formatDateTime(date: Date | string | number, locale: string = 'e
  * @param date - The date to format
  * @param locale - The locale string ('en' or 'uk')
  */
-export function formatDateShort(date: Date | string | number, locale: string = 'en'): string {
-  return formatDate(date, 'PP', locale);
+export function formatDateShort(
+  date: Date | string | number,
+  locale: string = "en"
+): string {
+  return formatDate(date, "PP", locale);
 }
 
 /**
@@ -50,8 +72,11 @@ export function formatDateShort(date: Date | string | number, locale: string = '
  * @param date - The date to format
  * @param locale - The locale string ('en' or 'uk')
  */
-export function formatTime(date: Date | string | number, locale: string = 'en'): string {
-  return formatDate(date, 'p', locale);
+export function formatTime(
+  date: Date | string | number,
+  locale: string = "en"
+): string {
+  return formatDate(date, "p", locale);
 }
 
 /**
@@ -59,10 +84,19 @@ export function formatTime(date: Date | string | number, locale: string = 'en'):
  * @param date - The date to format
  * @param locale - The locale string ('en' or 'uk')
  */
-export function formatRelativeDate(date: Date | string | number, locale: string = 'en'): string {
-  const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+export function formatRelativeDate(
+  date: Date | string | number,
+  locale: string = "en"
+): string {
+  const dateObj =
+    typeof date === "string" || typeof date === "number"
+      ? new Date(date)
+      : date;
   const dateLocale = getDateLocale(locale);
-  return formatDistance(dateObj, new Date(), { addSuffix: true, locale: dateLocale });
+  return formatDistance(dateObj, new Date(), {
+    addSuffix: true,
+    locale: dateLocale,
+  });
 }
 
 /**
@@ -70,8 +104,14 @@ export function formatRelativeDate(date: Date | string | number, locale: string 
  * @param date - The date to format
  * @param locale - The locale string ('en' or 'uk')
  */
-export function formatRelativeDateTime(date: Date | string | number, locale: string = 'en'): string {
-  const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+export function formatRelativeDateTime(
+  date: Date | string | number,
+  locale: string = "en"
+): string {
+  const dateObj =
+    typeof date === "string" || typeof date === "number"
+      ? new Date(date)
+      : date;
   const dateLocale = getDateLocale(locale);
   return formatRelative(dateObj, new Date(), { locale: dateLocale });
 }
@@ -81,38 +121,50 @@ export function formatRelativeDateTime(date: Date | string | number, locale: str
  * @param date - The date to check
  * @param locale - The locale string ('en' or 'uk')
  */
-export function getDateLabel(date: Date | string | number, locale: string = 'en'): string | null {
-  const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
-  
+export function getDateLabel(
+  date: Date | string | number,
+  locale: string = "en"
+): string | null {
+  const dateObj =
+    typeof date === "string" || typeof date === "number"
+      ? new Date(date)
+      : date;
+
   if (isToday(dateObj)) {
-    return locale === 'uk' ? 'Сьогодні' : 'Today';
+    return locale === "uk" ? "Сьогодні" : "Today";
   }
   if (isTomorrow(dateObj)) {
-    return locale === 'uk' ? 'Завтра' : 'Tomorrow';
+    return locale === "uk" ? "Завтра" : "Tomorrow";
   }
   if (isYesterday(dateObj)) {
-    return locale === 'uk' ? 'Вчора' : 'Yesterday';
+    return locale === "uk" ? "Вчора" : "Yesterday";
   }
-  
+
   return null;
 }
 
 /**
  * Check if a date is in a specific time period
  */
-export function isDateInPeriod(date: Date | string | number, period: 'today' | 'tomorrow' | 'yesterday' | 'thisWeek' | 'thisMonth'): boolean {
-  const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
-  
+export function isDateInPeriod(
+  date: Date | string | number,
+  period: "today" | "tomorrow" | "yesterday" | "thisWeek" | "thisMonth"
+): boolean {
+  const dateObj =
+    typeof date === "string" || typeof date === "number"
+      ? new Date(date)
+      : date;
+
   switch (period) {
-    case 'today':
+    case "today":
       return isToday(dateObj);
-    case 'tomorrow':
+    case "tomorrow":
       return isTomorrow(dateObj);
-    case 'yesterday':
+    case "yesterday":
       return isYesterday(dateObj);
-    case 'thisWeek':
+    case "thisWeek":
       return isThisWeek(dateObj);
-    case 'thisMonth':
+    case "thisMonth":
       return isThisMonth(dateObj);
     default:
       return false;
@@ -125,14 +177,20 @@ export function isDateInPeriod(date: Date | string | number, period: 'today' | '
  * @param date - The date to format
  * @param locale - The locale string ('en' or 'uk')
  */
-export function formatEventDate(date: Date | string | number, locale: string = 'en'): string {
-  const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+export function formatEventDate(
+  date: Date | string | number,
+  locale: string = "en"
+): string {
+  const dateObj =
+    typeof date === "string" || typeof date === "number"
+      ? new Date(date)
+      : date;
   const label = getDateLabel(dateObj, locale);
-  
+
   if (label) {
     return `${label}, ${formatTime(dateObj, locale)}`;
   }
-  
+
   return formatDateTime(dateObj, locale);
 }
 
@@ -142,9 +200,13 @@ export function formatEventDate(date: Date | string | number, locale: string = '
  * @param endDate - The end date
  * @param locale - The locale string ('en' or 'uk')
  */
-export function formatDateRange(startDate: Date | string | number, endDate: Date | string | number, locale: string = 'en'): string {
-  const start = formatDate(startDate, 'PPP', locale);
-  const end = formatDate(endDate, 'PPP', locale);
-  const separator = locale === 'uk' ? ' - ' : ' - ';
+export function formatDateRange(
+  startDate: Date | string | number,
+  endDate: Date | string | number,
+  locale: string = "en"
+): string {
+  const start = formatDate(startDate, "PPP", locale);
+  const end = formatDate(endDate, "PPP", locale);
+  const separator = locale === "uk" ? " - " : " - ";
   return `${start}${separator}${end}`;
 }
