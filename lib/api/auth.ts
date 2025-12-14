@@ -1,3 +1,4 @@
+import { User } from "@/types/auth";
 import apiClient, { tokenManager } from "./client";
 
 // Types for authentication
@@ -23,6 +24,11 @@ export interface AuthResponse {
     accessToken: string;
     refreshToken: string;
   };
+}
+
+export interface CurrentUserResponse {
+  data: User;
+  success: boolean;
 }
 
 // Login function
@@ -72,8 +78,8 @@ export async function logout(): Promise<void> {
 }
 
 // Get current user
-export async function getCurrentUser() {
-  const response = await apiClient.get("/api/auth/me");
+export async function getCurrentUser(): Promise<CurrentUserResponse> {
+  const response = await apiClient.get<CurrentUserResponse>("/api/auth/me");
   return response.data;
 }
 

@@ -180,10 +180,6 @@ export const tokenManager = {
   setTokens,
   clearTokens,
   hasToken,
-  // Deprecated: Use hasToken() instead. This method doesn't validate the token, only checks existence.
-  hasValidToken: (): boolean => {
-    return hasToken();
-  },
 };
 
 export default apiClient;

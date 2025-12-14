@@ -46,10 +46,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Load user on mount if token exists
   useEffect(() => {
     const loadUser = async () => {
-      if (tokenManager.hasValidToken()) {
+      if (tokenManager.hasToken()) {
         try {
           const userData = await getCurrentUser();
-          setUser(userData.user);
+          setUser(userData.data);
         } catch (error) {
           console.error("Failed to load user:", error);
           tokenManager.clearTokens();
@@ -96,10 +96,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Refresh user data
   const refreshUser = useCallback(async () => {
-    if (tokenManager.hasValidToken()) {
+    if (tokenManager.hasToken()) {
       try {
         const userData = await getCurrentUser();
-        setUser(userData.user);
+        setUser(userData.data);
       } catch (error) {
         console.error("Failed to refresh user:", error);
         setUser(null);

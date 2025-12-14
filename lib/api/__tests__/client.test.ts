@@ -96,13 +96,13 @@ describe("API Client", () => {
     });
 
     it("should check if valid token exists", () => {
-      expect(tokenManager.hasValidToken()).toBe(false);
+      expect(tokenManager.hasToken()).toBe(false);
 
       tokenManager.setTokens("test-token");
-      expect(tokenManager.hasValidToken()).toBe(true);
+      expect(tokenManager.hasToken()).toBe(true);
 
       tokenManager.clearTokens();
-      expect(tokenManager.hasValidToken()).toBe(false);
+      expect(tokenManager.hasToken()).toBe(false);
     });
   });
 });
