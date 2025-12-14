@@ -34,7 +34,7 @@ export const getEvents = async (
  * Fetch a single event by ID
  */
 export const getEventById = async (id: string): Promise<Event> => {
-  const response = await apiClient.get<ApiResponse<Event>>(`/api/events/${id}`);
+  const response = await apiClient.get<ApiResponse<Event>>(`/events/${id}`);
   return response.data.data;
 };
 
@@ -42,10 +42,7 @@ export const getEventById = async (id: string): Promise<Event> => {
  * Create a new event
  */
 export const createEvent = async (data: CreateEventRequest): Promise<Event> => {
-  const response = await apiClient.post<ApiResponse<Event>>(
-    "/api/events",
-    data
-  );
+  const response = await apiClient.post<ApiResponse<Event>>("/events", data);
   return response.data.data;
 };
 
@@ -57,7 +54,7 @@ export const updateEvent = async (
   data: UpdateEventRequest
 ): Promise<Event> => {
   const response = await apiClient.put<ApiResponse<Event>>(
-    `/api/events/${id}`,
+    `/events/${id}`,
     data
   );
   return response.data.data;
@@ -67,7 +64,7 @@ export const updateEvent = async (
  * Delete an event
  */
 export const deleteEvent = async (id: string): Promise<void> => {
-  await apiClient.delete(`/api/events/${id}`);
+  await apiClient.delete(`/events/${id}`);
 };
 
 /**
@@ -78,15 +75,12 @@ export const getMyEvents = async (
 ): Promise<PaginatedResponse<Event>> => {
   const { page = 1, limit = 10 } = params;
 
-  const response = await apiClient.get<PaginatedResponse<Event>>(
-    "/api/events/my",
-    {
-      params: {
-        page,
-        limit,
-      },
-    }
-  );
+  const response = await apiClient.get<PaginatedResponse<Event>>("/events/my", {
+    params: {
+      page,
+      limit,
+    },
+  });
 
   return response.data;
 };

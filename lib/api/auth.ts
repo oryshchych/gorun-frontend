@@ -34,7 +34,7 @@ export interface CurrentUserResponse {
 // Login function
 export async function login(credentials: LoginRequest): Promise<AuthResponse> {
   const response = await apiClient.post<AuthResponse>(
-    "/api/auth/login",
+    "/auth/login",
     credentials
   );
 
@@ -49,10 +49,7 @@ export async function login(credentials: LoginRequest): Promise<AuthResponse> {
 
 // Register function
 export async function register(data: RegisterRequest): Promise<AuthResponse> {
-  const response = await apiClient.post<AuthResponse>(
-    "/api/auth/register",
-    data
-  );
+  const response = await apiClient.post<AuthResponse>("/auth/register", data);
 
   // Store tokens
   tokenManager.setTokens(
@@ -67,7 +64,7 @@ export async function register(data: RegisterRequest): Promise<AuthResponse> {
 export async function logout(): Promise<void> {
   try {
     // Call logout endpoint to invalidate refresh token on server
-    await apiClient.post("/api/auth/logout");
+    await apiClient.post("/auth/logout");
   } catch (error) {
     // Continue with local logout even if server request fails
     console.error("Logout error:", error);
@@ -79,7 +76,7 @@ export async function logout(): Promise<void> {
 
 // Get current user
 export async function getCurrentUser(): Promise<CurrentUserResponse> {
-  const response = await apiClient.get<CurrentUserResponse>("/api/auth/me");
+  const response = await apiClient.get<CurrentUserResponse>("/auth/me");
   return response.data;
 }
 
@@ -87,7 +84,7 @@ export async function getCurrentUser(): Promise<CurrentUserResponse> {
 export async function refreshAccessToken(
   refreshToken: string
 ): Promise<string> {
-  const response = await apiClient.post("/api/auth/refresh", { refreshToken });
+  const response = await apiClient.post("/auth/refresh", { refreshToken });
 
   const { accessToken, refreshToken: newRefreshToken } = response.data;
 
