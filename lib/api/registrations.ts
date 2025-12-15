@@ -1,5 +1,9 @@
 import apiClient from "./client";
-import { Registration, CreateRegistrationRequest } from "@/types/registration";
+import {
+  Registration,
+  CreateRegistrationRequest,
+  Participant,
+} from "@/types/registration";
 import { ApiResponse, PaginatedResponse } from "@/types/api";
 
 export interface GetRegistrationsParams {
@@ -75,7 +79,7 @@ export const getMyRegistrations = async (
 };
 
 /**
- * Create a new registration for an event
+ * Create a new registration for an event (public, no auth required)
  */
 export const createRegistration = async (
   data: CreateRegistrationRequest
@@ -83,6 +87,18 @@ export const createRegistration = async (
   const response = await apiClient.post<ApiResponse<Registration>>(
     "/registrations",
     data
+  );
+  return response.data.data;
+};
+
+/**
+ * Get public participants list for an event (no auth required)
+ */
+export const getEventParticipants = async (
+  eventId: string
+): Promise<Participant[]> => {
+  const response = await apiClient.get<ApiResponse<Participant[]>>(
+    `/events/${eventId}/participants`
   );
   return response.data.data;
 };
