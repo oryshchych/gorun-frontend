@@ -23,7 +23,7 @@ export default function LanguageSwitcher() {
         <button
           key={loc}
           onClick={() => handleLocaleChange(loc)}
-          className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+          className={`px-3 py-1 rounded-md text-sm font-medium transition-colors cursor-pointer ${
             locale === loc
               ? "bg-primary text-primary-foreground"
               : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
