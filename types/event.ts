@@ -8,9 +8,11 @@ export interface Event {
   location: string;
   capacity: number;
   registeredCount: number;
-  organizerId: string;
-  organizer: User;
+  organizerId?: string;
+  organizer?: User;
   imageUrl?: string;
+  speakers?: string[]; // For future expansion
+  gallery?: string[]; // For future expansion
   createdAt: Date;
   updatedAt: Date;
 }

@@ -7,3 +7,4 @@ declare module "vitest" {
   interface AsymmetricMatchersContaining
     extends jest.Matchers<void>, TestingLibraryMatchers<any, void> {}
 }
+
