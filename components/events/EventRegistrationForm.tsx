@@ -337,7 +337,7 @@ export function EventRegistrationForm({
             <Button
               type="submit"
               disabled={isLoading || isCheckingPromoCode}
-              className="w-full"
+              className="w-full cursor-pointer"
               size="lg"
               aria-label={t("proceedToPayment")}
             >
