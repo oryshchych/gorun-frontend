@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const registrationSchema = z.object({
-  eventId: z.string().uuid("Invalid event ID format"),
+  eventId: z.string().min(1, "Invalid event ID"),
   name: z
     .string()
     .min(2, "Name must be at least 2 characters")
