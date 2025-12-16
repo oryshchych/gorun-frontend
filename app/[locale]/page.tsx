@@ -36,7 +36,7 @@ export default function HomePage() {
     data: event,
     isLoading: eventLoading,
     error: eventError,
-  } = useEvent(SINGLE_EVENT_ID);
+  } = useEvent(SINGLE_EVENT_ID, locale);
 
   // Fetch participants (only when event is loaded)
   const { data: participants = [], isLoading: participantsLoading } =

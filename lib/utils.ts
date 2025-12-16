@@ -12,9 +12,37 @@ import {
 } from "date-fns";
 import { enUS } from "date-fns/locale/en-US";
 import { uk } from "date-fns/locale/uk";
+import { SupportedLocale, TranslationField } from "@/types/event";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+/**
+ * Pick a localized string with fallback to the provided default value.
+ */
+export function getLocalizedString(
+  field: TranslationField | undefined,
+  locale: string,
+  fallbackLocale: SupportedLocale = "en",
+  fallbackValue = ""
+): string {
+  if (!field) return fallbackValue;
+  const normalizedLocale = (locale as SupportedLocale) || fallbackLocale;
+  return field[normalizedLocale] ?? field[fallbackLocale] ?? fallbackValue;
+}
+
+/**
+ * Pick a localized array of strings with fallback to provided default list.
+ */
+export function getLocalizedArray(
+  items: TranslationField[] | undefined,
+  locale: string,
+  fallbackLocale: SupportedLocale = "en",
+  fallbackList: string[] = []
+): string[] {
+  if (!items || items.length === 0) return fallbackList;
+  return items.map((item) => getLocalizedString(item, locale, fallbackLocale));
 }
 
 /**

@@ -85,8 +85,8 @@ export function EventRegistrationForm({
     await onSubmit(data);
   };
 
-  // Calculate price (this would come from event or API)
-  const basePrice = 1000; // TODO: Get from event or API
+  // Calculate price (sourced from event; defaults to 0 if missing)
+  const basePrice = event.basePrice ?? 0;
   const discountAmount =
     promoCodeDiscount?.discountType === "percentage"
       ? (basePrice * promoCodeDiscount.discountValue) / 100

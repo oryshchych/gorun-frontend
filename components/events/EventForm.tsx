@@ -44,12 +44,33 @@ export function EventForm({
   const form = useForm<EventFormData>({
     resolver: zodResolver(eventSchema) as any,
     defaultValues: {
-      title: defaultValues?.title || "",
-      description: defaultValues?.description || "",
-      date: defaultValues?.date || new Date(),
-      location: defaultValues?.location || "",
+      translations: {
+        title: {
+          en:
+            defaultValues?.translations?.title?.en ||
+            defaultValues?.title ||
+            "",
+          uk: defaultValues?.translations?.title?.uk || "",
+        },
+        description: {
+          en:
+            defaultValues?.translations?.description?.en ||
+            defaultValues?.description ||
+            "",
+          uk: defaultValues?.translations?.description?.uk || "",
+        },
+        location: {
+          en:
+            defaultValues?.translations?.location?.en ||
+            defaultValues?.location ||
+            "",
+          uk: defaultValues?.translations?.location?.uk || "",
+        },
+      },
+      date: defaultValues?.date ? new Date(defaultValues.date) : new Date(),
       capacity: defaultValues?.capacity || 50,
       imageUrl: defaultValues?.imageUrl || "",
+      basePrice: defaultValues?.basePrice ?? 0,
     },
   });
 
@@ -91,62 +112,114 @@ export function EventForm({
         className="space-y-6"
         aria-label="Event form"
       >
-        {/* Title */}
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field, fieldState }) => (
-            <AnimatedFormField error={fieldState.error?.message}>
-              <FormItem>
-                <FormLabel htmlFor="event-title">{t("eventTitle")}</FormLabel>
-                <FormControl>
-                  <Input
-                    id="event-title"
-                    placeholder={t("eventTitle")}
-                    {...field}
-                    disabled={isLoading}
-                    aria-required="true"
-                    aria-invalid={!!fieldState.error}
-                    aria-describedby={
-                      fieldState.error ? "event-title-error" : undefined
-                    }
-                  />
-                </FormControl>
-                <FormMessage id="event-title-error" />
-              </FormItem>
-            </AnimatedFormField>
-          )}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Title EN */}
+          <FormField
+            control={form.control}
+            name="translations.title.en"
+            render={({ field, fieldState }) => (
+              <AnimatedFormField error={fieldState.error?.message}>
+                <FormItem>
+                  <FormLabel htmlFor="event-title-en">
+                    {t("eventTitleEn")}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="event-title-en"
+                      placeholder={t("eventTitleEn")}
+                      {...field}
+                      disabled={isLoading}
+                      aria-required="true"
+                      aria-invalid={!!fieldState.error}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </AnimatedFormField>
+            )}
+          />
 
-        {/* Description */}
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field, fieldState }) => (
-            <AnimatedFormField error={fieldState.error?.message}>
-              <FormItem>
-                <FormLabel htmlFor="event-description">
-                  {t("description")}
-                </FormLabel>
-                <FormControl>
-                  <textarea
-                    id="event-description"
-                    placeholder={t("description")}
-                    className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-                    {...field}
-                    disabled={isLoading}
-                    aria-required="true"
-                    aria-invalid={!!fieldState.error}
-                    aria-describedby={
-                      fieldState.error ? "event-description-error" : undefined
-                    }
-                  />
-                </FormControl>
-                <FormMessage id="event-description-error" />
-              </FormItem>
-            </AnimatedFormField>
-          )}
-        />
+          {/* Title UK */}
+          <FormField
+            control={form.control}
+            name="translations.title.uk"
+            render={({ field, fieldState }) => (
+              <AnimatedFormField error={fieldState.error?.message}>
+                <FormItem>
+                  <FormLabel htmlFor="event-title-uk">
+                    {t("eventTitleUk")}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="event-title-uk"
+                      placeholder={t("eventTitleUk")}
+                      {...field}
+                      disabled={isLoading}
+                      aria-required="true"
+                      aria-invalid={!!fieldState.error}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </AnimatedFormField>
+            )}
+          />
+        </div>
+
+        {/* Descriptions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="translations.description.en"
+            render={({ field, fieldState }) => (
+              <AnimatedFormField error={fieldState.error?.message}>
+                <FormItem>
+                  <FormLabel htmlFor="event-description-en">
+                    {t("descriptionEn")}
+                  </FormLabel>
+                  <FormControl>
+                    <textarea
+                      id="event-description-en"
+                      placeholder={t("descriptionEn")}
+                      className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                      {...field}
+                      disabled={isLoading}
+                      aria-required="true"
+                      aria-invalid={!!fieldState.error}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </AnimatedFormField>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="translations.description.uk"
+            render={({ field, fieldState }) => (
+              <AnimatedFormField error={fieldState.error?.message}>
+                <FormItem>
+                  <FormLabel htmlFor="event-description-uk">
+                    {t("descriptionUk")}
+                  </FormLabel>
+                  <FormControl>
+                    <textarea
+                      id="event-description-uk"
+                      placeholder={t("descriptionUk")}
+                      className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                      {...field}
+                      disabled={isLoading}
+                      aria-required="true"
+                      aria-invalid={!!fieldState.error}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </AnimatedFormField>
+            )}
+          />
+        </div>
 
         {/* Date */}
         <FormField
@@ -185,31 +258,57 @@ export function EventForm({
         />
 
         {/* Location */}
-        <FormField
-          control={form.control}
-          name="location"
-          render={({ field, fieldState }) => (
-            <AnimatedFormField error={fieldState.error?.message}>
-              <FormItem>
-                <FormLabel htmlFor="event-location">{t("location")}</FormLabel>
-                <FormControl>
-                  <Input
-                    id="event-location"
-                    placeholder={t("location")}
-                    {...field}
-                    disabled={isLoading}
-                    aria-required="true"
-                    aria-invalid={!!fieldState.error}
-                    aria-describedby={
-                      fieldState.error ? "event-location-error" : undefined
-                    }
-                  />
-                </FormControl>
-                <FormMessage id="event-location-error" />
-              </FormItem>
-            </AnimatedFormField>
-          )}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="translations.location.en"
+            render={({ field, fieldState }) => (
+              <AnimatedFormField error={fieldState.error?.message}>
+                <FormItem>
+                  <FormLabel htmlFor="event-location-en">
+                    {t("locationEn")}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="event-location-en"
+                      placeholder={t("locationEn")}
+                      {...field}
+                      disabled={isLoading}
+                      aria-required="true"
+                      aria-invalid={!!fieldState.error}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </AnimatedFormField>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="translations.location.uk"
+            render={({ field, fieldState }) => (
+              <AnimatedFormField error={fieldState.error?.message}>
+                <FormItem>
+                  <FormLabel htmlFor="event-location-uk">
+                    {t("locationUk")}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="event-location-uk"
+                      placeholder={t("locationUk")}
+                      {...field}
+                      disabled={isLoading}
+                      aria-required="true"
+                      aria-invalid={!!fieldState.error}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </AnimatedFormField>
+            )}
+          />
+        </div>
 
         {/* Capacity */}
         <FormField
@@ -238,6 +337,36 @@ export function EventForm({
                   />
                 </FormControl>
                 <FormMessage id="event-capacity-error" />
+              </FormItem>
+            </AnimatedFormField>
+          )}
+        />
+
+        {/* Base Price */}
+        <FormField
+          control={form.control}
+          name="basePrice"
+          render={({ field, fieldState }) => (
+            <AnimatedFormField error={fieldState.error?.message}>
+              <FormItem>
+                <FormLabel htmlFor="event-base-price">
+                  {t("basePrice")}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    id="event-base-price"
+                    type="number"
+                    placeholder="0"
+                    {...field}
+                    onChange={(e) =>
+                      field.onChange(parseFloat(e.target.value) || 0)
+                    }
+                    disabled={isLoading}
+                    aria-invalid={!!fieldState.error}
+                    min="0"
+                  />
+                </FormControl>
+                <FormMessage />
               </FormItem>
             </AnimatedFormField>
           )}

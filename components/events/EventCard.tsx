@@ -12,6 +12,7 @@ import { uk } from "date-fns/locale/uk";
 import { useLocale } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
+import { getLocalizedString } from "@/lib/utils";
 
 interface EventCardProps {
   event: Event;
@@ -30,11 +31,24 @@ export function EventCard({ event }: EventCardProps) {
   const formattedDate = format(new Date(event.date), "PPP", {
     locale: dateLocale,
   });
+  const localizedTitle = getLocalizedString(
+    event.translations?.title,
+    locale,
+    "en",
+    event.title || ""
+  );
+  const localizedLocation = getLocalizedString(
+    event.translations?.location,
+    locale,
+    "en",
+    event.location || ""
+  );
+  const organizerName = event.organizer?.name;
 
   return (
     <Link
       href={`/${locale}/events/${event.id}`}
-      aria-label={`View details for ${event.title}`}
+      aria-label={`View details for ${localizedTitle}`}
       className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg block"
     >
       <motion.div
@@ -56,14 +70,14 @@ export function EventCard({ event }: EventCardProps) {
             role="img"
             aria-label={
               event.imageUrl
-                ? `Event image for ${event.title}`
+                ? `Event image for ${localizedTitle}`
                 : "No event image"
             }
           >
             {event.imageUrl ? (
               <Image
                 src={event.imageUrl}
-                alt={`Event image for ${event.title}`}
+                alt={`Event image for ${localizedTitle}`}
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -110,7 +124,7 @@ export function EventCard({ event }: EventCardProps) {
           <CardContent className="p-4">
             {/* Event Title */}
             <h3 className="font-semibold text-lg line-clamp-2 mb-3">
-              {event.title}
+              {localizedTitle}
             </h3>
 
             {/* Event Details */}
@@ -131,9 +145,9 @@ export function EventCard({ event }: EventCardProps) {
                 <MapPin className="w-4 h-4 shrink-0" aria-hidden="true" />
                 <span
                   className="truncate"
-                  aria-label={`Location: ${event.location}`}
+                  aria-label={`Location: ${localizedLocation}`}
                 >
-                  {event.location}
+                  {localizedLocation}
                 </span>
               </div>
 
@@ -149,12 +163,14 @@ export function EventCard({ event }: EventCardProps) {
             </div>
           </CardContent>
 
-          <CardFooter className="p-4 pt-0">
-            {/* Organizer */}
-            <div className="text-xs text-muted-foreground">
-              {t("organizer")}: {event.organizer.name}
-            </div>
-          </CardFooter>
+          {organizerName && (
+            <CardFooter className="p-4 pt-0">
+              {/* Organizer */}
+              <div className="text-xs text-muted-foreground">
+                {t("organizer")}: {organizerName}
+              </div>
+            </CardFooter>
+          )}
         </Card>
       </motion.div>
     </Link>

@@ -105,7 +105,7 @@ export const useCreateRegistration = () => {
     mutationFn: async (data) => {
       // Get the event to check capacity before registration
       const event = queryClient.getQueryData<Event>(
-        eventKeys.detail(data.eventId)
+        eventKeys.detailAllLocales(data.eventId)
       );
 
       // Check if event is at capacity
@@ -118,20 +118,23 @@ export const useCreateRegistration = () => {
     onMutate: async (data) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({
-        queryKey: eventKeys.detail(data.eventId),
+        queryKey: eventKeys.detailAllLocales(data.eventId),
       });
 
       // Snapshot previous event
       const previousEvent = queryClient.getQueryData<Event>(
-        eventKeys.detail(data.eventId)
+        eventKeys.detailAllLocales(data.eventId)
       );
 
       // Optimistically update event's registered count
       if (previousEvent) {
-        queryClient.setQueryData<Event>(eventKeys.detail(data.eventId), {
-          ...previousEvent,
-          registeredCount: previousEvent.registeredCount + 1,
-        });
+        queryClient.setQueryData<Event>(
+          eventKeys.detailAllLocales(data.eventId),
+          {
+            ...previousEvent,
+            registeredCount: previousEvent.registeredCount + 1,
+          }
+        );
       }
 
       return { previousEvent };
@@ -140,7 +143,7 @@ export const useCreateRegistration = () => {
       // Rollback on error
       if (context?.previousEvent) {
         queryClient.setQueryData(
-          eventKeys.detail(data.eventId),
+          eventKeys.detailAllLocales(data.eventId),
           context.previousEvent
         );
       }
@@ -159,7 +162,7 @@ export const useCreateRegistration = () => {
         queryKey: registrationKeys.check(newRegistration.eventId),
       });
       queryClient.invalidateQueries({
-        queryKey: eventKeys.detail(newRegistration.eventId),
+        queryKey: eventKeys.detailAllLocales(newRegistration.eventId),
       });
       queryClient.invalidateQueries({
         queryKey: eventKeys.lists(),
@@ -189,17 +192,17 @@ export const useCancelRegistration = () => {
     onMutate: async ({ id, eventId }) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({
-        queryKey: eventKeys.detail(eventId),
+        queryKey: eventKeys.detailAllLocales(eventId),
       });
 
       // Snapshot previous event
       const previousEvent = queryClient.getQueryData<Event>(
-        eventKeys.detail(eventId)
+        eventKeys.detailAllLocales(eventId)
       );
 
       // Optimistically update event's registered count
       if (previousEvent && previousEvent.registeredCount > 0) {
-        queryClient.setQueryData<Event>(eventKeys.detail(eventId), {
+        queryClient.setQueryData<Event>(eventKeys.detailAllLocales(eventId), {
           ...previousEvent,
           registeredCount: previousEvent.registeredCount - 1,
         });
@@ -211,7 +214,7 @@ export const useCancelRegistration = () => {
       // Rollback on error
       if (context?.previousEvent) {
         queryClient.setQueryData(
-          eventKeys.detail(eventId),
+          eventKeys.detailAllLocales(eventId),
           context.previousEvent
         );
       }
@@ -229,7 +232,7 @@ export const useCancelRegistration = () => {
         queryKey: registrationKeys.check(eventId),
       });
       queryClient.invalidateQueries({
-        queryKey: eventKeys.detail(eventId),
+        queryKey: eventKeys.detailAllLocales(eventId),
       });
       queryClient.invalidateQueries({
         queryKey: eventKeys.lists(),

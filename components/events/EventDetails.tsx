@@ -20,6 +20,7 @@ import { uk } from "date-fns/locale/uk";
 import { useLocale } from "next-intl";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { getLocalizedString } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import {
   useCreateRegistration,
@@ -70,9 +71,37 @@ export function EventDetails({ event }: EventDetailsProps) {
   const isFull = availableSpots <= 0;
   const isOrganizer = user?.id === event.organizerId;
 
+  const localizedTitle = getLocalizedString(
+    event.translations?.title,
+    locale,
+    "en",
+    event.title || ""
+  );
+  const localizedDescription = getLocalizedString(
+    event.translations?.description,
+    locale,
+    "en",
+    event.description || ""
+  );
+  const localizedLocation = getLocalizedString(
+    event.translations?.location,
+    locale,
+    "en",
+    event.location || ""
+  );
+
   const formattedDate = format(new Date(event.date), "PPPp", {
     locale: dateLocale,
   });
+
+  const getNameParts = (fullName?: string) => {
+    if (!fullName) return { first: "Guest", last: "User" };
+    const [first, ...rest] = fullName.trim().split(/\s+/);
+    return {
+      first: first || "Guest",
+      last: rest.join(" ") || "User",
+    };
+  };
 
   const handleRegister = async () => {
     if (!isAuthenticated) {
@@ -80,8 +109,17 @@ export function EventDetails({ event }: EventDetailsProps) {
       return;
     }
 
+    const { first, last } = getNameParts(user?.name);
+    const email = user?.email || "guest@example.com";
+
     try {
-      await createRegistration.mutateAsync({ eventId: event.id });
+      await createRegistration.mutateAsync({
+        eventId: event.id,
+        name: first,
+        surname: last,
+        email,
+        city: "Kyiv",
+      });
     } catch (error) {
       // Error is handled by the mutation
     }
@@ -138,7 +176,7 @@ export function EventDetails({ event }: EventDetailsProps) {
         >
           <Image
             src={event.imageUrl}
-            alt={event.title}
+            alt={localizedTitle}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
@@ -151,7 +189,7 @@ export function EventDetails({ event }: EventDetailsProps) {
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
-              <CardTitle className="text-3xl mb-2">{event.title}</CardTitle>
+              <CardTitle className="text-3xl mb-2">{localizedTitle}</CardTitle>
               <div className="flex items-center gap-2">
                 {isFull ? (
                   <Badge variant="destructive">{t("eventFull")}</Badge>
@@ -199,7 +237,7 @@ export function EventDetails({ event }: EventDetailsProps) {
               />
               <div className="min-w-0">
                 <p className="text-sm text-muted-foreground">{t("date")}</p>
-                <p className="font-medium break-words">{formattedDate}</p>
+                <p className="font-medium wrap-break-word">{formattedDate}</p>
               </div>
             </div>
 
@@ -210,7 +248,9 @@ export function EventDetails({ event }: EventDetailsProps) {
               />
               <div className="min-w-0">
                 <p className="text-sm text-muted-foreground">{t("location")}</p>
-                <p className="font-medium break-words">{event.location}</p>
+                <p className="font-medium wrap-break-word">
+                  {localizedLocation}
+                </p>
               </div>
             </div>
 
@@ -230,27 +270,29 @@ export function EventDetails({ event }: EventDetailsProps) {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <User
-                className="w-5 h-5 text-muted-foreground shrink-0"
-                aria-hidden="true"
-              />
-              <div className="min-w-0">
-                <p className="text-sm text-muted-foreground">
-                  {t("organizer")}
-                </p>
-                <p className="font-medium break-words">
-                  {event.organizer.name}
-                </p>
+            {event.organizer?.name && (
+              <div className="flex items-center gap-3">
+                <User
+                  className="w-5 h-5 text-muted-foreground shrink-0"
+                  aria-hidden="true"
+                />
+                <div className="min-w-0">
+                  <p className="text-sm text-muted-foreground">
+                    {t("organizer")}
+                  </p>
+                  <p className="font-medium wrap-break-word">
+                    {event.organizer.name}
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Description */}
           <div>
             <h3 className="font-semibold text-lg mb-2">{t("description")}</h3>
             <p className="text-muted-foreground whitespace-pre-wrap">
-              {event.description}
+              {localizedDescription}
             </p>
           </div>
 
@@ -344,10 +386,10 @@ export function EventDetails({ event }: EventDetailsProps) {
                         />
                         <div className="flex-1 min-w-0">
                           <p className="font-medium truncate">
-                            {registration.user.name}
+                            {registration.user?.name || tCommon("loading")}
                           </p>
                           <p className="text-xs text-muted-foreground truncate">
-                            {registration.user.email}
+                            {registration.user?.email || "—"}
                           </p>
                         </div>
                       </div>

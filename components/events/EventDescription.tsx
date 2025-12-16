@@ -3,9 +3,10 @@
 import { Event } from "@/types/event";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, MapPin, Users, Image as ImageIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { format } from "date-fns";
 import Image from "next/image";
+import { getLocalizedArray, getLocalizedString } from "@/lib/utils";
 
 interface EventDescriptionProps {
   event: Event;
@@ -13,6 +14,34 @@ interface EventDescriptionProps {
 
 export function EventDescription({ event }: EventDescriptionProps) {
   const t = useTranslations("event");
+  const locale = useLocale();
+
+  const localizedTitle = getLocalizedString(
+    event.translations?.title,
+    locale,
+    "en",
+    event.title || ""
+  );
+  const localizedDescription = getLocalizedString(
+    event.translations?.description,
+    locale,
+    "en",
+    event.description || ""
+  );
+  const localizedLocation = getLocalizedString(
+    event.translations?.location,
+    locale,
+    "en",
+    event.location || ""
+  );
+  const localizedSpeakers = event.translations?.speakers
+    ? getLocalizedArray(
+        event.translations.speakers,
+        locale,
+        "en",
+        event.speakers || []
+      )
+    : event.speakers;
 
   return (
     <div className="space-y-6">
@@ -21,7 +50,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
         <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden border">
           <Image
             src={event.imageUrl}
-            alt={event.title}
+            alt={localizedTitle}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 1200px"
@@ -31,7 +60,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
       )}
 
       {/* Event Title */}
-      <h1 className="text-3xl md:text-4xl font-bold">{event.title}</h1>
+      <h1 className="text-3xl md:text-4xl font-bold">{localizedTitle}</h1>
 
       {/* Event Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -57,7 +86,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg">{event.location}</p>
+            <p className="text-lg">{localizedLocation}</p>
           </CardContent>
         </Card>
 
@@ -83,20 +112,20 @@ export function EventDescription({ event }: EventDescriptionProps) {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground whitespace-pre-wrap">
-            {event.description}
+            {localizedDescription}
           </p>
         </CardContent>
       </Card>
 
       {/* Speakers (if available) */}
-      {event.speakers && event.speakers.length > 0 && (
+      {localizedSpeakers && localizedSpeakers.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>{t("speakers")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="list-disc list-inside space-y-2">
-              {event.speakers.map((speaker, index) => (
+              {localizedSpeakers.map((speaker, index) => (
                 <li key={index} className="text-muted-foreground">
                   {speaker}
                 </li>
@@ -124,7 +153,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
                 >
                   <Image
                     src={imageUrl}
-                    alt={`${event.title} - Image ${index + 1}`}
+                    alt={`${localizedTitle} - Image ${index + 1}`}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 50vw, 33vw"

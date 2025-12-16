@@ -1,11 +1,27 @@
 import { User } from "./auth";
 
+export type SupportedLocale = "en" | "uk";
+
+export interface TranslationField {
+  en?: string;
+  uk?: string;
+}
+
+export interface EventTranslations {
+  title: TranslationField;
+  description: TranslationField;
+  location: TranslationField;
+  speakers?: TranslationField[];
+}
+
 export interface Event {
   id: string;
-  title: string;
-  description: string;
+  translations?: EventTranslations;
+  // Fallback fields for backwards compatibility with pre-i18n data
+  title?: string;
+  description?: string;
+  location?: string;
   date: Date;
-  location: string;
   capacity: number;
   registeredCount: number;
   organizerId?: string;
@@ -13,24 +29,23 @@ export interface Event {
   imageUrl?: string;
   speakers?: string[]; // For future expansion
   gallery?: string[]; // For future expansion
+  basePrice?: number;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface CreateEventRequest {
-  title: string;
-  description: string;
-  date: Date;
-  location: string;
-  capacity: number;
-  imageUrl?: string;
-}
-
-export interface UpdateEventRequest {
+interface BaseEventPayload {
+  translations: EventTranslations;
+  // Optional fallbacks for legacy APIs
   title?: string;
   description?: string;
-  date?: Date;
   location?: string;
-  capacity?: number;
+  date: Date;
+  capacity: number;
   imageUrl?: string;
+  basePrice?: number;
 }
+
+export interface CreateEventRequest extends BaseEventPayload {}
+
+export interface UpdateEventRequest extends Partial<BaseEventPayload> {}

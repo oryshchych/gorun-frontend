@@ -1,54 +1,61 @@
 import { z } from "zod";
 
+const translatedString = (min: number, max: number, field: string) =>
+  z
+    .string()
+    .min(min, `${field} must be at least ${min} characters`)
+    .max(max, `${field} must not exceed ${max} characters`);
+
+const translationFieldSchema = {
+  title: z.object({
+    en: translatedString(3, 100, "Title"),
+    uk: translatedString(3, 100, "Title"),
+  }),
+  description: z.object({
+    en: translatedString(10, 2000, "Description"),
+    uk: translatedString(10, 2000, "Description"),
+  }),
+  location: z.object({
+    en: translatedString(3, 200, "Location"),
+    uk: translatedString(3, 200, "Location"),
+  }),
+};
+
 export const eventSchema = z.object({
-  title: z
-    .string()
-    .min(3, "Title must be at least 3 characters")
-    .max(100, "Title must not exceed 100 characters"),
-  description: z
-    .string()
-    .min(10, "Description must be at least 10 characters")
-    .max(2000, "Description must not exceed 2000 characters"),
+  translations: z.object(translationFieldSchema),
   date: z
     .union([z.string(), z.date()])
     .transform((val) => (typeof val === "string" ? new Date(val) : val))
     .refine((date) => date > new Date(), {
       message: "Event date must be in the future",
     }),
-  location: z
-    .string()
-    .min(3, "Location must be at least 3 characters")
-    .max(200, "Location must not exceed 200 characters"),
   capacity: z
     .number()
     .int("Capacity must be a whole number")
     .positive("Capacity must be greater than 0")
     .max(10000, "Capacity must not exceed 10,000"),
   imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  basePrice: z
+    .number()
+    .nonnegative("Base price must be 0 or greater")
+    .max(1_000_000, "Base price is too high")
+    .optional(),
 });
 
 export const updateEventSchema = z.object({
-  title: z
-    .string()
-    .min(3, "Title must be at least 3 characters")
-    .max(100, "Title must not exceed 100 characters")
-    .optional(),
-  description: z
-    .string()
-    .min(10, "Description must be at least 10 characters")
-    .max(2000, "Description must not exceed 2000 characters")
-    .optional(),
+  translations: z
+    .object({
+      title: translationFieldSchema.title.partial(),
+      description: translationFieldSchema.description.partial(),
+      location: translationFieldSchema.location.partial(),
+    })
+    .partial(),
   date: z
     .union([z.string(), z.date()])
     .transform((val) => (typeof val === "string" ? new Date(val) : val))
     .refine((date) => date > new Date(), {
       message: "Event date must be in the future",
     })
-    .optional(),
-  location: z
-    .string()
-    .min(3, "Location must be at least 3 characters")
-    .max(200, "Location must not exceed 200 characters")
     .optional(),
   capacity: z
     .number()
@@ -57,6 +64,11 @@ export const updateEventSchema = z.object({
     .max(10000, "Capacity must not exceed 10,000")
     .optional(),
   imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  basePrice: z
+    .number()
+    .nonnegative("Base price must be 0 or greater")
+    .max(1_000_000, "Base price is too high")
+    .optional(),
 });
 
 export type EventFormData = z.infer<typeof eventSchema>;

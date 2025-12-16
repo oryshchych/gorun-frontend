@@ -127,7 +127,14 @@
     "attendees": "Attendees",
     "viewDetails": "View Details",
     "spotsLeft": "spots left",
-    "almostFull": "Almost Full"
+    "almostFull": "Almost Full",
+    "eventTitleEn": "Event Title (EN)",
+    "eventTitleUk": "Event Title (UK)",
+    "descriptionEn": "Description (EN)",
+    "descriptionUk": "Description (UK)",
+    "locationEn": "Location (EN)",
+    "locationUk": "Location (UK)",
+    "basePrice": "Base Price"
   },
   "event": {
     "description": "Description",

@@ -3,7 +3,7 @@
 import { useEvent } from "@/hooks/useEvents";
 import { EventDetails } from "@/components/events/EventDetails";
 import { Button } from "@/components/ui/button";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { use } from "react";
@@ -14,11 +14,12 @@ interface EventDetailsPageProps {
 
 export default function EventDetailsPage({ params }: EventDetailsPageProps) {
   const t = useTranslations("common");
+  const locale = useLocale();
   const router = useRouter();
   const resolvedParams = use(params);
   const { id } = resolvedParams;
 
-  const { data: event, isLoading, error } = useEvent(id);
+  const { data: event, isLoading, error } = useEvent(id, locale);
 
   const handleBack = () => {
     router.back();

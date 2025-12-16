@@ -127,7 +127,14 @@
     "attendees": "Учасники",
     "viewDetails": "Переглянути деталі",
     "spotsLeft": "місць залишилось",
-    "almostFull": "Майже заповнено"
+    "almostFull": "Майже заповнено",
+    "eventTitleEn": "Назва події (EN)",
+    "eventTitleUk": "Назва події (UK)",
+    "descriptionEn": "Опис (EN)",
+    "descriptionUk": "Опис (UK)",
+    "locationEn": "Локація (EN)",
+    "locationUk": "Локація (UK)",
+    "basePrice": "Базова ціна"
   },
   "event": {
     "description": "Опис",
