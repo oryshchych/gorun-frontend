@@ -85,6 +85,7 @@ export default function HomePage() {
                 alt="GoRun Events Platform"
                 width={60}
                 height={20}
+                style={{ height: "auto" }}
                 priority
               />
             </Link>
@@ -116,6 +117,7 @@ export default function HomePage() {
                 alt="GoRun Events Platform"
                 width={60}
                 height={20}
+                style={{ height: "auto" }}
                 priority
               />
             </Link>
@@ -154,6 +156,7 @@ export default function HomePage() {
               alt="GoRun Events Platform"
               width={60}
               height={20}
+              style={{ height: "auto" }}
               priority
             />
           </Link>
