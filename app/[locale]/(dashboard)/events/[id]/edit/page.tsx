@@ -25,8 +25,8 @@ export default function EditEventPage({ params }: EditEventPageProps) {
   const { id } = resolvedParams;
   const { user } = useAuth();
 
-  const { data: event, isLoading, error } = useEvent(id);
-  const updateEvent = useUpdateEvent(id);
+  const { data: event, isLoading, error } = useEvent(id, locale);
+  const updateEvent = useUpdateEvent(id, locale);
 
   const handleSubmit = async (data: EventFormData) => {
     try {

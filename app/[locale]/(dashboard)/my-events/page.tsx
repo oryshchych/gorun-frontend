@@ -15,7 +15,11 @@ export default function MyEventsPage() {
   const router = useRouter();
   const [page, setPage] = useState(1);
 
-  const { data, isLoading, error } = useMyEvents({ page, limit: 12 });
+  const { data, isLoading, error } = useMyEvents({
+    page,
+    limit: 12,
+    lang: locale,
+  });
 
   const handleCreateEvent = () => {
     router.push(`/${locale}/events/create`);

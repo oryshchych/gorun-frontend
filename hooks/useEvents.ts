@@ -24,7 +24,9 @@ export const eventKeys = {
   lists: () => [...eventKeys.all, "list"] as const,
   list: (params: GetEventsParams) => [...eventKeys.lists(), params] as const,
   details: () => [...eventKeys.all, "detail"] as const,
-  detail: (id: string) => [...eventKeys.details(), id] as const,
+  detailAllLocales: (id: string) => [...eventKeys.details(), id] as const,
+  detail: (id: string, lang?: string) =>
+    [...eventKeys.detailAllLocales(id), lang || "all"] as const,
   myEvents: () => [...eventKeys.all, "my"] as const,
   myEventsList: (params: GetEventsParams) =>
     [...eventKeys.myEvents(), params] as const,
@@ -44,10 +46,10 @@ export const useEvents = (params: GetEventsParams = {}) => {
 /**
  * Hook to fetch a single event by ID
  */
-export const useEvent = (id: string) => {
+export const useEvent = (id: string, lang?: string) => {
   return useQuery<Event, Error>({
-    queryKey: eventKeys.detail(id),
-    queryFn: () => getEventById(id),
+    queryKey: eventKeys.detail(id, lang),
+    queryFn: () => getEventById(id, lang),
     enabled: !!id,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -91,7 +93,7 @@ export const useCreateEvent = () => {
 /**
  * Hook to update an existing event
  */
-export const useUpdateEvent = (id: string) => {
+export const useUpdateEvent = (id: string, lang?: string) => {
   const queryClient = useQueryClient();
 
   return useMutation<
@@ -103,16 +105,16 @@ export const useUpdateEvent = (id: string) => {
     mutationFn: (data) => updateEvent(id, data),
     onMutate: async (updatedData) => {
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: eventKeys.detail(id) });
+      await queryClient.cancelQueries({ queryKey: eventKeys.detail(id, lang) });
 
       // Snapshot previous value
       const previousEvent = queryClient.getQueryData<Event>(
-        eventKeys.detail(id)
+        eventKeys.detail(id, lang)
       );
 
       // Optimistically update the cache
       if (previousEvent) {
-        queryClient.setQueryData<Event>(eventKeys.detail(id), {
+        queryClient.setQueryData<Event>(eventKeys.detail(id, lang), {
           ...previousEvent,
           ...updatedData,
         });
@@ -123,13 +125,16 @@ export const useUpdateEvent = (id: string) => {
     onError: (error, _, context) => {
       // Rollback on error
       if (context?.previousEvent) {
-        queryClient.setQueryData(eventKeys.detail(id), context.previousEvent);
+        queryClient.setQueryData(
+          eventKeys.detail(id, lang),
+          context.previousEvent
+        );
       }
       handleApiError(error, "Failed to Update Event");
     },
     onSuccess: (updatedEvent) => {
       // Update cache with server response
-      queryClient.setQueryData(eventKeys.detail(id), updatedEvent);
+      queryClient.setQueryData(eventKeys.detail(id, lang), updatedEvent);
 
       // Invalidate lists to refetch
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
@@ -158,15 +163,19 @@ export const useDeleteEvent = () => {
     mutationFn: deleteEvent,
     onMutate: async (eventId) => {
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: eventKeys.detail(eventId) });
+      await queryClient.cancelQueries({
+        queryKey: eventKeys.detailAllLocales(eventId),
+      });
 
       // Snapshot previous value
       const previousEvent = queryClient.getQueryData<Event>(
-        eventKeys.detail(eventId)
+        eventKeys.detailAllLocales(eventId)
       );
 
       // Optimistically remove from cache
-      queryClient.removeQueries({ queryKey: eventKeys.detail(eventId) });
+      queryClient.removeQueries({
+        queryKey: eventKeys.detailAllLocales(eventId),
+      });
 
       return { previousEvent, eventId };
     },
@@ -174,7 +183,7 @@ export const useDeleteEvent = () => {
       // Rollback on error
       if (context?.previousEvent) {
         queryClient.setQueryData(
-          eventKeys.detail(eventId),
+          eventKeys.detailAllLocales(eventId),
           context.previousEvent
         );
       }

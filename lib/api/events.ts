@@ -9,6 +9,7 @@ export interface GetEventsParams {
   startDate?: string;
   endDate?: string;
   location?: string;
+  lang?: string;
 }
 
 /**
@@ -17,12 +18,13 @@ export interface GetEventsParams {
 export const getEvents = async (
   params: GetEventsParams = {}
 ): Promise<PaginatedResponse<Event>> => {
-  const { page = 1, limit = 10, ...filters } = params;
+  const { page = 1, limit = 10, lang, ...filters } = params;
 
   const response = await apiClient.get<PaginatedResponse<Event>>("/events", {
     params: {
       page,
       limit,
+      lang,
       ...filters,
     },
   });
@@ -33,8 +35,13 @@ export const getEvents = async (
 /**
  * Fetch a single event by ID
  */
-export const getEventById = async (id: string): Promise<Event> => {
-  const response = await apiClient.get<ApiResponse<Event>>(`/events/${id}`);
+export const getEventById = async (
+  id: string,
+  lang?: string
+): Promise<Event> => {
+  const response = await apiClient.get<ApiResponse<Event>>(`/events/${id}`, {
+    params: lang ? { lang } : undefined,
+  });
   return response.data.data;
 };
 
@@ -73,12 +80,13 @@ export const deleteEvent = async (id: string): Promise<void> => {
 export const getMyEvents = async (
   params: GetEventsParams = {}
 ): Promise<PaginatedResponse<Event>> => {
-  const { page = 1, limit = 10 } = params;
+  const { page = 1, limit = 10, lang } = params;
 
   const response = await apiClient.get<PaginatedResponse<Event>>("/events/my", {
     params: {
       page,
       limit,
+      lang,
     },
   });
 
