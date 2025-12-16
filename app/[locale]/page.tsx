@@ -1,130 +1,63 @@
-"use client";
+"use server";
 
-import { useTranslations, useLocale } from "next-intl";
-import { ThemeToggle } from "@/components/layout/ThemeToggle";
-import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
+import { getTranslations } from "next-intl/server";
 import Footer from "@/components/layout/Footer";
-import { useEvent } from "@/hooks/useEvents";
-import { useParticipants } from "@/hooks/useParticipants";
-import { useCreateRegistration } from "@/hooks/useRegistrations";
-import { EventDescription } from "@/components/events/EventDescription";
-import { EventRegistrationForm } from "@/components/events/EventRegistrationForm";
-import { ParticipantsList } from "@/components/events/ParticipantsList";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Header from "@/components/layout/Header";
 import { Card } from "@/components/ui/card";
-import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
-import { useState } from "react";
-import { RegistrationFormData } from "@/lib/validations/registration";
-import { toast } from "sonner";
-import Image from "next/image";
-import Link from "next/link";
+import HomePageClient from "@/components/events/HomePageClient";
+import { Event } from "@/types/event";
+import { Participant } from "@/types/registration";
 
 // For MVP: We'll use a fixed event ID or fetch the first event
 // In production, this would come from environment or API endpoint
 const SINGLE_EVENT_ID = process.env.NEXT_PUBLIC_SINGLE_EVENT_ID || "single";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-export default function HomePage() {
-  const t = useTranslations();
-  const locale = useLocale();
-  const [promoCodeDiscount, setPromoCodeDiscount] = useState<{
-    discountType: "percentage" | "amount";
-    discountValue: number;
-  } | null>(null);
+async function fetchEvent(locale: string): Promise<Event> {
+  const res = await fetch(
+    `${API_BASE}/api/events/${SINGLE_EVENT_ID}?lang=${locale}`,
+    { cache: "no-store" }
+  );
+  if (!res.ok) {
+    throw new Error(`Failed to fetch event: ${res.status}`);
+  }
+  const json = await res.json();
+  return json.data as Event;
+}
 
-  // Fetch the single event
-  const {
-    data: event,
-    isLoading: eventLoading,
-    error: eventError,
-  } = useEvent(SINGLE_EVENT_ID, locale);
+async function fetchParticipants(eventId: string): Promise<Participant[]> {
+  const res = await fetch(`${API_BASE}/api/events/${eventId}/participants`, {
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to fetch participants: ${res.status}`);
+  }
+  const json = await res.json();
+  return json.data as Participant[];
+}
 
-  // Fetch participants (only when event is loaded)
-  const { data: participants = [], isLoading: participantsLoading } =
-    useParticipants(event?.id || "");
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations();
 
-  // Registration mutation
-  const createRegistration = useCreateRegistration();
+  let event: Event | null = null;
+  let participants: Participant[] = [];
 
-  // Handle promo code check (this would call an API endpoint)
-  const handlePromoCodeCheck = async (code: string) => {
-    // TODO: Implement API call to validate promo code
-    // For now, this is a placeholder
-    try {
-      // const response = await apiClient.post('/promo-codes/validate', { code });
-      // setPromoCodeDiscount(response.data);
-      toast.success("Promo code validated");
-    } catch (error: any) {
-      throw error;
-    }
-  };
-
-  // Handle registration form submission
-  const handleRegistrationSubmit = async (data: RegistrationFormData) => {
-    try {
-      await createRegistration.mutateAsync(data);
-      // After successful registration, redirect to payment
-      // TODO: Implement payment redirect (Plata by Mono)
-      toast.success(t("event.registrationSuccess"));
-    } catch (error: any) {
-      // Error is handled by the mutation hook
-      console.error("Registration error:", error);
-    }
-  };
-
-  if (eventLoading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <header className="border-b sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <Link
-              href={`/${locale}`}
-              className="flex items-center hover:opacity-80 transition-opacity"
-            >
-              <Image
-                src="/images/logos/logo.png"
-                alt="GoRun Events Platform"
-                width={60}
-                height={20}
-                priority
-              />
-            </Link>
-            <div className="flex items-center gap-2">
-              <LanguageSwitcher />
-              <ThemeToggle />
-            </div>
-          </div>
-        </header>
-        <main className="flex-1 flex items-center justify-center">
-          <LoadingSpinner />
-        </main>
-        <Footer />
-      </div>
-    );
+  try {
+    event = await fetchEvent(locale);
+    participants = await fetchParticipants(event.id);
+  } catch (error) {
+    console.error("HomePage data fetch error:", error);
   }
 
-  if (eventError || !event) {
+  if (!event) {
     return (
       <div className="min-h-screen flex flex-col">
-        <header className="border-b sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <Link
-              href={`/${locale}`}
-              className="flex items-center hover:opacity-80 transition-opacity"
-            >
-              <Image
-                src="/images/logos/logo.png"
-                alt="GoRun Events Platform"
-                width={60}
-                height={20}
-                priority
-              />
-            </Link>
-            <div className="flex items-center gap-2">
-              <LanguageSwitcher />
-              <ThemeToggle />
-            </div>
-          </div>
-        </header>
+        <Header />
         <main className="flex-1 flex items-center justify-center">
           <Card className="p-8 text-center">
             <h1 className="text-2xl font-bold mb-4">
@@ -142,71 +75,16 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="border-b sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link
-            href={`/${locale}`}
-            className="flex items-center hover:opacity-80 transition-opacity"
-          >
-            <Image
-              src="/images/logos/logo.png"
-              alt="GoRun Events Platform"
-              width={60}
-              height={20}
-              priority
-            />
-          </Link>
-          <div className="flex items-center gap-2">
-            <LanguageSwitcher />
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
+      <Header />
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8 md:py-12">
-          <Tabs defaultValue="description" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-8">
-              <TabsTrigger value="description">
-                {t("event.description")}
-              </TabsTrigger>
-              <TabsTrigger value="registration">
-                {t("event.register")}
-              </TabsTrigger>
-              <TabsTrigger value="participants">
-                {t("event.participants")}
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="description" className="mt-6">
-              <EventDescription event={event} />
-            </TabsContent>
-
-            <TabsContent value="registration" className="mt-6">
-              <div className="max-w-2xl mx-auto">
-                <EventRegistrationForm
-                  event={event}
-                  onSubmit={handleRegistrationSubmit}
-                  isLoading={createRegistration.isPending}
-                  promoCodeDiscount={promoCodeDiscount}
-                  onPromoCodeCheck={handlePromoCodeCheck}
-                />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="participants" className="mt-6">
-              <div className="max-w-4xl mx-auto">
-                <ParticipantsList
-                  participants={participants}
-                  isLoading={participantsLoading}
-                />
-              </div>
-            </TabsContent>
-          </Tabs>
+          <HomePageClient
+            event={event}
+            participants={participants}
+            locale={locale}
+          />
         </div>
       </main>
-
       <Footer />
     </div>
   );

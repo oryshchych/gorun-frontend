@@ -19,7 +19,7 @@ export default function Header() {
         Skip to main content
       </a>
 
-      <div className="container flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center gap-4 sm:gap-6">
           <Link
             href={`/${locale}`}
@@ -31,14 +31,15 @@ export default function Header() {
               alt="GoRun Events Platform"
               width={60}
               height={20}
+              style={{ height: "auto" }}
               priority
             />
           </Link>
         </div>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle />
           <LanguageSwitcher />
+          <ThemeToggle />
         </div>
       </div>
     </header>

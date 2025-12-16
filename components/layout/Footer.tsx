@@ -19,7 +19,7 @@ export default function Footer() {
 
   return (
     <footer className="border-t bg-background" role="contentinfo">
-      <div className="container py-8 md:py-12 px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto py-8 md:py-12 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Contact Information */}
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
@@ -69,7 +69,7 @@ export default function Footer() {
             </div>
           </div>
           {/* Copyright */}
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             © {currentYear} GoRun Events Platform.{" "}
             {locale === "uk" ? "Всі права захищені." : "All rights reserved."}
           </p>

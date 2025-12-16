@@ -80,6 +80,7 @@ export function EventCard({ event }: EventCardProps) {
                 alt={`Event image for ${localizedTitle}`}
                 fill
                 className="object-cover"
+                loading="eager"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
             ) : (
