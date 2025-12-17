@@ -5,12 +5,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EventDescription } from "@/components/events/EventDescription";
 import { EventRegistrationForm } from "@/components/events/EventRegistrationForm";
 import { ParticipantsList } from "@/components/events/ParticipantsList";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RegistrationFormData } from "@/lib/validations/registration";
 import { useCreateRegistration } from "@/hooks/useRegistrations";
 import { toast } from "sonner";
 import { Event } from "@/types/event";
 import { Participant } from "@/types/registration";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface HomePageClientProps {
   event: Event;
@@ -25,10 +26,37 @@ export default function HomePageClient({
 }: HomePageClientProps) {
   const t = useTranslations();
   const createRegistration = useCreateRegistration();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<string>("description");
   const [promoCodeDiscount, setPromoCodeDiscount] = useState<{
     discountType: "percentage" | "amount";
     discountValue: number;
   } | null>(null);
+
+  // Sync tab with URL search params
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab && ["description", "registration", "participants"].includes(tab)) {
+      setActiveTab(tab);
+    } else {
+      setActiveTab("description");
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    const params = new URLSearchParams(searchParams.toString());
+    if (value === "description") {
+      params.delete("tab");
+    } else {
+      params.set("tab", value);
+    }
+    const newUrl = params.toString()
+      ? `/${locale}?${params.toString()}`
+      : `/${locale}`;
+    router.push(newUrl, { scroll: false });
+  };
 
   const handlePromoCodeCheck = async (code: string) => {
     try {
@@ -51,7 +79,7 @@ export default function HomePageClient({
   };
 
   return (
-    <Tabs defaultValue="description" className="w-full">
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
       <TabsList className="grid w-full grid-cols-3 mb-8">
         <TabsTrigger value="description">{t("event.description")}</TabsTrigger>
         <TabsTrigger value="registration">{t("event.register")}</TabsTrigger>
