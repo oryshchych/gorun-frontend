@@ -72,7 +72,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-lg">
+            <p className="text-lg" suppressHydrationWarning>
               {format(new Date(event.date), "PPP 'at' p")}
             </p>
           </CardContent>

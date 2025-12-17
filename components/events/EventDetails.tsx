@@ -237,7 +237,12 @@ export function EventDetails({ event }: EventDetailsProps) {
               />
               <div className="min-w-0">
                 <p className="text-sm text-muted-foreground">{t("date")}</p>
-                <p className="font-medium wrap-break-word">{formattedDate}</p>
+                <p
+                  className="font-medium wrap-break-word"
+                  suppressHydrationWarning
+                >
+                  {formattedDate}
+                </p>
               </div>
             </div>
 

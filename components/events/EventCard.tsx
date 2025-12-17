@@ -136,6 +136,7 @@ export function EventCard({ event }: EventCardProps) {
                 <span
                   className="truncate"
                   aria-label={`Event date: ${formattedDate}`}
+                  suppressHydrationWarning
                 >
                   {formattedDate}
                 </span>
