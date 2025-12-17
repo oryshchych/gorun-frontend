@@ -96,7 +96,7 @@
     "description": "Description",
     "date": "Date",
     "location": "Location",
-    "capacity": "Capacity",
+    "capacity": "Registered Participants",
     "availableSpots": "Available Spots",
     "registeredCount": "Registered",
     "organizer": "Organizer",
@@ -140,7 +140,7 @@
     "description": "Description",
     "date": "Date",
     "location": "Location",
-    "capacity": "Capacity",
+    "capacity": "Registered Participants",
     "registered": "registered",
     "speakers": "Speakers",
     "gallery": "Gallery",
@@ -168,7 +168,9 @@
     "discount": "Discount",
     "basePrice": "Base Price",
     "total": "Total",
-    "proceedToPayment": "Proceed to Payment"
+    "proceedToPayment": "Proceed to Payment",
+    "when": "When",
+    "where": "Where"
   },
   "validation": {
     "required": "This field is required",
