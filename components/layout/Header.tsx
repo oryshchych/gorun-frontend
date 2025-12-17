@@ -23,7 +23,7 @@ export default function Header() {
         <div className="flex items-center gap-4 sm:gap-6">
           <Link
             href={`/${locale}`}
-            className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
+            className="flex items-center space-x-2 focus:outline-none"
             aria-label="GoRun Events Platform Home"
           >
             <Image
