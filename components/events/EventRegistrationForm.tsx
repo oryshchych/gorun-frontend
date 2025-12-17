@@ -337,7 +337,7 @@ export function EventRegistrationForm({
             <Button
               type="submit"
               disabled={isLoading || isCheckingPromoCode}
-              className="w-full cursor-pointer border-2 border-brand shadow-lg hover:shadow-xl transition-shadow font-semibold"
+              className="w-full cursor-pointer bg-[#48C773] text-white hover:bg-[#48C773]/90 shadow-lg hover:shadow-xl transition-all font-semibold"
               size="lg"
               aria-label={t("proceedToPayment")}
             >
