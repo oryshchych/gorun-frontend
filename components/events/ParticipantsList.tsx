@@ -2,6 +2,7 @@
 
 import { Participant } from "@/types/registration";
 import { useTranslations } from "next-intl";
+import { Card } from "@/components/ui/card";
 
 interface ParticipantsListProps {
   participants: Participant[];
@@ -33,28 +34,55 @@ export function ParticipantsList({
   }
 
   return (
-    <div className="space-y-2">
-      <h2 className="text-xl font-semibold mb-4">
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold">
         {t("participants")} ({participants.length})
       </h2>
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <tbody>
-            {participants.map((participant, index) => (
-              <tr
-                key={participant.id}
-                className="border-b hover:bg-accent/50 transition-colors"
-              >
-                <td className="p-2">{index + 1}</td>
-                <td className="p-2">{participant.name}</td>
-                <td className="p-2">{participant.surname}</td>
-                <td className="p-2">{participant.city || "-"}</td>
-                <td className="p-2">{participant.runningClub || "-"}</td>
+      <Card className="overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-table-header border-b border-table-row-divider">
+                <th className="p-3 text-left text-sm font-semibold text-text-secondary">
+                  #
+                </th>
+                <th className="p-3 text-left text-sm font-semibold text-text-secondary">
+                  {t("name") || "Name"}
+                </th>
+                <th className="p-3 text-left text-sm font-semibold text-text-secondary">
+                  {t("surname") || "Surname"}
+                </th>
+                <th className="p-3 text-left text-sm font-semibold text-text-secondary">
+                  {t("city") || "City"}
+                </th>
+                <th className="p-3 text-left text-sm font-semibold text-text-secondary">
+                  {t("runningClub") || "Running Club"}
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {participants.map((participant, index) => (
+                <tr
+                  key={participant.id}
+                  className="border-b border-table-row-divider hover:bg-table-row-hover transition-colors even:bg-table-zebra"
+                >
+                  <td className="p-3 text-text-primary">{index + 1}</td>
+                  <td className="p-3 text-text-primary">{participant.name}</td>
+                  <td className="p-3 text-text-primary">
+                    {participant.surname}
+                  </td>
+                  <td className="p-3 text-text-secondary">
+                    {participant.city || "-"}
+                  </td>
+                  <td className="p-3 text-text-secondary">
+                    {participant.runningClub || "-"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
     </div>
   );
 }
