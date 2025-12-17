@@ -21,6 +21,8 @@ export interface Event {
   title?: string;
   description?: string;
   location?: string;
+  latitude?: number;
+  longitude?: number;
   date: Date;
   capacity: number;
   registeredCount: number;
@@ -40,6 +42,8 @@ interface BaseEventPayload {
   title?: string;
   description?: string;
   location?: string;
+  latitude?: number;
+  longitude?: number;
   date: Date;
   capacity: number;
   imageUrl?: string;

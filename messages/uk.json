@@ -170,7 +170,8 @@
     "total": "Всього",
     "proceedToPayment": "Перейти до оплати",
     "when": "Коли",
-    "where": "Де"
+    "where": "Де",
+    "viewOnMap": "Переглянути на карті"
   },
   "validation": {
     "required": "Це поле обов'язкове",

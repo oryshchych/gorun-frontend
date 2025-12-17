@@ -170,7 +170,8 @@
     "total": "Total",
     "proceedToPayment": "Proceed to Payment",
     "when": "When",
-    "where": "Where"
+    "where": "Where",
+    "viewOnMap": "View on Map"
   },
   "validation": {
     "required": "This field is required",

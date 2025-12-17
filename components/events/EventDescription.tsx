@@ -2,7 +2,13 @@
 
 import { Event } from "@/types/event";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, MapPin, Users, Image as ImageIcon } from "lucide-react";
+import {
+  Calendar,
+  MapPin,
+  Users,
+  Image as ImageIcon,
+  ExternalLink,
+} from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { format } from "date-fns";
 import Image from "next/image";
@@ -43,6 +49,57 @@ export function EventDescription({ event }: EventDescriptionProps) {
       )
     : event.speakers;
 
+  // Helper function to get coordinates (prioritize separate fields, then parse from location)
+  const getCoordinates = (): { lat: number; lng: number } | null => {
+    // First, check if separate latitude/longitude fields exist
+    if (event.latitude !== undefined && event.longitude !== undefined) {
+      return { lat: event.latitude, lng: event.longitude };
+    }
+    // Fallback: try to parse coordinates from location string
+    const coordMatch = localizedLocation.match(
+      /(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/
+    );
+    if (coordMatch) {
+      return { lat: parseFloat(coordMatch[1]), lng: parseFloat(coordMatch[2]) };
+    }
+    return null;
+  };
+
+  // Helper function to create map link
+  const getMapLink = (): string => {
+    const coords = getCoordinates();
+    if (coords) {
+      // Universal link that works with Google Maps, Apple Maps, and others
+      return `https://www.google.com/maps?q=${coords.lat},${coords.lng}`;
+    }
+    // For location strings, use Google Maps search
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(localizedLocation)}`;
+  };
+
+  // Helper function to get Google Maps embed URL (no API key needed)
+  const getMapEmbedUrl = (): string | null => {
+    const coords = getCoordinates();
+    if (coords) {
+      // Use coordinates directly - works without API key
+      return `https://www.google.com/maps?q=${coords.lat},${coords.lng}&output=embed`;
+    }
+    // For location strings, use search query
+    return `https://www.google.com/maps?q=${encodeURIComponent(localizedLocation)}&output=embed`;
+  };
+
+  // Helper function to get static map image URL (alternative to iframe)
+  const getStaticMapUrl = (): string | null => {
+    const coords = getCoordinates();
+    if (coords) {
+      // Static map image - no service worker issues
+      return `https://maps.googleapis.com/maps/api/staticmap?center=${coords.lat},${coords.lng}&zoom=15&size=600x300&markers=${coords.lat},${coords.lng}&key=AIzaSyBFw0Qbyq9zTFTd-tUY6d-s6U4kR1F8J0`;
+    }
+    return null;
+  };
+
+  const coords = getCoordinates();
+  const mapEmbedUrl = getMapEmbedUrl();
+
   return (
     <div className="space-y-6">
       {/* Event Image */}
@@ -81,18 +138,6 @@ export function EventDescription({ event }: EventDescriptionProps) {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <MapPin className="w-4 h-4" />
-              {t("where")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg">{localizedLocation}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Users className="w-4 h-4" />
               {t("capacity")}
             </CardTitle>
@@ -101,6 +146,49 @@ export function EventDescription({ event }: EventDescriptionProps) {
             <p className="text-lg">
               {event.registeredCount} / {event.capacity} {t("registered")}
             </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <MapPin className="w-4 h-4" />
+              {t("where")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-lg flex-1">{localizedLocation}</p>
+              <a
+                href={getMapLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-[#48C773] hover:text-[#48C773]/80 transition-colors font-medium text-sm whitespace-nowrap"
+                aria-label={`${t("viewOnMap")}: ${localizedLocation}`}
+              >
+                <span>{t("viewOnMap")}</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            </div>
+            {/* Embedded Map Preview */}
+            {mapEmbedUrl && (
+              <div className="w-full h-64 rounded-lg overflow-hidden border relative group">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src={mapEmbedUrl}
+                  title={`Map of ${localizedLocation}`}
+                  onError={(e) => {
+                    // Silently handle iframe errors to prevent console noise
+                    console.debug("Map iframe load issue (non-critical)");
+                  }}
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
