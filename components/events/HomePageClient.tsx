@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Event } from "@/types/event";
 import { Participant } from "@/types/registration";
 import { useSearchParams, useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface HomePageClientProps {
   event: Event;
@@ -105,25 +106,64 @@ export default function HomePageClient({
       </Card>
 
       <TabsContent value="description" className="mt-6">
-        <EventDescription event={event} />
+        <AnimatePresence mode="wait">
+          {activeTab === "description" && (
+            <motion.div
+              key="description"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.7, ease: "easeInOut" }}
+            >
+              <EventDescription event={event} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </TabsContent>
 
       <TabsContent value="registration" className="mt-6">
-        <div className="max-w-2xl mx-auto">
-          <EventRegistrationForm
-            event={event}
-            onSubmit={handleRegistrationSubmit}
-            isLoading={createRegistration.isPending}
-            promoCodeDiscount={promoCodeDiscount}
-            onPromoCodeCheck={handlePromoCodeCheck}
-          />
-        </div>
+        <AnimatePresence mode="wait">
+          {activeTab === "registration" && (
+            <motion.div
+              key="registration"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.7, ease: "easeInOut" }}
+            >
+              <div className="max-w-2xl mx-auto">
+                <EventRegistrationForm
+                  event={event}
+                  onSubmit={handleRegistrationSubmit}
+                  isLoading={createRegistration.isPending}
+                  promoCodeDiscount={promoCodeDiscount}
+                  onPromoCodeCheck={handlePromoCodeCheck}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </TabsContent>
 
       <TabsContent value="participants" className="mt-6">
-        <div className="max-w-4xl mx-auto">
-          <ParticipantsList participants={participants} isLoading={false} />
-        </div>
+        <AnimatePresence mode="wait">
+          {activeTab === "participants" && (
+            <motion.div
+              key="participants"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.7, ease: "easeInOut" }}
+            >
+              <div className="max-w-4xl mx-auto">
+                <ParticipantsList
+                  participants={participants}
+                  isLoading={false}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </TabsContent>
     </Tabs>
   );
