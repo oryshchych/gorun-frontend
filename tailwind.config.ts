@@ -48,6 +48,10 @@ const config: Config = {
           foreground: "hsl(var(--brand-foreground))",
           hover: "hsl(var(--brand-hover))",
         },
+        logo: {
+          DEFAULT: "hsl(var(--logo))",
+          foreground: "hsl(var(--logo-foreground))",
+        },
         text: {
           primary: "hsl(var(--text-primary))",
           secondary: "hsl(var(--text-secondary))",

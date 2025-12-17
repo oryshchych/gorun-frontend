@@ -85,19 +85,19 @@ export default function HomePageClient({
         <TabsList className="flex w-full bg-transparent p-0 gap-2 sm:gap-1 sm:grid sm:grid-cols-3">
           <TabsTrigger
             value="description"
-            className="flex-1 sm:flex-none min-h-[44px] px-3 py-2.5 sm:py-1.5 text-xs sm:text-sm whitespace-nowrap bg-transparent text-text-secondary data-[state=active]:bg-brand data-[state=active]:text-brand-foreground data-[state=active]:shadow-sm transition-all rounded-md"
+            className="flex-1 sm:flex-none min-h-[44px] px-3 py-2.5 sm:py-1.5 text-xs sm:text-sm whitespace-nowrap bg-transparent text-text-secondary data-[state=active]:bg-[#48C773] data-[state=active]:text-white data-[state=active]:shadow-sm transition-all rounded-md"
           >
             {t("event.description")}
           </TabsTrigger>
           <TabsTrigger
             value="registration"
-            className="flex-1 sm:flex-none min-h-[44px] px-3 py-2.5 sm:py-1.5 text-xs sm:text-sm whitespace-nowrap bg-transparent text-text-secondary data-[state=active]:bg-brand data-[state=active]:text-brand-foreground data-[state=active]:shadow-sm transition-all rounded-md"
+            className="flex-1 sm:flex-none min-h-[44px] px-3 py-2.5 sm:py-1.5 text-xs sm:text-sm whitespace-nowrap bg-transparent text-text-secondary data-[state=active]:bg-[#48C773] data-[state=active]:text-white data-[state=active]:shadow-sm transition-all rounded-md"
           >
             {t("event.register")}
           </TabsTrigger>
           <TabsTrigger
             value="participants"
-            className="flex-1 sm:flex-none min-h-[44px] px-3 py-2.5 sm:py-1.5 text-xs sm:text-sm whitespace-nowrap bg-transparent text-text-secondary data-[state=active]:bg-brand data-[state=active]:text-brand-foreground data-[state=active]:shadow-sm transition-all rounded-md"
+            className="flex-1 sm:flex-none min-h-[44px] px-3 py-2.5 sm:py-1.5 text-xs sm:text-sm whitespace-nowrap bg-transparent text-text-secondary data-[state=active]:bg-[#48C773] data-[state=active]:text-white data-[state=active]:shadow-sm transition-all rounded-md"
           >
             {t("event.participants")}
           </TabsTrigger>
