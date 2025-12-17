@@ -36,7 +36,7 @@ export function ParticipantsList({
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">
-        {t("participants")} ({participants.length})
+        {t("capacity")} ({participants.length})
       </h2>
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
