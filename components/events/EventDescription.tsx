@@ -106,6 +106,13 @@ export function EventDescription({ event }: EventDescriptionProps) {
   const coords = getCoordinates();
   const mapEmbedUrl = getMapEmbedUrl();
 
+  // Check if we're on localhost to avoid API referrer restrictions
+  const isLocalhost =
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1" ||
+      window.location.hostname === "0.0.0.0");
+
   return (
     <div className="space-y-6">
       {/* Event Image */}
@@ -177,7 +184,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
               </a>
             </div>
             {/* Embedded Map Preview */}
-            {mapEmbedUrl && (
+            {mapEmbedUrl && !isLocalhost && (
               <div className="w-full h-64 rounded-lg overflow-hidden border relative group">
                 <iframe
                   width="100%"
@@ -193,6 +200,22 @@ export function EventDescription({ event }: EventDescriptionProps) {
                     console.debug("Map iframe load issue (non-critical)");
                   }}
                 />
+              </div>
+            )}
+            {/* On localhost, show a message instead of embed to avoid API restrictions */}
+            {mapEmbedUrl && isLocalhost && (
+              <div className="w-full h-64 rounded-lg border bg-muted/30 flex items-center justify-center">
+                <p className="text-sm text-muted-foreground text-center px-4">
+                  Map preview available on deployed site.{" "}
+                  <a
+                    href={getMapLink()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#48C773] hover:underline"
+                  >
+                    Open in Maps
+                  </a>
+                </p>
               </div>
             )}
           </CardContent>
