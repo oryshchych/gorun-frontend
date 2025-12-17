@@ -21,6 +21,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
+import { format } from "date-fns";
 
 interface EventFormProps {
   onSubmit: (data: EventFormData) => void | Promise<void>;
@@ -66,6 +67,18 @@ export function EventForm({
             "",
           uk: defaultValues?.translations?.location?.uk || "",
         },
+        date: {
+          en:
+            defaultValues?.translations?.date?.en ||
+            (defaultValues?.date
+              ? format(new Date(defaultValues.date), "PPP 'at' p")
+              : ""),
+          uk:
+            defaultValues?.translations?.date?.uk ||
+            (defaultValues?.date
+              ? format(new Date(defaultValues.date), "PPP 'at' p")
+              : ""),
+        },
       },
       date: defaultValues?.date ? new Date(defaultValues.date) : new Date(),
       capacity: defaultValues?.capacity || 50,
@@ -91,7 +104,18 @@ export function EventForm({
   }, [watchImageUrl]);
 
   const handleSubmit = async (data: EventFormData) => {
-    await onSubmit(data);
+    // Ensure date is included in translations if not already formatted
+    const formattedData = {
+      ...data,
+      translations: {
+        ...data.translations,
+        date: {
+          en: data.translations.date?.en || format(data.date, "PPP 'at' p"),
+          uk: data.translations.date?.uk || format(data.date, "PPP 'at' p"),
+        },
+      },
+    };
+    await onSubmit(formattedData);
   };
 
   // Format date for datetime-local input
