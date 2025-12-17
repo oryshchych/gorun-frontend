@@ -41,7 +41,7 @@ export function ParticipantsList({
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
-            <thead>
+            {/* <thead>
               <tr className="bg-table-header border-b border-table-row-divider">
                 <th className="p-3 text-left text-sm font-semibold text-text-secondary">
                   #
@@ -59,7 +59,7 @@ export function ParticipantsList({
                   {t("runningClub") || "Running Club"}
                 </th>
               </tr>
-            </thead>
+            </thead> */}
             <tbody>
               {participants.map((participant, index) => (
                 <tr
