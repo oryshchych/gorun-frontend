@@ -12,6 +12,7 @@ export interface EventTranslations {
   description: TranslationField;
   location: TranslationField;
   speakers?: TranslationField[];
+  date: TranslationField;
 }
 
 export interface Event {

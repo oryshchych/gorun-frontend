@@ -40,6 +40,12 @@ export function EventDescription({ event }: EventDescriptionProps) {
     "en",
     event.location || ""
   );
+  const localizedDate = getLocalizedString(
+    event.translations?.date,
+    locale,
+    "en",
+    event.date?.toString() || ""
+  );
   const localizedSpeakers = event.translations?.speakers
     ? getLocalizedArray(
         event.translations.speakers,
@@ -130,7 +136,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
           </CardHeader>
           <CardContent>
             <p className="text-lg" suppressHydrationWarning>
-              {format(new Date(event.date), "PPP 'at' p")}
+              {localizedDate}
             </p>
           </CardContent>
         </Card>
