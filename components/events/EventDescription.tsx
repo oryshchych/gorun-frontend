@@ -349,16 +349,16 @@ export function EventDescription({ event }: EventDescriptionProps) {
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <div className="flex gap-6 pt-8 items-start">
+                    <div className="flex flex-col md:flex-row gap-6 pt-4 md:pt-8 items-start">
                       {/* Image */}
                       {speaker.image && (
-                        <div className="relative rounded-lg overflow-hidden border shrink-0">
+                        <div className="relative w-full md:w-64 aspect-square rounded-lg overflow-hidden border shrink-0">
                           <Image
                             src={speaker.image.trim()}
                             alt={speaker.fullname}
+                            fill
                             className="object-cover"
-                            width={256}
-                            height={256}
+                            sizes="(max-width: 768px) 100vw, 256px"
                           />
                         </div>
                       )}
