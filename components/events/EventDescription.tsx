@@ -236,13 +236,13 @@ export function EventDescription({ event }: EventDescriptionProps) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <p className="text-lg flex-1">{localizedLocation}</p>
               <a
                 href={getMapLink()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-[#48C773] hover:text-[#48C773]/80 transition-colors font-medium text-sm whitespace-nowrap"
+                className="flex items-center gap-2 font-medium text-sm whitespace-nowrap"
                 aria-label={`${t("viewOnMap")}: ${localizedLocation}`}
               >
                 <span>{t("viewOnMap")}</span>
