@@ -19,6 +19,8 @@ import { getLocalizedArray, getLocalizedString } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import ReactMarkdown from "react-markdown";
+import type { Components } from "react-markdown";
 
 interface EventDescriptionProps {
   event: Event;
@@ -280,16 +282,41 @@ export function EventDescription({ event }: EventDescriptionProps) {
       </div>
 
       {/* Description */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("description")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground whitespace-pre-wrap">
-            {localizedDescription}
-          </p>
-        </CardContent>
-      </Card>
+      {localizedDescription && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("description")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="prose prose-neutral max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-[#48C773] prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted prose-ul:text-muted-foreground prose-li:text-muted-foreground">
+              <ReactMarkdown
+                components={
+                  {
+                    p: ({ children }) => (
+                      <p className="mb-4 last:mb-0">{children}</p>
+                    ),
+                    strong: ({ children }) => (
+                      <strong className="font-semibold text-foreground">
+                        {children}
+                      </strong>
+                    ),
+                    ul: ({ children }) => (
+                      <ul className="list-disc list-inside mb-4 space-y-2">
+                        {children}
+                      </ul>
+                    ),
+                    li: ({ children }) => (
+                      <li className="text-muted-foreground">{children}</li>
+                    ),
+                  } as Components
+                }
+              >
+                {String(localizedDescription)}
+              </ReactMarkdown>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Speakers (if available) */}
       {localizedSpeakers && localizedSpeakers.length > 0 && (
