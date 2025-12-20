@@ -15,12 +15,23 @@ import {
 import { useTranslations, useLocale } from "next-intl";
 import { format } from "date-fns";
 import Image from "next/image";
-import { getLocalizedArray, getLocalizedString } from "@/lib/utils";
+import {
+  getLocalizedArray,
+  getLocalizedString,
+  getLocalizedSpeaker,
+} from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
+import { Instagram } from "lucide-react";
 
 interface EventDescriptionProps {
   event: Event;
@@ -57,14 +68,10 @@ export function EventDescription({ event }: EventDescriptionProps) {
     "en",
     event.date?.toString() || ""
   );
-  const localizedSpeakers = event.translations?.speakers
-    ? getLocalizedArray(
-        event.translations.speakers,
-        locale,
-        "en",
-        event.speakers || []
-      )
-    : event.speakers;
+  // Get localized speakers
+  const localizedSpeakers = event.speakers
+    ? event.speakers.map((speaker) => getLocalizedSpeaker(speaker, locale))
+    : [];
 
   // Helper function to get coordinates (prioritize separate fields, then parse from location)
   const getCoordinates = (): { lat: number; lng: number } | null => {
@@ -325,13 +332,73 @@ export function EventDescription({ event }: EventDescriptionProps) {
             <CardTitle>{t("speakers")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="list-disc list-inside space-y-2">
+            <Accordion type="single" className="w-full">
               {localizedSpeakers.map((speaker, index) => (
-                <li key={index} className="text-muted-foreground">
-                  {speaker}
-                </li>
+                <AccordionItem
+                  key={speaker.id || index}
+                  value={`speaker-${index}`}
+                >
+                  <AccordionTrigger>
+                    <div className="flex flex-col items-start gap-1">
+                      <span className="font-semibold text-foreground">
+                        {speaker.fullname}
+                      </span>
+                      <span className="text-sm text-muted-foreground font-normal">
+                        {speaker.shortDescription}
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="flex gap-6 pt-8 items-start">
+                      {/* Image */}
+                      {speaker.image && (
+                        <div className="relative rounded-lg overflow-hidden border shrink-0">
+                          <Image
+                            src={speaker.image.trim()}
+                            alt={speaker.fullname}
+                            className="object-cover"
+                            width={256}
+                            height={256}
+                          />
+                        </div>
+                      )}
+                      {/* Description */}
+                      <div className="space-y-4 flex-1">
+                        <div className="prose prose-sm prose-neutral max-w-none dark:prose-invert prose-p:text-muted-foreground">
+                          <ReactMarkdown
+                            components={
+                              {
+                                p: ({ children }) => (
+                                  <p className="mb-3 last:mb-0">{children}</p>
+                                ),
+                                strong: ({ children }) => (
+                                  <strong className="font-semibold text-foreground">
+                                    {children}
+                                  </strong>
+                                ),
+                              } as Components
+                            }
+                          >
+                            {String(speaker.description)}
+                          </ReactMarkdown>
+                        </div>
+                        {speaker.instagramLink && (
+                          <a
+                            href={speaker.instagramLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-white hover:text-white/80 transition-colors font-medium text-sm"
+                          >
+                            <Instagram className="w-4 h-4" />
+                            <span>Instagram</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
               ))}
-            </ul>
+            </Accordion>
           </CardContent>
         </Card>
       )}

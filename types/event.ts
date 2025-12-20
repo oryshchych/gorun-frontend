@@ -7,11 +7,27 @@ export interface TranslationField {
   uk?: string;
 }
 
+export interface SpeakerTranslations {
+  fullname?: TranslationField;
+  shortDescription?: TranslationField;
+  description?: TranslationField;
+}
+
+export interface Speaker {
+  id?: string;
+  translations?: SpeakerTranslations;
+  fullname: string;
+  shortDescription: string;
+  description: string;
+  image: string;
+  instagramLink: string;
+}
+
 export interface EventTranslations {
   title: TranslationField;
   description: TranslationField;
   location: TranslationField;
-  speakers?: TranslationField[];
+  speakers?: SpeakerTranslations[];
   date: TranslationField;
 }
 
@@ -30,7 +46,7 @@ export interface Event {
   organizerId?: string;
   organizer?: User;
   imageUrl?: string;
-  speakers?: string[]; // For future expansion
+  speakers?: Speaker[]; // Array of speaker objects
   gallery?: string[]; // For future expansion
   basePrice?: number;
   createdAt: Date;

@@ -12,7 +12,12 @@ import {
 } from "date-fns";
 import { enUS } from "date-fns/locale/en-US";
 import { uk } from "date-fns/locale/uk";
-import { SupportedLocale, TranslationField } from "@/types/event";
+import {
+  SupportedLocale,
+  TranslationField,
+  Speaker,
+  SpeakerTranslations,
+} from "@/types/event";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -43,6 +48,45 @@ export function getLocalizedArray(
 ): string[] {
   if (!items || items.length === 0) return fallbackList;
   return items.map((item) => getLocalizedString(item, locale, fallbackLocale));
+}
+
+/**
+ * Get localized speaker data
+ */
+export function getLocalizedSpeaker(
+  speaker: Speaker,
+  locale: string,
+  fallbackLocale: SupportedLocale = "en"
+): Speaker {
+  if (!speaker.translations) {
+    return speaker;
+  }
+
+  const translations = speaker.translations;
+  return {
+    ...speaker,
+    fullname:
+      getLocalizedString(
+        translations.fullname,
+        locale,
+        fallbackLocale,
+        speaker.fullname
+      ) || speaker.fullname,
+    shortDescription:
+      getLocalizedString(
+        translations.shortDescription,
+        locale,
+        fallbackLocale,
+        speaker.shortDescription
+      ) || speaker.shortDescription,
+    description:
+      getLocalizedString(
+        translations.description,
+        locale,
+        fallbackLocale,
+        speaker.description
+      ) || speaker.description,
+  };
 }
 
 /**
