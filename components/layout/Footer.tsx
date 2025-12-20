@@ -11,7 +11,7 @@ export default function Footer() {
 
   // Contact information - these should be moved to environment variables or config
   const contactInfo = {
-    phone: "+380501234567",
+    phone: "",
     email: "gorunteam.ua@gmail.com",
     instagram: "https://instagram.com/gorun.lviv",
     facebook: "https://facebook.com/profile.php?id=61584661056098",

@@ -5,9 +5,12 @@ import { useLocale } from "next-intl";
 import { ThemeToggle } from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
 import Image from "next/image";
+import { Instagram } from "lucide-react";
 
 export default function Header() {
   const locale = useLocale();
+
+  const instagramUrl = "https://instagram.com/gorun.lviv";
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
@@ -38,6 +41,16 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Instagram */}
+          <a
+            href={instagramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md p-1"
+            aria-label="Follow us on Instagram"
+          >
+            <Instagram className="w-5 h-5" aria-hidden="true" />
+          </a>
           <LanguageSwitcher />
           <ThemeToggle />
         </div>
