@@ -70,8 +70,7 @@ export default function Footer() {
           </div>
           {/* Copyright */}
           <p className="text-sm text-muted-foreground" suppressHydrationWarning>
-            © {currentYear} GoRun Events Platform.{" "}
-            {locale === "uk" ? "Всі права захищені." : "All rights reserved."}
+            © {currentYear} GoRun
           </p>
         </div>
       </div>
