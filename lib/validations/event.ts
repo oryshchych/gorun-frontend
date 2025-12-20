@@ -19,6 +19,10 @@ const translationFieldSchema = {
     en: translatedString(3, 200, "Location"),
     uk: translatedString(3, 200, "Location"),
   }),
+  date: z.object({
+    en: z.string().min(1, "Date (EN) is required"),
+    uk: z.string().min(1, "Date (UK) is required"),
+  }),
 };
 
 export const eventSchema = z.object({
@@ -48,6 +52,7 @@ export const updateEventSchema = z.object({
       title: translationFieldSchema.title.partial(),
       description: translationFieldSchema.description.partial(),
       location: translationFieldSchema.location.partial(),
+      date: translationFieldSchema.date.partial(),
     })
     .partial(),
   date: z

@@ -293,7 +293,7 @@ export function EventRegistrationForm({
                           </p>
                         )}
                         {promoCodeDiscount && (
-                          <p className="text-sm text-green-600 dark:text-green-400">
+                          <p className="text-sm text-brand">
                             {t("promoCodeApplied")}:{" "}
                             {promoCodeDiscount.discountType === "percentage"
                               ? `${promoCodeDiscount.discountValue}%`
@@ -316,7 +316,7 @@ export function EventRegistrationForm({
                 <span>{basePrice} UAH</span>
               </div>
               {promoCodeDiscount && discountAmount > 0 && (
-                <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
+                <div className="flex justify-between text-sm text-brand">
                   <span>{t("discount")}:</span>
                   <span>
                     -{discountAmount} UAH (
@@ -337,7 +337,7 @@ export function EventRegistrationForm({
             <Button
               type="submit"
               disabled={isLoading || isCheckingPromoCode}
-              className="w-full cursor-pointer"
+              className="w-full cursor-pointer bg-[#48C773] text-white hover:bg-[#48C773]/90 shadow-lg hover:shadow-xl transition-all font-semibold"
               size="lg"
               aria-label={t("proceedToPayment")}
             >

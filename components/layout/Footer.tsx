@@ -11,7 +11,7 @@ export default function Footer() {
 
   // Contact information - these should be moved to environment variables or config
   const contactInfo = {
-    phone: "+380501234567",
+    phone: "",
     email: "gorunteam.ua@gmail.com",
     instagram: "https://instagram.com/gorun.lviv",
     facebook: "https://facebook.com/profile.php?id=61584661056098",
@@ -69,9 +69,8 @@ export default function Footer() {
             </div>
           </div>
           {/* Copyright */}
-          <p className="text-sm text-muted-foreground">
-            © {currentYear} GoRun Events Platform.{" "}
-            {locale === "uk" ? "Всі права захищені." : "All rights reserved."}
+          <p className="text-sm text-muted-foreground" suppressHydrationWarning>
+            © {currentYear} GoRun
           </p>
         </div>
       </div>

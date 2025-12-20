@@ -43,6 +43,27 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        brand: {
+          DEFAULT: "hsl(var(--brand))",
+          foreground: "hsl(var(--brand-foreground))",
+          hover: "hsl(var(--brand-hover))",
+        },
+        logo: {
+          DEFAULT: "hsl(var(--logo))",
+          foreground: "hsl(var(--logo-foreground))",
+        },
+        text: {
+          primary: "hsl(var(--text-primary))",
+          secondary: "hsl(var(--text-secondary))",
+          muted: "hsl(var(--text-muted))",
+        },
+        divider: "hsl(var(--divider))",
+        table: {
+          header: "hsl(var(--table-header))",
+          "row-hover": "hsl(var(--table-row-hover))",
+          "row-divider": "hsl(var(--table-row-divider))",
+          zebra: "hsl(var(--table-zebra))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -51,6 +72,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 };
 export default config;

@@ -1,10 +1,8 @@
 "use client";
 
 import { Participant } from "@/types/registration";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, MapPin, Building2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { format } from "date-fns";
+import { Card } from "@/components/ui/card";
 
 interface ParticipantsListProps {
   participants: Participant[];
@@ -19,79 +17,72 @@ export function ParticipantsList({
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="w-5 h-5" />
-            {t("participants")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">{t("loading")}</p>
-        </CardContent>
-      </Card>
+      <div className="space-y-2">
+        <h2 className="text-xl font-semibold mb-4">{t("participants")}</h2>
+        <p className="text-muted-foreground">{t("loading")}</p>
+      </div>
     );
   }
 
   if (participants.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="w-5 h-5" />
-            {t("participants")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">{t("noParticipants")}</p>
-        </CardContent>
-      </Card>
+      <div className="space-y-2">
+        <h2 className="text-xl font-semibold mb-4">{t("participants")}</h2>
+        <p className="text-muted-foreground">{t("noParticipants")}</p>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Users className="w-5 h-5" />
-          {t("participants")} ({participants.length})
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {participants.map((participant) => (
-            <div
-              key={participant.id}
-              className="flex items-start gap-4 p-4 border rounded-lg hover:bg-accent/50 transition-colors"
-            >
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-semibold text-lg">
-                    {participant.name} {participant.surname}
-                  </h3>
-                </div>
-                <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                  {participant.city && (
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4" />
-                      <span>{participant.city}</span>
-                    </div>
-                  )}
-                  {participant.runningClub && (
-                    <div className="flex items-center gap-1">
-                      <Building2 className="w-4 h-4" />
-                      <span>{participant.runningClub}</span>
-                    </div>
-                  )}
-                  <div className="text-xs">
-                    {format(new Date(participant.registeredAt), "PPP")}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold">
+        {t("capacity")} ({participants.length})
+      </h2>
+      <Card className="overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            {/* <thead>
+              <tr className="bg-table-header border-b border-table-row-divider">
+                <th className="p-3 text-left text-sm font-semibold text-text-secondary">
+                  #
+                </th>
+                <th className="p-3 text-left text-sm font-semibold text-text-secondary">
+                  {t("name") || "Name"}
+                </th>
+                <th className="p-3 text-left text-sm font-semibold text-text-secondary">
+                  {t("surname") || "Surname"}
+                </th>
+                <th className="p-3 text-left text-sm font-semibold text-text-secondary">
+                  {t("city") || "City"}
+                </th>
+                <th className="p-3 text-left text-sm font-semibold text-text-secondary">
+                  {t("runningClub") || "Running Club"}
+                </th>
+              </tr>
+            </thead> */}
+            <tbody>
+              {participants.map((participant, index) => (
+                <tr
+                  key={participant.id}
+                  className="border-b border-table-row-divider hover:bg-table-row-hover transition-colors even:bg-table-zebra"
+                >
+                  <td className="p-3 text-text-primary">{index + 1}</td>
+                  <td className="p-3 text-text-primary">{participant.name}</td>
+                  <td className="p-3 text-text-primary">
+                    {participant.surname}
+                  </td>
+                  <td className="p-3 text-text-secondary">
+                    {participant.city || "-"}
+                  </td>
+                  <td className="p-3 text-text-secondary">
+                    {participant.runningClub || "-"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 }

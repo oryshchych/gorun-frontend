@@ -76,7 +76,7 @@ export function EventCard({ event }: EventCardProps) {
           >
             {event.imageUrl ? (
               <Image
-                src={event.imageUrl}
+                src={event.imageUrl.trim()}
                 alt={`Event image for ${localizedTitle}`}
                 fill
                 className="object-cover"
@@ -136,6 +136,7 @@ export function EventCard({ event }: EventCardProps) {
                 <span
                   className="truncate"
                   aria-label={`Event date: ${formattedDate}`}
+                  suppressHydrationWarning
                 >
                   {formattedDate}
                 </span>

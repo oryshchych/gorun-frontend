@@ -175,7 +175,7 @@ export function EventDetails({ event }: EventDetailsProps) {
           className="relative w-full h-[400px] rounded-lg overflow-hidden"
         >
           <Image
-            src={event.imageUrl}
+            src={event.imageUrl.trim()}
             alt={localizedTitle}
             fill
             className="object-cover"
@@ -237,7 +237,12 @@ export function EventDetails({ event }: EventDetailsProps) {
               />
               <div className="min-w-0">
                 <p className="text-sm text-muted-foreground">{t("date")}</p>
-                <p className="font-medium wrap-break-word">{formattedDate}</p>
+                <p
+                  className="font-medium wrap-break-word"
+                  suppressHydrationWarning
+                >
+                  {formattedDate}
+                </p>
               </div>
             </div>
 
