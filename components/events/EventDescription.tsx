@@ -8,11 +8,17 @@ import {
   Users,
   Image as ImageIcon,
   ExternalLink,
+  ChevronLeft,
+  ChevronRight,
+  X,
 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { format } from "date-fns";
 import Image from "next/image";
 import { getLocalizedArray, getLocalizedString } from "@/lib/utils";
+import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface EventDescriptionProps {
   event: Event;
@@ -21,6 +27,9 @@ interface EventDescriptionProps {
 export function EventDescription({ event }: EventDescriptionProps) {
   const t = useTranslations("event");
   const locale = useLocale();
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
+    null
+  );
 
   const localizedTitle = getLocalizedString(
     event.translations?.title,
@@ -107,11 +116,59 @@ export function EventDescription({ event }: EventDescriptionProps) {
   const mapEmbedUrl = getMapEmbedUrl();
 
   // Check if we're on localhost to avoid API referrer restrictions
-  const isLocalhost =
-    typeof window !== "undefined" &&
-    (window.location.hostname === "localhost" ||
-      window.location.hostname === "127.0.0.1" ||
-      window.location.hostname === "0.0.0.0");
+  // Use useState to avoid hydration mismatch
+  const [isLocalhost, setIsLocalhost] = useState(false);
+
+  useEffect(() => {
+    setIsLocalhost(
+      window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1" ||
+        window.location.hostname === "0.0.0.0"
+    );
+  }, []);
+
+  // Handle keyboard navigation in gallery
+  useEffect(() => {
+    if (selectedImageIndex === null || !event.gallery) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        setSelectedImageIndex((prev) =>
+          prev !== null ? Math.max(0, prev - 1) : null
+        );
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        setSelectedImageIndex((prev) =>
+          prev !== null ? Math.min(event.gallery!.length - 1, prev + 1) : null
+        );
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        setSelectedImageIndex(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedImageIndex, event.gallery]);
+
+  const handleNextImage = () => {
+    if (selectedImageIndex !== null && event.gallery) {
+      setSelectedImageIndex((prev) =>
+        prev !== null ? (prev + 1) % event.gallery!.length : null
+      );
+    }
+  };
+
+  const handlePrevImage = () => {
+    if (selectedImageIndex !== null && event.gallery) {
+      setSelectedImageIndex((prev) =>
+        prev !== null
+          ? (prev - 1 + event.gallery!.length) % event.gallery!.length
+          : null
+      );
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -119,7 +176,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
       {event.imageUrl && (
         <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden border">
           <Image
-            src={event.imageUrl}
+            src={event.imageUrl.trim()}
             alt={localizedTitle}
             fill
             className="object-cover"
@@ -266,21 +323,110 @@ export function EventDescription({ event }: EventDescriptionProps) {
               {event.gallery.map((imageUrl, index) => (
                 <div
                   key={index}
-                  className="relative aspect-square rounded-lg overflow-hidden border"
+                  className="relative aspect-square rounded-lg overflow-hidden border cursor-pointer hover:opacity-90 transition-opacity group"
+                  onClick={() => setSelectedImageIndex(index)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelectedImageIndex(index);
+                    }
+                  }}
+                  aria-label={`View image ${index + 1} of ${event.gallery?.length || 0}`}
                 >
                   <Image
-                    src={imageUrl}
+                    src={imageUrl.trim()}
                     alt={`${localizedTitle} - Image ${index + 1}`}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 50vw, 33vw"
                   />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
       )}
+
+      {/* Gallery Carousel Dialog */}
+      <Dialog
+        open={selectedImageIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) setSelectedImageIndex(null);
+        }}
+      >
+        <DialogContent className="max-w-7xl w-full h-[90vh] p-0 gap-0 bg-black/95 border-none [&>button]:hidden">
+          <DialogTitle className="sr-only">
+            {selectedImageIndex !== null && event.gallery
+              ? `${localizedTitle} - Image ${selectedImageIndex + 1} of ${event.gallery.length}`
+              : "Gallery"}
+          </DialogTitle>
+          <div className="relative w-full h-full flex items-center justify-center">
+            {/* Close Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-4 right-4 z-50 text-white hover:bg-white/20 cursor-pointer"
+              onClick={() => setSelectedImageIndex(null)}
+              aria-label="Close gallery"
+            >
+              <X className="w-6 h-6" />
+            </Button>
+
+            {/* Previous Button */}
+            {event.gallery && event.gallery.length > 1 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute left-4 z-50 text-white hover:bg-white/20 h-12 w-12 cursor-pointer"
+                onClick={handlePrevImage}
+                aria-label="Previous image"
+              >
+                <ChevronLeft className="w-8 h-8" />
+              </Button>
+            )}
+
+            {/* Image */}
+            {selectedImageIndex !== null && event.gallery && (
+              <div className="relative w-full h-full flex items-center justify-center p-4 md:p-8">
+                <Image
+                  src={event.gallery[selectedImageIndex].trim()}
+                  alt={`${localizedTitle} - Image ${selectedImageIndex + 1}`}
+                  width={1200}
+                  height={800}
+                  className="w-auto h-full object-contain"
+                  sizes="90vw"
+                  priority
+                />
+              </div>
+            )}
+
+            {/* Next Button */}
+            {event.gallery && event.gallery.length > 1 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-4 z-50 text-white hover:bg-white/20 h-12 w-12 cursor-pointer"
+                onClick={handleNextImage}
+                aria-label="Next image"
+              >
+                <ChevronRight className="w-8 h-8" />
+              </Button>
+            )}
+
+            {/* Image Counter */}
+            {event.gallery &&
+              event.gallery.length > 1 &&
+              selectedImageIndex !== null && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 bg-black/50 text-white px-4 py-2 rounded-full text-sm">
+                  {selectedImageIndex + 1} / {event.gallery.length}
+                </div>
+              )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

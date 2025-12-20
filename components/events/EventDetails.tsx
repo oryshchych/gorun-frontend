@@ -175,7 +175,7 @@ export function EventDetails({ event }: EventDetailsProps) {
           className="relative w-full h-[400px] rounded-lg overflow-hidden"
         >
           <Image
-            src={event.imageUrl}
+            src={event.imageUrl.trim()}
             alt={localizedTitle}
             fill
             className="object-cover"

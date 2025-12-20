@@ -76,7 +76,7 @@ export function EventCard({ event }: EventCardProps) {
           >
             {event.imageUrl ? (
               <Image
-                src={event.imageUrl}
+                src={event.imageUrl.trim()}
                 alt={`Event image for ${localizedTitle}`}
                 fill
                 className="object-cover"
