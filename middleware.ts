@@ -89,5 +89,5 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/(uk|en)/:path*"],
+  matcher: ["/", "/(uk|en)/:path*", "/content/:path*"],
 };
