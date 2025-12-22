@@ -59,9 +59,8 @@ export default function Footer() {
 
   const handlePrivacyClick = async () => {
     if (!privacyContent) {
-      const file = "/content/privacy-policy-uk.md";
       const content = await loadMarkdownContent(
-        file,
+        "/content/privacy-policy-uk.md",
         "Контент політики конфіденційності не вдалося завантажити.",
         "Privacy policy content could not be loaded."
       );
@@ -72,9 +71,8 @@ export default function Footer() {
 
   const handleTermsClick = async () => {
     if (!termsContent) {
-      const file = "/content/terms-of-service-uk.md";
       const content = await loadMarkdownContent(
-        file,
+        "/content/terms-of-service-uk.md",
         "Контент умов використання не вдалося завантажити.",
         "Terms of service content could not be loaded."
       );
