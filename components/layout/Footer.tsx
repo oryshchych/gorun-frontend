@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
 import type { Components } from "react-markdown";
+import { agreements } from "@/content/agreements";
 
 export default function Footer() {
   const locale = useLocale();
@@ -59,11 +60,12 @@ export default function Footer() {
 
   const handlePrivacyClick = async () => {
     if (!privacyContent) {
-      const content = await loadMarkdownContent(
-        "/content/privacy-policy-uk.md",
-        "Контент політики конфіденційності не вдалося завантажити.",
-        "Privacy policy content could not be loaded."
-      );
+      // const content = await loadMarkdownContent(
+      //   "/content/privacy-policy-uk.md",
+      //   "Контент політики конфіденційності не вдалося завантажити.",
+      //   "Privacy policy content could not be loaded."
+      // );
+      const content = agreements.privacyPolicy;
       setPrivacyContent(content);
     }
     setIsPrivacyOpen(true);
@@ -71,11 +73,12 @@ export default function Footer() {
 
   const handleTermsClick = async () => {
     if (!termsContent) {
-      const content = await loadMarkdownContent(
-        "/content/terms-of-service-uk.md",
-        "Контент умов використання не вдалося завантажити.",
-        "Terms of service content could not be loaded."
-      );
+      // const content = await loadMarkdownContent(
+      //   "/content/terms-of-service-uk.md",
+      //   "Контент умов використання не вдалося завантажити.",
+      //   "Terms of service content could not be loaded."
+      // );
+      const content = agreements.termsOfService;
       setTermsContent(content);
     }
     setIsTermsOpen(true);
