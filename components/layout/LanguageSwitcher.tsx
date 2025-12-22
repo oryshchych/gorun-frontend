@@ -1,20 +1,41 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { locales } from "@/i18n";
 
 export default function LanguageSwitcher() {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const handleLocaleChange = (newLocale: string) => {
-    // Get the current pathname without the locale prefix
-    const pathWithoutLocale = pathname.replace(`/${locale}`, "");
+    // Remove locale prefix if it exists in pathname
+    let pathWithoutLocale = pathname;
+
+    // Check if pathname starts with any locale and remove it
+    for (const loc of locales) {
+      if (pathname === `/${loc}` || pathname.startsWith(`/${loc}/`)) {
+        pathWithoutLocale = pathname.slice(`/${loc}`.length);
+        break;
+      }
+    }
+
+    // Ensure path starts with / (handle root path case)
+    const normalizedPath =
+      pathWithoutLocale === "" || pathWithoutLocale === "/"
+        ? "/"
+        : pathWithoutLocale.startsWith("/")
+          ? pathWithoutLocale
+          : `/${pathWithoutLocale}`;
+
+    // Preserve search params if any
+    const search = searchParams.toString();
+    const queryString = search ? `?${search}` : "";
 
     // Navigate to the same path with the new locale
-    router.push(`/${newLocale}${pathWithoutLocale}`);
+    router.push(`/${newLocale}${normalizedPath}${queryString}`);
   };
 
   return (
