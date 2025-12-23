@@ -165,6 +165,7 @@
     "checkingPromoCode": "Checking promo code",
     "promoCodeApplied": "Promo code applied",
     "promoCodeInvalid": "Invalid or expired promo code",
+    "validate": "Apply",
     "discount": "Discount",
     "basePrice": "Base Price",
     "total": "Total",

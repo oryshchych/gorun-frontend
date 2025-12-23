@@ -165,6 +165,7 @@
     "checkingPromoCode": "Перевірка промокоду",
     "promoCodeApplied": "Промокод застосовано",
     "promoCodeInvalid": "Невірний або застарілий промокод",
+    "validate": "Застосувати",
     "discount": "Знижка",
     "basePrice": "Базова ціна",
     "total": "Всього",
