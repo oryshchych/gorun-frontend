@@ -27,16 +27,23 @@ const translationFieldSchema = {
 
 const imageUrlSchema = z
   .object({
+    portrait: z.string().url("Must be a valid URL").or(z.literal("")),
+    landscape: z.string().url("Must be a valid URL").or(z.literal("")),
+  })
+  .optional();
+
+const imageUrlUpdateSchema = z
+  .object({
     portrait: z
       .string()
       .url("Must be a valid URL")
-      .optional()
-      .or(z.literal("")),
+      .or(z.literal(""))
+      .optional(),
     landscape: z
       .string()
       .url("Must be a valid URL")
-      .optional()
-      .or(z.literal("")),
+      .or(z.literal(""))
+      .optional(),
   })
   .optional();
 
@@ -83,7 +90,7 @@ export const updateEventSchema = z.object({
     .positive("Capacity must be greater than 0")
     .max(10000, "Capacity must not exceed 10,000")
     .optional(),
-  imageUrl: imageUrlSchema,
+  imageUrl: imageUrlUpdateSchema,
   basePrice: z
     .number()
     .nonnegative("Base price must be 0 or greater")
