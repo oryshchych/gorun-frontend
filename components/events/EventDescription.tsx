@@ -68,6 +68,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
     "en",
     event.date?.toString() || ""
   );
+  const mainImage = event.imageUrl?.landscape || event.imageUrl?.portrait;
   // Get localized speakers
   const localizedSpeakers = event.speakers
     ? event.speakers.map((speaker) => getLocalizedSpeaker(speaker, locale))
@@ -182,10 +183,10 @@ export function EventDescription({ event }: EventDescriptionProps) {
   return (
     <div className="space-y-6">
       {/* Event Image */}
-      {event.imageUrl && (
+      {mainImage && (
         <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden border">
           <Image
-            src={event.imageUrl.trim()}
+            src={mainImage.trim()}
             alt={localizedTitle}
             fill
             className="object-cover"

@@ -57,7 +57,10 @@ describe("EventList", () => {
         createdAt: new Date("2024-01-01"),
         updatedAt: new Date("2024-01-01"),
       },
-      imageUrl: "https://example.com/image.jpg",
+      imageUrl: {
+        portrait: "https://example.com/image-portrait.jpg",
+        landscape: "https://example.com/image.jpg",
+      },
       createdAt: new Date("2024-01-01"),
       updatedAt: new Date("2024-01-01"),
     },

@@ -39,7 +39,7 @@ export function EventForm({
   const t = useTranslations("events");
   const tCommon = useTranslations("common");
   const [imagePreview, setImagePreview] = useState<string | undefined>(
-    defaultValues?.imageUrl
+    defaultValues?.imageUrl?.landscape || defaultValues?.imageUrl?.portrait
   );
 
   const form = useForm<EventFormData>({
@@ -82,7 +82,10 @@ export function EventForm({
       },
       date: defaultValues?.date ? new Date(defaultValues.date) : new Date(),
       capacity: defaultValues?.capacity || 50,
-      imageUrl: defaultValues?.imageUrl || "",
+      imageUrl: defaultValues?.imageUrl || {
+        portrait: "",
+        landscape: "",
+      },
       basePrice: defaultValues?.basePrice ?? 0,
     },
   });
@@ -90,11 +93,13 @@ export function EventForm({
   const watchImageUrl = form.watch("imageUrl");
 
   useEffect(() => {
-    if (watchImageUrl && watchImageUrl.trim() !== "") {
+    const candidate =
+      watchImageUrl?.landscape?.trim() || watchImageUrl?.portrait?.trim();
+    if (candidate) {
       // Validate URL format before setting preview
       try {
-        new URL(watchImageUrl);
-        setImagePreview(watchImageUrl);
+        new URL(candidate);
+        setImagePreview(candidate);
       } catch {
         setImagePreview(undefined);
       }
@@ -104,9 +109,18 @@ export function EventForm({
   }, [watchImageUrl]);
 
   const handleSubmit = async (data: EventFormData) => {
+    const hasImage =
+      data.imageUrl?.portrait?.trim() || data.imageUrl?.landscape?.trim();
+    const normalizedImageUrl = hasImage
+      ? {
+          portrait: data.imageUrl?.portrait?.trim() || "",
+          landscape: data.imageUrl?.landscape?.trim() || "",
+        }
+      : undefined;
     // Ensure date is included in translations if not already formatted
     const formattedData = {
       ...data,
+      imageUrl: normalizedImageUrl,
       translations: {
         ...data.translations,
         date: {
@@ -399,25 +413,59 @@ export function EventForm({
         {/* Image URL */}
         <FormField
           control={form.control}
-          name="imageUrl"
+          name="imageUrl.portrait"
           render={({ field, fieldState }) => (
             <AnimatedFormField error={fieldState.error?.message}>
               <FormItem>
-                <FormLabel htmlFor="event-image-url">{t("imageUrl")}</FormLabel>
+                <FormLabel htmlFor="event-image-url-portrait">
+                  {t("imageUrlPortrait")}
+                </FormLabel>
                 <FormControl>
                   <Input
-                    id="event-image-url"
+                    id="event-image-url-portrait"
                     type="url"
-                    placeholder="https://example.com/image.jpg"
+                    placeholder="https://example.com/image-portrait.jpg"
                     {...field}
                     disabled={isLoading}
                     aria-invalid={!!fieldState.error}
                     aria-describedby={
-                      fieldState.error ? "event-image-url-error" : undefined
+                      fieldState.error
+                        ? "event-image-url-portrait-error"
+                        : undefined
                     }
                   />
                 </FormControl>
-                <FormMessage id="event-image-url-error" />
+                <FormMessage id="event-image-url-portrait-error" />
+              </FormItem>
+            </AnimatedFormField>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="imageUrl.landscape"
+          render={({ field, fieldState }) => (
+            <AnimatedFormField error={fieldState.error?.message}>
+              <FormItem>
+                <FormLabel htmlFor="event-image-url-landscape">
+                  {t("imageUrlLandscape")}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    id="event-image-url-landscape"
+                    type="url"
+                    placeholder="https://example.com/image-landscape.jpg"
+                    {...field}
+                    disabled={isLoading}
+                    aria-invalid={!!fieldState.error}
+                    aria-describedby={
+                      fieldState.error
+                        ? "event-image-url-landscape-error"
+                        : undefined
+                    }
+                  />
+                </FormControl>
+                <FormMessage id="event-image-url-landscape-error" />
               </FormItem>
             </AnimatedFormField>
           )}

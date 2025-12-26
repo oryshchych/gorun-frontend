@@ -31,6 +31,11 @@ export interface EventTranslations {
   date: TranslationField;
 }
 
+export interface EventImageUrl {
+  portrait: string;
+  landscape: string;
+}
+
 export interface Event {
   id: string;
   translations?: EventTranslations;
@@ -45,7 +50,7 @@ export interface Event {
   registeredCount: number;
   organizerId?: string;
   organizer?: User;
-  imageUrl?: string;
+  imageUrl?: EventImageUrl;
   speakers?: Speaker[]; // Array of speaker objects
   gallery?: string[]; // For future expansion
   basePrice?: number;
@@ -63,10 +68,14 @@ interface BaseEventPayload {
   longitude?: number;
   date: Date;
   capacity: number;
-  imageUrl?: string;
+  imageUrl?: EventImageUrl;
   basePrice?: number;
 }
 
 export interface CreateEventRequest extends BaseEventPayload {}
 
-export interface UpdateEventRequest extends Partial<BaseEventPayload> {}
+export interface UpdateEventRequest extends Partial<
+  Omit<BaseEventPayload, "imageUrl">
+> {
+  imageUrl?: Partial<EventImageUrl>;
+}

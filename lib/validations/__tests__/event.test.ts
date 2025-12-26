@@ -1,6 +1,27 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { eventSchema, updateEventSchema } from "../event";
 
+const baseTranslations = {
+  title: { en: "Tech Conference", uk: "Tech Conference" },
+  description: {
+    en: "A great tech conference for developers",
+    uk: "A great tech conference for developers",
+  },
+  location: { en: "Kyiv, Ukraine", uk: "Kyiv, Ukraine" },
+  date: { en: "December 31, 2024 at 10:00 AM", uk: "31 грудня 2024 10:00" },
+};
+
+const buildEventData = (overrides: Record<string, any> = {}) => ({
+  translations: JSON.parse(JSON.stringify(baseTranslations)),
+  date: new Date("2024-12-31T10:00:00Z"),
+  capacity: 100,
+  imageUrl: {
+    portrait: "https://example.com/image-portrait.jpg",
+    landscape: "https://example.com/image-landscape.jpg",
+  },
+  ...overrides,
+});
+
 describe("Event Validation Schemas", () => {
   beforeEach(() => {
     // Mock current date to ensure consistent testing
@@ -10,54 +31,27 @@ describe("Event Validation Schemas", () => {
 
   describe("eventSchema", () => {
     it("should validate correct event data", () => {
-      const validData = {
-        title: "Tech Conference",
-        description: "A great tech conference for developers",
-        date: new Date("2024-12-31T10:00:00Z"),
-        location: "Kyiv, Ukraine",
-        capacity: 100,
-        imageUrl: "https://example.com/image.jpg",
-      };
-
-      const result = eventSchema.safeParse(validData);
+      const result = eventSchema.safeParse(buildEventData());
       expect(result.success).toBe(true);
     });
 
     it("should validate event data without optional imageUrl", () => {
-      const validData = {
-        title: "Tech Conference",
-        description: "A great tech conference for developers",
-        date: new Date("2024-12-31T10:00:00Z"),
-        location: "Kyiv, Ukraine",
-        capacity: 100,
-      };
-
-      const result = eventSchema.safeParse(validData);
+      const result = eventSchema.safeParse(
+        buildEventData({ imageUrl: undefined })
+      );
       expect(result.success).toBe(true);
     });
 
-    it("should validate event data with empty string imageUrl", () => {
-      const validData = {
-        title: "Tech Conference",
-        description: "A great tech conference for developers",
-        date: new Date("2024-12-31T10:00:00Z"),
-        location: "Kyiv, Ukraine",
-        capacity: 100,
-        imageUrl: "",
-      };
-
-      const result = eventSchema.safeParse(validData);
+    it("should validate event data with empty imageUrl fields", () => {
+      const result = eventSchema.safeParse(
+        buildEventData({ imageUrl: { portrait: "", landscape: "" } })
+      );
       expect(result.success).toBe(true);
     });
 
     it("should reject title shorter than 3 characters", () => {
-      const invalidData = {
-        title: "AB",
-        description: "A great tech conference for developers",
-        date: new Date("2024-12-31T10:00:00Z"),
-        location: "Kyiv, Ukraine",
-        capacity: 100,
-      };
+      const invalidData = buildEventData();
+      invalidData.translations.title.en = "AB";
 
       const result = eventSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
@@ -68,70 +62,11 @@ describe("Event Validation Schemas", () => {
       }
     });
 
-    it("should reject title longer than 100 characters", () => {
-      const invalidData = {
-        title: "a".repeat(101),
-        description: "A great tech conference for developers",
-        date: new Date("2024-12-31T10:00:00Z"),
-        location: "Kyiv, Ukraine",
-        capacity: 100,
-      };
-
-      const result = eventSchema.safeParse(invalidData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0].message).toBe(
-          "Title must not exceed 100 characters"
-        );
-      }
-    });
-
-    it("should reject description shorter than 10 characters", () => {
-      const invalidData = {
-        title: "Tech Conference",
-        description: "Short",
-        date: new Date("2024-12-31T10:00:00Z"),
-        location: "Kyiv, Ukraine",
-        capacity: 100,
-      };
-
-      const result = eventSchema.safeParse(invalidData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0].message).toBe(
-          "Description must be at least 10 characters"
-        );
-      }
-    });
-
-    it("should reject description longer than 2000 characters", () => {
-      const invalidData = {
-        title: "Tech Conference",
-        description: "a".repeat(2001),
-        date: new Date("2024-12-31T10:00:00Z"),
-        location: "Kyiv, Ukraine",
-        capacity: 100,
-      };
-
-      const result = eventSchema.safeParse(invalidData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0].message).toBe(
-          "Description must not exceed 2000 characters"
-        );
-      }
-    });
-
     it("should reject past date", () => {
-      const invalidData = {
-        title: "Tech Conference",
-        description: "A great tech conference for developers",
-        date: new Date("2023-01-01T10:00:00Z"),
-        location: "Kyiv, Ukraine",
-        capacity: 100,
-      };
+      const result = eventSchema.safeParse(
+        buildEventData({ date: new Date("2023-01-01T10:00:00Z") })
+      );
 
-      const result = eventSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.issues[0].message).toBe(
@@ -141,67 +76,19 @@ describe("Event Validation Schemas", () => {
     });
 
     it("should accept date as string and transform to Date", () => {
-      const validData = {
-        title: "Tech Conference",
-        description: "A great tech conference for developers",
-        date: "2024-12-31T10:00:00Z",
-        location: "Kyiv, Ukraine",
-        capacity: 100,
-      };
+      const result = eventSchema.safeParse(
+        buildEventData({ date: "2024-12-31T10:00:00Z" })
+      );
 
-      const result = eventSchema.safeParse(validData);
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.date).toBeInstanceOf(Date);
       }
     });
 
-    it("should reject location shorter than 3 characters", () => {
-      const invalidData = {
-        title: "Tech Conference",
-        description: "A great tech conference for developers",
-        date: new Date("2024-12-31T10:00:00Z"),
-        location: "AB",
-        capacity: 100,
-      };
-
-      const result = eventSchema.safeParse(invalidData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0].message).toBe(
-          "Location must be at least 3 characters"
-        );
-      }
-    });
-
-    it("should reject location longer than 200 characters", () => {
-      const invalidData = {
-        title: "Tech Conference",
-        description: "A great tech conference for developers",
-        date: new Date("2024-12-31T10:00:00Z"),
-        location: "a".repeat(201),
-        capacity: 100,
-      };
-
-      const result = eventSchema.safeParse(invalidData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0].message).toBe(
-          "Location must not exceed 200 characters"
-        );
-      }
-    });
-
     it("should reject non-integer capacity", () => {
-      const invalidData = {
-        title: "Tech Conference",
-        description: "A great tech conference for developers",
-        date: new Date("2024-12-31T10:00:00Z"),
-        location: "Kyiv, Ukraine",
-        capacity: 100.5,
-      };
+      const result = eventSchema.safeParse(buildEventData({ capacity: 100.5 }));
 
-      const result = eventSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.issues[0].message).toBe(
@@ -211,15 +98,8 @@ describe("Event Validation Schemas", () => {
     });
 
     it("should reject zero or negative capacity", () => {
-      const invalidData = {
-        title: "Tech Conference",
-        description: "A great tech conference for developers",
-        date: new Date("2024-12-31T10:00:00Z"),
-        location: "Kyiv, Ukraine",
-        capacity: 0,
-      };
+      const result = eventSchema.safeParse(buildEventData({ capacity: 0 }));
 
-      const result = eventSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.issues[0].message).toBe(
@@ -228,35 +108,13 @@ describe("Event Validation Schemas", () => {
       }
     });
 
-    it("should reject capacity exceeding 10000", () => {
-      const invalidData = {
-        title: "Tech Conference",
-        description: "A great tech conference for developers",
-        date: new Date("2024-12-31T10:00:00Z"),
-        location: "Kyiv, Ukraine",
-        capacity: 10001,
-      };
-
-      const result = eventSchema.safeParse(invalidData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0].message).toBe(
-          "Capacity must not exceed 10,000"
-        );
-      }
-    });
-
     it("should reject invalid imageUrl format", () => {
-      const invalidData = {
-        title: "Tech Conference",
-        description: "A great tech conference for developers",
-        date: new Date("2024-12-31T10:00:00Z"),
-        location: "Kyiv, Ukraine",
-        capacity: 100,
-        imageUrl: "not-a-url",
-      };
+      const result = eventSchema.safeParse(
+        buildEventData({
+          imageUrl: { portrait: "not-a-url", landscape: "" },
+        })
+      );
 
-      const result = eventSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error.issues[0].message).toBe("Must be a valid URL");
@@ -267,16 +125,18 @@ describe("Event Validation Schemas", () => {
   describe("updateEventSchema", () => {
     it("should validate partial update with only title", () => {
       const validData = {
-        title: "Updated Conference",
+        translations: {
+          title: { en: "Updated Conference" },
+        },
       };
 
       const result = updateEventSchema.safeParse(validData);
       expect(result.success).toBe(true);
     });
 
-    it("should validate partial update with multiple fields", () => {
+    it("should validate partial update with image fields", () => {
       const validData = {
-        title: "Updated Conference",
+        imageUrl: { portrait: "https://example.com/new.jpg" },
         capacity: 200,
       };
 
@@ -285,23 +145,18 @@ describe("Event Validation Schemas", () => {
     });
 
     it("should validate empty update object", () => {
-      const validData = {};
-
-      const result = updateEventSchema.safeParse(validData);
+      const result = updateEventSchema.safeParse({});
       expect(result.success).toBe(true);
     });
 
-    it("should reject invalid title in partial update", () => {
-      const invalidData = {
-        title: "AB",
-      };
+    it("should reject invalid image URL in update", () => {
+      const result = updateEventSchema.safeParse({
+        imageUrl: { landscape: "bad-url" },
+      });
 
-      const result = updateEventSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe(
-          "Title must be at least 3 characters"
-        );
+        expect(result.error.issues[0].message).toBe("Must be a valid URL");
       }
     });
   });

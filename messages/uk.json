@@ -101,6 +101,8 @@
     "registeredCount": "Зареєстровано",
     "organizer": "Організатор",
     "imageUrl": "URL зображення",
+    "imageUrlPortrait": "Портретний URL зображення",
+    "imageUrlLandscape": "Альбомний URL зображення",
     "register": "Зареєструватися",
     "cancelRegistration": "Скасувати реєстрацію",
     "eventFull": "Подія заповнена",

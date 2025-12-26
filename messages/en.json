@@ -101,6 +101,8 @@
     "registeredCount": "Registered",
     "organizer": "Organizer",
     "imageUrl": "Image URL",
+    "imageUrlPortrait": "Portrait Image URL",
+    "imageUrlLandscape": "Landscape Image URL",
     "register": "Register",
     "cancelRegistration": "Cancel Registration",
     "eventFull": "Event Full",

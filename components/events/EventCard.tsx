@@ -31,6 +31,8 @@ export function EventCard({ event }: EventCardProps) {
   const formattedDate = format(new Date(event.date), "PPP", {
     locale: dateLocale,
   });
+  const primaryImage =
+    event.imageUrl?.landscape || event.imageUrl?.portrait || "";
   const localizedTitle = getLocalizedString(
     event.translations?.title,
     locale,
@@ -69,14 +71,14 @@ export function EventCard({ event }: EventCardProps) {
             className="relative w-full h-48 bg-muted"
             role="img"
             aria-label={
-              event.imageUrl
+              primaryImage
                 ? `Event image for ${localizedTitle}`
                 : "No event image"
             }
           >
-            {event.imageUrl ? (
+            {primaryImage ? (
               <Image
-                src={event.imageUrl.trim()}
+                src={primaryImage.trim()}
                 alt={`Event image for ${localizedTitle}`}
                 fill
                 className="object-cover"

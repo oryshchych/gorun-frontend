@@ -25,6 +25,21 @@ const translationFieldSchema = {
   }),
 };
 
+const imageUrlSchema = z
+  .object({
+    portrait: z
+      .string()
+      .url("Must be a valid URL")
+      .optional()
+      .or(z.literal("")),
+    landscape: z
+      .string()
+      .url("Must be a valid URL")
+      .optional()
+      .or(z.literal("")),
+  })
+  .optional();
+
 export const eventSchema = z.object({
   translations: z.object(translationFieldSchema),
   date: z
@@ -38,7 +53,7 @@ export const eventSchema = z.object({
     .int("Capacity must be a whole number")
     .positive("Capacity must be greater than 0")
     .max(10000, "Capacity must not exceed 10,000"),
-  imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  imageUrl: imageUrlSchema,
   basePrice: z
     .number()
     .nonnegative("Base price must be 0 or greater")
@@ -68,7 +83,7 @@ export const updateEventSchema = z.object({
     .positive("Capacity must be greater than 0")
     .max(10000, "Capacity must not exceed 10,000")
     .optional(),
-  imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  imageUrl: imageUrlSchema,
   basePrice: z
     .number()
     .nonnegative("Base price must be 0 or greater")
