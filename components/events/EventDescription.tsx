@@ -20,6 +20,7 @@ import {
   getLocalizedString,
   getLocalizedSpeaker,
 } from "@/lib/utils";
+import { useResponsiveImage } from "@/hooks/useResponsiveImage";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -68,6 +69,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
     "en",
     event.date?.toString() || ""
   );
+  const mainImage = useResponsiveImage(event.imageUrl);
   // Get localized speakers
   const localizedSpeakers = event.speakers
     ? event.speakers.map((speaker) => getLocalizedSpeaker(speaker, locale))
@@ -182,13 +184,13 @@ export function EventDescription({ event }: EventDescriptionProps) {
   return (
     <div className="space-y-6">
       {/* Event Image */}
-      {event.imageUrl && (
-        <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden border">
+      {mainImage && (
+        <div className="relative w-full h-64 md:h-128 rounded-lg overflow-hidden border">
           <Image
-            src={event.imageUrl.trim()}
+            src={mainImage.trim()}
             alt={localizedTitle}
             fill
-            className="object-cover"
+            className="object-cover object-bottom"
             sizes="(max-width: 768px) 100vw, 1200px"
             priority
           />

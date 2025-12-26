@@ -14,6 +14,8 @@ import { Event } from "@/types/event";
 import { Participant } from "@/types/registration";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { validatePromoCode } from "@/lib/api/promo-codes";
+import { PromoCodeValidationResponse } from "@/types/promo-code";
 
 interface HomePageClientProps {
   event: Event;
@@ -31,10 +33,8 @@ export default function HomePageClient({
   const searchParams = useSearchParams();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<string>("description");
-  const [promoCodeDiscount, setPromoCodeDiscount] = useState<{
-    discountType: "percentage" | "amount";
-    discountValue: number;
-  } | null>(null);
+  const [promoCodeDiscount, setPromoCodeDiscount] =
+    useState<PromoCodeValidationResponse | null>(null);
 
   // Sync tab with URL search params
   useEffect(() => {
@@ -61,12 +61,29 @@ export default function HomePageClient({
   };
 
   const handlePromoCodeCheck = async (code: string) => {
+    const normalizedCode = code.trim();
+
+    // If the field was cleared, drop any existing discount and skip network calls
+    if (!normalizedCode) {
+      setPromoCodeDiscount(null);
+      return;
+    }
+
     try {
-      // TODO: call API to validate promo codes
-      // const response = await apiClient.post('/promo-codes/validate', { code });
-      // setPromoCodeDiscount(response.data);
-      toast.success("Promo code validated");
+      const result = await validatePromoCode({
+        code: normalizedCode,
+        eventId: event.id,
+      });
+
+      if (!result.isValid) {
+        setPromoCodeDiscount(null);
+        throw new Error(t("event.promoCodeInvalid"));
+      }
+
+      setPromoCodeDiscount(result);
+      toast.success(t("event.promoCodeApplied"));
     } catch (error: any) {
+      setPromoCodeDiscount(null);
       throw error;
     }
   };

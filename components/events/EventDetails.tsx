@@ -22,6 +22,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { getLocalizedString } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
+import { useResponsiveImage } from "@/hooks/useResponsiveImage";
 import {
   useCreateRegistration,
   useCancelRegistration,
@@ -93,6 +94,7 @@ export function EventDetails({ event }: EventDetailsProps) {
   const formattedDate = format(new Date(event.date), "PPPp", {
     locale: dateLocale,
   });
+  const mainImage = useResponsiveImage(event.imageUrl);
 
   const getNameParts = (fullName?: string) => {
     if (!fullName) return { first: "Guest", last: "User" };
@@ -167,7 +169,7 @@ export function EventDetails({ event }: EventDetailsProps) {
       className="space-y-6"
     >
       {/* Event Image */}
-      {event.imageUrl && (
+      {mainImage && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -175,10 +177,10 @@ export function EventDetails({ event }: EventDetailsProps) {
           className="relative w-full h-[400px] rounded-lg overflow-hidden"
         >
           <Image
-            src={event.imageUrl.trim()}
+            src={mainImage.trim()}
             alt={localizedTitle}
             fill
-            className="object-cover"
+            className="object-cover object-bottom"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
             priority
           />

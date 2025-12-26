@@ -13,6 +13,7 @@ import { useLocale } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
 import { getLocalizedString } from "@/lib/utils";
+import { useResponsiveImage } from "@/hooks/useResponsiveImage";
 
 interface EventCardProps {
   event: Event;
@@ -22,6 +23,7 @@ export function EventCard({ event }: EventCardProps) {
   const t = useTranslations("events");
   const locale = useLocale();
   const dateLocale = locale === "uk" ? uk : enUS;
+  const primaryImage = useResponsiveImage(event.imageUrl) || "";
 
   const availableSpots = event.capacity - event.registeredCount;
   const isFull = availableSpots <= 0;
@@ -69,17 +71,17 @@ export function EventCard({ event }: EventCardProps) {
             className="relative w-full h-48 bg-muted"
             role="img"
             aria-label={
-              event.imageUrl
+              primaryImage
                 ? `Event image for ${localizedTitle}`
                 : "No event image"
             }
           >
-            {event.imageUrl ? (
+            {primaryImage ? (
               <Image
-                src={event.imageUrl.trim()}
+                src={primaryImage.trim()}
                 alt={`Event image for ${localizedTitle}`}
                 fill
-                className="object-cover"
+                className="object-cover object-bottom"
                 loading="eager"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />

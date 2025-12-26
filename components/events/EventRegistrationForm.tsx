@@ -76,9 +76,15 @@ export function EventRegistrationForm({
 
   const watchPromoCode = form.watch("promoCode");
 
-  const handlePromoCodeBlur = async () => {
+  const validatePromoCodeInput = async () => {
     const promoCode = watchPromoCode?.trim();
-    if (!promoCode || !onPromoCodeCheck) return;
+    if (!onPromoCodeCheck) return;
+
+    // No code -> just reset UI, no network request
+    if (!promoCode) {
+      setPromoCodeError(null);
+      return;
+    }
 
     setIsCheckingPromoCode(true);
     setPromoCodeError(null);
@@ -87,7 +93,9 @@ export function EventRegistrationForm({
       await onPromoCodeCheck(promoCode);
     } catch (error: any) {
       setPromoCodeError(
-        error?.response?.data?.message || t("promoCodeInvalid")
+        error?.response?.data?.message ||
+          error?.message ||
+          t("promoCodeInvalid")
       );
     } finally {
       setIsCheckingPromoCode(false);
@@ -349,14 +357,35 @@ export function EventRegistrationForm({
                     </FormLabel>
                     <FormControl>
                       <div className="space-y-2">
-                        <Input
-                          id="registration-promo-code"
-                          placeholder={t("promoCodePlaceholder")}
-                          {...field}
-                          disabled={isLoading || isCheckingPromoCode}
-                          onBlur={handlePromoCodeBlur}
-                          aria-invalid={!!fieldState.error || !!promoCodeError}
-                        />
+                        <div className="relative">
+                          <Input
+                            id="registration-promo-code"
+                            placeholder={t("promoCodePlaceholder")}
+                            {...field}
+                            disabled={isLoading || isCheckingPromoCode}
+                            aria-invalid={
+                              !!fieldState.error || !!promoCodeError
+                            }
+                            className="pr-28"
+                          />
+                          {watchPromoCode?.trim() && (
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="default"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 h-7 px-2 cursor-pointer bg-[#48C773] text-white hover:bg-[#3fa962] shadow-sm"
+                              onClick={validatePromoCodeInput}
+                              disabled={isCheckingPromoCode || isLoading}
+                              aria-label={tCommon("apply")}
+                            >
+                              {isCheckingPromoCode ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                tCommon("apply")
+                              )}
+                            </Button>
+                          )}
+                        </div>
                         {isCheckingPromoCode && (
                           <p className="text-sm text-muted-foreground">
                             {t("checkingPromoCode")}...
@@ -369,6 +398,11 @@ export function EventRegistrationForm({
                               ? `${promoCodeDiscount.discountValue}%`
                               : `${promoCodeDiscount.discountValue} UAH`}{" "}
                             {t("discount")}
+                          </p>
+                        )}
+                        {promoCodeError && (
+                          <p className="text-sm text-destructive">
+                            {promoCodeError}
                           </p>
                         )}
                       </div>

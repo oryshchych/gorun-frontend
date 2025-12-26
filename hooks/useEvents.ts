@@ -14,7 +14,12 @@ import {
   getMyEvents,
   GetEventsParams,
 } from "@/lib/api/events";
-import { Event, CreateEventRequest, UpdateEventRequest } from "@/types/event";
+import {
+  Event,
+  CreateEventRequest,
+  UpdateEventRequest,
+  EventImageUrl,
+} from "@/types/event";
 import { PaginatedResponse } from "@/types/api";
 import { handleApiError, showSuccessToast } from "@/lib/error-handler";
 
@@ -114,9 +119,25 @@ export const useUpdateEvent = (id: string, lang?: string) => {
 
       // Optimistically update the cache
       if (previousEvent) {
+        // Merge imageUrl properly if provided (UpdateEventRequest has Partial<EventImageUrl>)
+        const mergedImageUrl: EventImageUrl | undefined =
+          updatedData.imageUrl !== undefined
+            ? {
+                portrait:
+                  updatedData.imageUrl.portrait ??
+                  previousEvent.imageUrl?.portrait ??
+                  "",
+                landscape:
+                  updatedData.imageUrl.landscape ??
+                  previousEvent.imageUrl?.landscape ??
+                  "",
+              }
+            : previousEvent.imageUrl;
+
         queryClient.setQueryData<Event>(eventKeys.detail(id, lang), {
           ...previousEvent,
           ...updatedData,
+          imageUrl: mergedImageUrl,
         });
       }
 
