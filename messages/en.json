@@ -136,7 +136,20 @@
     "descriptionUk": "Description (UK)",
     "locationEn": "Location (EN)",
     "locationUk": "Location (UK)",
-    "basePrice": "Base Price"
+    "basePrice": "Base Price",
+    "allFundsForZSU": "All collected funds for the Armed Forces of Ukraine",
+    "inEventProgram": "In the event program:",
+    "professionalRunners": "Performances by professional runners",
+    "prizeDraw": "Prize draw from partners",
+    "charityAuction": "Charity auction",
+    "coffeeBreak": "Coffee break",
+    "forEveryoneInterestedInRunning": "For everyone who is interested in running",
+    "startAt": "START AT",
+    "gorunTeam": "GORUN.TEAM",
+    "gorunLocation": "GORUN",
+    "warmIntimateMeeting": "A warm, intimate offline meeting for everyone who lives by running or is just taking their first steps",
+    "shootingRange": "Strilnytsia",
+    "venue": "Venue"
   },
   "event": {
     "description": "Description",

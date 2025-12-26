@@ -14,6 +14,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getLocalizedString } from "@/lib/utils";
 import { useResponsiveImage } from "@/hooks/useResponsiveImage";
+import { EventImageOverlay } from "./EventImageOverlay";
 
 interface EventCardProps {
   event: Event;
@@ -68,7 +69,7 @@ export function EventCard({ event }: EventCardProps) {
         >
           {/* Event Image */}
           <div
-            className="relative w-full h-48 bg-muted"
+            className="relative w-full h-48 bg-muted overflow-hidden"
             role="img"
             aria-label={
               primaryImage
@@ -77,14 +78,19 @@ export function EventCard({ event }: EventCardProps) {
             }
           >
             {primaryImage ? (
-              <Image
-                src={primaryImage.trim()}
-                alt={`Event image for ${localizedTitle}`}
-                fill
-                className="object-cover object-bottom"
-                loading="eager"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
+              <>
+                <Image
+                  src={primaryImage.trim()}
+                  alt={`Event image for ${localizedTitle}`}
+                  fill
+                  className="object-cover object-bottom"
+                  loading="eager"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+                {/* Gradient overlay for better text readability */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+                <EventImageOverlay event={event} variant="compact" />
+              </>
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-primary/10 to-primary/5">
                 <Calendar

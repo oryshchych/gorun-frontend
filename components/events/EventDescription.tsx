@@ -21,6 +21,7 @@ import {
   getLocalizedSpeaker,
 } from "@/lib/utils";
 import { useResponsiveImage } from "@/hooks/useResponsiveImage";
+import { EventImageOverlay } from "./EventImageOverlay";
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -185,7 +186,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
     <div className="space-y-6">
       {/* Event Image */}
       {mainImage && (
-        <div className="relative w-full h-64 md:h-128 rounded-lg overflow-hidden border">
+        <div className="relative w-full h-144 lg:h-[700px] rounded-lg overflow-hidden border">
           <Image
             src={mainImage.trim()}
             alt={localizedTitle}
@@ -194,6 +195,9 @@ export function EventDescription({ event }: EventDescriptionProps) {
             sizes="(max-width: 768px) 100vw, 1200px"
             priority
           />
+          {/* Gradient overlay for better text readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+          <EventImageOverlay event={event} variant="full" />
         </div>
       )}
 
