@@ -7,6 +7,11 @@ import { Card } from "@/components/ui/card";
 import HomePageClient from "@/components/events/HomePageClient";
 import { Event } from "@/types/event";
 import { Participant } from "@/types/registration";
+import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
+import { generateEventStructuredData } from "@/lib/seo";
+import { getLocalizedString } from "@/lib/utils";
+import type { Metadata } from "next";
+import { siteConfig } from "@/lib/seo";
 
 // For MVP: We'll use a fixed event ID or fetch the first event
 // In production, this would come from environment or API endpoint
@@ -34,6 +39,49 @@ async function fetchParticipants(eventId: string): Promise<Participant[]> {
   }
   const json = await res.json();
   return json.data as Participant[];
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  let event: Event | null = null;
+
+  try {
+    event = await fetchEvent(locale);
+  } catch (error) {
+    // If event not found, return default metadata
+  }
+
+  if (event) {
+    const localizedTitle = getLocalizedString(
+      event.translations?.title,
+      locale,
+      "en",
+      event.title || ""
+    );
+    const localizedDescription = getLocalizedString(
+      event.translations?.description,
+      locale,
+      "en",
+      event.description || ""
+    );
+
+    return generateSEOMetadata({
+      locale,
+      title: localizedTitle,
+      description: localizedDescription,
+      image: event.imageUrl?.landscape || event.imageUrl?.portrait,
+      path: "",
+    });
+  }
+
+  return generateSEOMetadata({
+    locale,
+    path: "",
+  });
 }
 
 export default async function HomePage({
@@ -73,19 +121,58 @@ export default async function HomePage({
     );
   }
 
+  const localizedTitle = getLocalizedString(
+    event.translations?.title,
+    locale,
+    "en",
+    event.title || ""
+  );
+  const localizedDescription = getLocalizedString(
+    event.translations?.description,
+    locale,
+    "en",
+    event.description || ""
+  );
+  const localizedLocation = getLocalizedString(
+    event.translations?.location,
+    locale,
+    "en",
+    event.location || ""
+  );
+
+  const structuredData = generateEventStructuredData({
+    id: event.id,
+    title: localizedTitle,
+    description: localizedDescription,
+    date: new Date(event.date).toISOString(),
+    location: localizedLocation,
+    imageUrl: event.imageUrl,
+    basePrice: event.basePrice,
+    capacity: event.capacity,
+    registeredCount: event.registeredCount,
+    locale,
+    url: `${siteConfig.url}/${locale}`,
+  });
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1">
-        <div className="container mx-auto px-4 py-8 md:py-12">
-          <HomePageClient
-            event={event}
-            participants={participants}
-            locale={locale}
-          />
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1">
+          <div className="container mx-auto px-4 py-8 md:py-12">
+            <HomePageClient
+              event={event}
+              participants={participants}
+              locale={locale}
+            />
+          </div>
+        </main>
+        <Footer />
+      </div>
+    </>
   );
 }

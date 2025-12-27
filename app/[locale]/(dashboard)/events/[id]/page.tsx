@@ -7,6 +7,9 @@ import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { use } from "react";
+import { generateEventStructuredData } from "@/lib/seo";
+import { getLocalizedString } from "@/lib/utils";
+import { siteConfig } from "@/lib/seo";
 
 interface EventDetailsPageProps {
   params: Promise<{ id: string; locale: string }>;
@@ -49,14 +52,53 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
     );
   }
 
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
-      <Button variant="ghost" onClick={handleBack} className="mb-6">
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        {t("back")}
-      </Button>
+  const localizedTitle = getLocalizedString(
+    event.translations?.title,
+    locale,
+    "en",
+    event.title || ""
+  );
+  const localizedDescription = getLocalizedString(
+    event.translations?.description,
+    locale,
+    "en",
+    event.description || ""
+  );
+  const localizedLocation = getLocalizedString(
+    event.translations?.location,
+    locale,
+    "en",
+    event.location || ""
+  );
 
-      <EventDetails event={event} />
-    </div>
+  const structuredData = generateEventStructuredData({
+    id: event.id,
+    title: localizedTitle,
+    description: localizedDescription,
+    date: new Date(event.date).toISOString(),
+    location: localizedLocation,
+    imageUrl: event.imageUrl,
+    basePrice: event.basePrice,
+    capacity: event.capacity,
+    registeredCount: event.registeredCount,
+    locale,
+    url: `${siteConfig.url}/${locale}/events/${event.id}`,
+  });
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
+        <Button variant="ghost" onClick={handleBack} className="mb-6">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          {t("back")}
+        </Button>
+
+        <EventDetails event={event} />
+      </div>
+    </>
   );
 }
