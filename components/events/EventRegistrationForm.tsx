@@ -33,7 +33,7 @@ interface EventRegistrationFormProps {
   onSubmit: (data: RegistrationFormData) => void | Promise<void>;
   isLoading?: boolean;
   promoCodeDiscount?: {
-    discountType: "percentage" | "amount";
+    discountType: "percentage" | "fixed";
     discountValue: number;
   } | null;
   onPromoCodeCheck?: (code: string) => Promise<void>;
@@ -168,7 +168,7 @@ export function EventRegistrationForm({
   const discountAmount =
     promoCodeDiscount?.discountType === "percentage"
       ? (basePrice * promoCodeDiscount.discountValue) / 100
-      : promoCodeDiscount?.discountType === "amount"
+      : promoCodeDiscount?.discountType === "fixed"
         ? promoCodeDiscount.discountValue
         : 0;
   const finalPrice = Math.max(0, basePrice - discountAmount);

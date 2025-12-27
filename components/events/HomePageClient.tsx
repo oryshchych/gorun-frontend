@@ -75,7 +75,8 @@ export default function HomePageClient({
         eventId: event.id,
       });
 
-      if (!result.isValid) {
+      // validatePromoCode returns null if invalid/expired
+      if (!result) {
         setPromoCodeDiscount(null);
         throw new Error(t("event.promoCodeInvalid"));
       }
