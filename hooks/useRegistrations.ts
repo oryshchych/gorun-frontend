@@ -175,6 +175,13 @@ export const useCreateRegistration = () => {
     onSuccess: (result) => {
       const { registration, paymentLink } = result;
 
+      // Debug: log payment link
+      console.log("Registration success:", {
+        registrationId: registration.id,
+        hasPaymentLink: !!paymentLink,
+        paymentLink: paymentLink,
+      });
+
       // Invalidate relevant queries
       queryClient.invalidateQueries({
         queryKey: registrationKeys.myRegistrations(),
@@ -198,8 +205,11 @@ export const useCreateRegistration = () => {
           "Registration successful! Redirecting to payment...",
           "Registration Successful"
         );
-        // Redirect to payment page
-        window.location.href = paymentLink;
+        // Small delay to ensure toast is visible before redirect
+        setTimeout(() => {
+          console.log("Redirecting to payment:", paymentLink);
+          window.location.href = paymentLink;
+        }, 500);
       } else {
         // Authenticated registration (no payment needed)
         showSuccessToast(

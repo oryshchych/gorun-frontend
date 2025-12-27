@@ -91,9 +91,19 @@ export const createRegistration = async (
   >("/registrations", data);
 
   // Backend returns { success: true, data: Registration, paymentLink?: string }
+  // paymentLink is at the root level of response.data, not nested in data
+  const responseData = response.data as any;
+
+  // Debug: log the response structure
+  console.log("Registration response:", {
+    hasData: !!responseData.data,
+    hasPaymentLink: !!responseData.paymentLink,
+    paymentLink: responseData.paymentLink,
+  });
+
   return {
-    registration: response.data.data,
-    paymentLink: (response.data as any).paymentLink,
+    registration: responseData.data,
+    paymentLink: responseData.paymentLink,
   };
 };
 
