@@ -53,15 +53,25 @@ const validatePayload = ({
 
 /**
  * Validate a promo code and return discount details.
+ * Returns null if validation fails (invalid/expired code).
  */
 export const validatePromoCode = async (
   payload: PromoCodeValidationRequest
-): Promise<PromoCodeValidationResponse> => {
-  const validatedPayload = validatePayload(payload);
+): Promise<PromoCodeValidationResponse | null> => {
+  try {
+    const validatedPayload = validatePayload(payload);
 
-  const response = await apiClient.post<
-    ApiResponse<PromoCodeValidationResponse>
-  >("/promo-codes/validate", validatedPayload);
+    const response = await apiClient.post<
+      ApiResponse<PromoCodeValidationResponse>
+    >("/promo-codes/validate", validatedPayload);
 
-  return response.data.data;
+    return response.data.data;
+  } catch (error: any) {
+    // Return null for invalid/expired codes (400, 404, etc.)
+    if (error?.response?.status === 400 || error?.response?.status === 404) {
+      return null;
+    }
+    // Re-throw other errors (network, 500, etc.)
+    throw error;
+  }
 };
