@@ -1,5 +1,5 @@
 import apiClient from "./client";
-import { ApiResponse } from "@/types/api";
+import { ApiSuccessResponse } from "@/types/api";
 import {
   PromoCodeValidationRequest,
   PromoCodeValidationResponse,
@@ -62,7 +62,7 @@ export const validatePromoCode = async (
     const validatedPayload = validatePayload(payload);
 
     const response = await apiClient.post<
-      ApiResponse<PromoCodeValidationResponse>
+      ApiSuccessResponse<PromoCodeValidationResponse>
     >("/promo-codes/validate", validatedPayload);
 
     return response.data.data;

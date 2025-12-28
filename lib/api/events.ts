@@ -1,6 +1,10 @@
 import apiClient from "./client";
 import { Event, CreateEventRequest, UpdateEventRequest } from "@/types/event";
-import { ApiResponse, PaginatedResponse } from "@/types/api";
+import {
+  ApiResponse,
+  ApiSuccessResponse,
+  PaginatedResponse,
+} from "@/types/api";
 
 export interface GetEventsParams {
   page?: number;
@@ -39,9 +43,12 @@ export const getEventById = async (
   id: string,
   lang?: string
 ): Promise<Event> => {
-  const response = await apiClient.get<ApiResponse<Event>>(`/events/${id}`, {
-    params: lang ? { lang } : undefined,
-  });
+  const response = await apiClient.get<ApiSuccessResponse<Event>>(
+    `/events/${id}`,
+    {
+      params: lang ? { lang } : undefined,
+    }
+  );
   return response.data.data;
 };
 
@@ -49,7 +56,10 @@ export const getEventById = async (
  * Create a new event
  */
 export const createEvent = async (data: CreateEventRequest): Promise<Event> => {
-  const response = await apiClient.post<ApiResponse<Event>>("/events", data);
+  const response = await apiClient.post<ApiSuccessResponse<Event>>(
+    "/events",
+    data
+  );
   return response.data.data;
 };
 
@@ -60,7 +70,7 @@ export const updateEvent = async (
   id: string,
   data: UpdateEventRequest
 ): Promise<Event> => {
-  const response = await apiClient.put<ApiResponse<Event>>(
+  const response = await apiClient.put<ApiSuccessResponse<Event>>(
     `/events/${id}`,
     data
   );

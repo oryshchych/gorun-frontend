@@ -1,5 +1,9 @@
 import { toast } from "sonner";
 import { FormattedError } from "./api/client";
+import {
+  getMessageFromCode,
+  handleApiError as handleApiErrorWithCode,
+} from "./api-response-handler";
 
 /**
  * Error Handler Utility Module
@@ -11,16 +15,19 @@ import { FormattedError } from "./api/client";
  * - Toast notification helpers for success, error, info, warning, and loading states
  * - Consistent error handling for API calls
  * - Form field error extraction
+ * - Code-based API error handling with translations
  *
  * Usage:
  * ```typescript
  * import { handleApiError, showSuccessToast } from '@/lib/error-handler';
+ * import { useTranslations } from 'next-intl';
  *
+ * const t = useTranslations('apiCodes');
  * try {
  *   await someApiCall();
- *   showSuccessToast('Operation completed successfully!');
+ *   showSuccessToast('Operation completed successfully!', t);
  * } catch (error) {
- *   handleApiError(error, 'Operation Failed');
+ *   handleApiError(error, 'Operation Failed', t);
  * }
  * ```
  */
@@ -89,9 +96,38 @@ export function getUserFriendlyMessage(error: FormattedError | string): string {
 
 /**
  * Display error toast notification
+ * @param error - Error object or message string or API code
+ * @param title - Optional toast title
+ * @param t - Optional translation function for code-based messages
  */
-export function showErrorToast(error: FormattedError | string, title?: string) {
-  const message = getUserFriendlyMessage(error);
+export function showErrorToast(
+  error: FormattedError | string,
+  title?: string,
+  t?: (key: string) => string
+) {
+  let message: string;
+
+  if (t) {
+    // Try to use code-based translation
+    if (typeof error === "string") {
+      message = getMessageFromCode(error, t, getUserFriendlyMessage(error));
+    } else {
+      // Check if error has a code
+      const errorWithCode = error as FormattedError & { code?: string };
+      if (errorWithCode.code) {
+        message = getMessageFromCode(
+          errorWithCode.code,
+          t,
+          getUserFriendlyMessage(error)
+        );
+      } else {
+        message = getUserFriendlyMessage(error);
+      }
+    }
+  } else {
+    message = getUserFriendlyMessage(error);
+  }
+
   toast.error(title || "Error", {
     description: message,
     duration: 5000,
@@ -100,10 +136,20 @@ export function showErrorToast(error: FormattedError | string, title?: string) {
 
 /**
  * Display success toast notification
+ * @param message - Success message or API code
+ * @param title - Optional toast title
+ * @param t - Optional translation function for code-based messages
  */
-export function showSuccessToast(message: string, title?: string) {
+export function showSuccessToast(
+  message: string,
+  title?: string,
+  t?: (key: string) => string
+) {
+  const translatedMessage = t
+    ? getMessageFromCode(message, t, message)
+    : message;
   toast.success(title || "Success", {
-    description: message,
+    description: translatedMessage,
     duration: 3000,
   });
 }
@@ -139,10 +185,25 @@ export function showLoadingToast(message: string, title?: string) {
 
 /**
  * Handle API errors with automatic toast notification
+ * @param error - Error object from API call
+ * @param customMessage - Optional custom error title
+ * @param t - Optional translation function for code-based messages
  */
-export function handleApiError(error: unknown, customMessage?: string) {
+export function handleApiError(
+  error: unknown,
+  customMessage?: string,
+  t?: (key: string) => string
+) {
   console.error("API Error:", error);
 
+  if (t) {
+    // Use code-based error handling
+    const errorInfo = handleApiErrorWithCode(error, t);
+    showErrorToast(errorInfo.message, customMessage, t);
+    return errorInfo;
+  }
+
+  // Fallback to legacy error handling
   if (typeof error === "object" && error !== null && "message" in error) {
     showErrorToast(error as FormattedError, customMessage);
   } else if (typeof error === "string") {

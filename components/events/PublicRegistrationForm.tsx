@@ -18,9 +18,7 @@ import {
 } from "@/components/ui/form";
 import { AnimatedFormField } from "@/components/shared/AnimatedFormField";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
 
 interface PublicRegistrationFormProps {
   eventId: string;

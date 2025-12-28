@@ -22,6 +22,7 @@ import {
 } from "@/types/event";
 import { PaginatedResponse } from "@/types/api";
 import { handleApiError, showSuccessToast } from "@/lib/error-handler";
+import { useTranslations } from "next-intl";
 
 // Query keys for cache management
 export const eventKeys = {
@@ -76,6 +77,7 @@ export const useMyEvents = (params: GetEventsParams = {}) => {
  */
 export const useCreateEvent = () => {
   const queryClient = useQueryClient();
+  const t = useTranslations("apiCodes");
 
   return useMutation<Event, Error, CreateEventRequest>({
     mutationFn: createEvent,
@@ -84,13 +86,10 @@ export const useCreateEvent = () => {
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
       queryClient.invalidateQueries({ queryKey: eventKeys.myEvents() });
 
-      showSuccessToast(
-        "Your event has been created successfully!",
-        "Event Created"
-      );
+      showSuccessToast("SUCCESS_EVENTS_CREATED", "Event Created", t);
     },
     onError: (error) => {
-      handleApiError(error, "Failed to Create Event");
+      handleApiError(error, "Failed to Create Event", t);
     },
   });
 };
@@ -100,6 +99,7 @@ export const useCreateEvent = () => {
  */
 export const useUpdateEvent = (id: string, lang?: string) => {
   const queryClient = useQueryClient();
+  const t = useTranslations("apiCodes");
 
   return useMutation<
     Event,
@@ -151,7 +151,7 @@ export const useUpdateEvent = (id: string, lang?: string) => {
           context.previousEvent
         );
       }
-      handleApiError(error, "Failed to Update Event");
+      handleApiError(error, "Failed to Update Event", t);
     },
     onSuccess: (updatedEvent) => {
       // Update cache with server response
@@ -161,10 +161,7 @@ export const useUpdateEvent = (id: string, lang?: string) => {
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
       queryClient.invalidateQueries({ queryKey: eventKeys.myEvents() });
 
-      showSuccessToast(
-        "Your event has been updated successfully!",
-        "Event Updated"
-      );
+      showSuccessToast("SUCCESS_EVENTS_UPDATED", "Event Updated", t);
     },
   });
 };
@@ -174,6 +171,7 @@ export const useUpdateEvent = (id: string, lang?: string) => {
  */
 export const useDeleteEvent = () => {
   const queryClient = useQueryClient();
+  const t = useTranslations("apiCodes");
 
   return useMutation<
     void,
@@ -208,17 +206,14 @@ export const useDeleteEvent = () => {
           context.previousEvent
         );
       }
-      handleApiError(error, "Failed to Delete Event");
+      handleApiError(error, "Failed to Delete Event", t);
     },
     onSuccess: () => {
       // Invalidate lists to refetch
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
       queryClient.invalidateQueries({ queryKey: eventKeys.myEvents() });
 
-      showSuccessToast(
-        "The event has been deleted successfully!",
-        "Event Deleted"
-      );
+      showSuccessToast("SUCCESS_EVENTS_DELETED", "Event Deleted", t);
     },
   });
 };
