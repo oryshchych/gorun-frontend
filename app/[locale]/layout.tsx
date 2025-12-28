@@ -8,6 +8,7 @@ import { QueryProvider } from "@/components/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { generateMetadata as generateSEOMetadata, siteConfig } from "@/lib/seo";
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import "../globals.css";
 
@@ -63,6 +64,7 @@ export default async function LocaleLayout({
             </NextIntlClientProvider>
           </QueryProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
