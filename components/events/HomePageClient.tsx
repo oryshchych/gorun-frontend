@@ -29,6 +29,7 @@ export default function HomePageClient({
   locale,
 }: HomePageClientProps) {
   const t = useTranslations();
+  const tApiCodes = useTranslations("apiCodes");
   const createRegistration = useCreateRegistration();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -75,17 +76,18 @@ export default function HomePageClient({
         eventId: event.id,
       });
 
-      // validatePromoCode returns null if invalid/expired
-      if (!result) {
-        setPromoCodeDiscount(null);
-        throw new Error(t("event.promoCodeInvalid"));
-      }
-
       setPromoCodeDiscount(result);
       toast.success(t("event.promoCodeApplied"));
     } catch (error: any) {
       setPromoCodeDiscount(null);
-      throw error;
+
+      // Handle API error with code-based translation
+      const { handleApiError: handleApiErrorWithCode } =
+        await import("@/lib/api-response-handler");
+      const errorInfo = handleApiErrorWithCode(error, tApiCodes);
+
+      // Throw error with translated message
+      throw new Error(errorInfo.message);
     }
   };
 
