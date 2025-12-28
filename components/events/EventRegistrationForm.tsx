@@ -414,7 +414,9 @@ export function EventRegistrationForm({
             {/* Price Summary */}
             <div className="border-t pt-4 space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{t("basePrice")}:</span>
+                <span className="text-muted-foreground">
+                  {t("registrationFee")}:
+                </span>
                 <span>{basePrice} UAH</span>
               </div>
               {promoCodeDiscount && discountAmount > 0 && (

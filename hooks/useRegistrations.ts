@@ -162,7 +162,12 @@ export const useCreateRegistration = () => {
       // Handle backend error structure with code-based translations
       const errorInfo = handleApiErrorWithCode(error, t);
 
-      if (errorInfo.errors) {
+      // If we have a code-based message, use it (it's already translated)
+      // Otherwise, try to use field-specific errors
+      if (errorInfo.code && errorInfo.message) {
+        // Use the code-based translated message (highest priority)
+        showErrorToast(errorInfo.message, tAuth("registrationFailed"));
+      } else if (errorInfo.errors) {
         // Show field-specific errors
         const fieldErrors = handleValidationErrors(errorInfo.errors, t);
         const firstFieldError = Object.values(fieldErrors)[0];
