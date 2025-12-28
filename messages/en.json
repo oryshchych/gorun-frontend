@@ -362,6 +362,7 @@
     "ERROR_REGISTRATION_INVALID_ID": "Invalid registration ID",
     "ERROR_REGISTRATION_DUPLICATE_EMAIL": "You are already registered for this event",
     "ERROR_REGISTRATION_DUPLICATE_USER": "You are already registered for this event",
+    "ERROR_REGISTRATION_PENDING_PAYMENT": "You have already registered for this event, but payment is still pending. Please check your email to complete the payment",
     "ERROR_REGISTRATION_EVENT_FULL": "Event has reached full capacity",
     "ERROR_REGISTRATION_EVENT_PAST": "Cannot register for past events",
     "ERROR_REGISTRATION_FORBIDDEN": "Not authorized to perform this action",

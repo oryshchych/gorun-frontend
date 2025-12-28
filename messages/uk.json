@@ -362,6 +362,7 @@
     "ERROR_REGISTRATION_INVALID_ID": "Невірний ID реєстрації",
     "ERROR_REGISTRATION_DUPLICATE_EMAIL": "Ви вже зареєстровані на цю подію",
     "ERROR_REGISTRATION_DUPLICATE_USER": "Ви вже зареєстровані на цю подію",
+    "ERROR_REGISTRATION_PENDING_PAYMENT": "Ви вже зареєструвалися на цю подію, але платіж ще не завершений. Перейдіть на вказаний при реєстрації email і завершіть платіж",
     "ERROR_REGISTRATION_EVENT_FULL": "Подія досягла максимальної кількості учасників",
     "ERROR_REGISTRATION_EVENT_PAST": "Неможливо зареєструватися на минулі події",
     "ERROR_REGISTRATION_FORBIDDEN": "Не маєте дозволу на виконання цієї дії",
