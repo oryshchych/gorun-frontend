@@ -66,16 +66,18 @@ export default function MyRegistrationsPage() {
             transition={{ duration: 0.3 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {registrations.map((registration, index) => (
-              <motion.div
-                key={registration.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-              >
-                <EventCard event={registration.event} />
-              </motion.div>
-            ))}
+            {registrations
+              .filter((registration) => registration.event)
+              .map((registration, index) => (
+                <motion.div
+                  key={registration.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                >
+                  <EventCard event={registration.event!} />
+                </motion.div>
+              ))}
           </motion.div>
 
           {/* Pagination */}
