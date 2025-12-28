@@ -5,9 +5,12 @@ export interface ApiResponse<T = any> {
 }
 
 export interface ApiError {
-  error: string;
-  message: string;
-  statusCode: number;
+  success: false;
+  error: {
+    message: string;
+    errors?: Record<string, string[]>;
+  };
+  statusCode?: number;
 }
 
 export interface PaginatedResponse<T = any> {

@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  registrationSchema,
+  createRegistrationSchema,
   RegistrationFormData,
 } from "@/lib/validations/registration";
 import { Button } from "@/components/ui/button";
@@ -33,7 +33,7 @@ interface EventRegistrationFormProps {
   onSubmit: (data: RegistrationFormData) => void | Promise<void>;
   isLoading?: boolean;
   promoCodeDiscount?: {
-    discountType: "percentage" | "amount";
+    discountType: "percentage" | "fixed";
     discountValue: number;
   } | null;
   onPromoCodeCheck?: (code: string) => Promise<void>;
@@ -61,7 +61,7 @@ export function EventRegistrationForm({
   const [termsContent, setTermsContent] = useState<string>("");
 
   const form = useForm<RegistrationFormData>({
-    resolver: zodResolver(registrationSchema) as any,
+    resolver: zodResolver(createRegistrationSchema(tValidation)) as any,
     defaultValues: {
       eventId: event.id,
       name: "",
@@ -168,7 +168,7 @@ export function EventRegistrationForm({
   const discountAmount =
     promoCodeDiscount?.discountType === "percentage"
       ? (basePrice * promoCodeDiscount.discountValue) / 100
-      : promoCodeDiscount?.discountType === "amount"
+      : promoCodeDiscount?.discountType === "fixed"
         ? promoCodeDiscount.discountValue
         : 0;
   const finalPrice = Math.max(0, basePrice - discountAmount);

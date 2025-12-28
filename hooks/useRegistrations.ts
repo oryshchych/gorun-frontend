@@ -92,12 +92,13 @@ export const useCheckRegistration = (eventId: string) => {
 
 /**
  * Hook to create a new registration
+ * Returns registration and optional paymentLink for public registrations
  */
 export const useCreateRegistration = () => {
   const queryClient = useQueryClient();
 
   return useMutation<
-    Registration,
+    { registration: Registration; paymentLink?: string },
     Error,
     CreateRegistrationRequest,
     { previousEvent?: Event }
@@ -139,7 +140,7 @@ export const useCreateRegistration = () => {
 
       return { previousEvent };
     },
-    onError: (error, data, context) => {
+    onError: (error: any, data, context) => {
       // Rollback on error
       if (context?.previousEvent) {
         queryClient.setQueryData(
@@ -148,30 +149,74 @@ export const useCreateRegistration = () => {
         );
       }
 
-      handleApiError(error, "Registration Failed");
+      // Handle backend error structure
+      const errorMessage =
+        error?.response?.data?.error?.message ||
+        error?.message ||
+        "Registration failed";
+
+      const errors = error?.response?.data?.error?.errors as
+        | Record<string, string[]>
+        | undefined;
+
+      if (errors) {
+        // Show field-specific errors
+        const errorArrays = Object.values(errors);
+        const firstError = errorArrays[0]?.[0];
+        if (firstError) {
+          showErrorToast(firstError, "Validation Error");
+        } else {
+          showErrorToast(errorMessage, "Registration Failed");
+        }
+      } else {
+        showErrorToast(errorMessage, "Registration Failed");
+      }
     },
-    onSuccess: (newRegistration) => {
+    onSuccess: (result) => {
+      const { registration, paymentLink } = result;
+
+      // Debug: log payment link
+      console.log("Registration success:", {
+        registrationId: registration.id,
+        hasPaymentLink: !!paymentLink,
+        paymentLink: paymentLink,
+      });
+
       // Invalidate relevant queries
       queryClient.invalidateQueries({
         queryKey: registrationKeys.myRegistrations(),
       });
       queryClient.invalidateQueries({
-        queryKey: registrationKeys.eventRegistrations(newRegistration.eventId),
+        queryKey: registrationKeys.eventRegistrations(registration.eventId),
       });
       queryClient.invalidateQueries({
-        queryKey: registrationKeys.check(newRegistration.eventId),
+        queryKey: registrationKeys.check(registration.eventId),
       });
       queryClient.invalidateQueries({
-        queryKey: eventKeys.detailAllLocales(newRegistration.eventId),
+        queryKey: eventKeys.detailAllLocales(registration.eventId),
       });
       queryClient.invalidateQueries({
         queryKey: eventKeys.lists(),
       });
 
-      showSuccessToast(
-        "You have been successfully registered for this event!",
-        "Registration Successful"
-      );
+      // If paymentLink exists, redirect to payment (public registration)
+      if (paymentLink && typeof window !== "undefined") {
+        showSuccessToast(
+          "Registration successful! Redirecting to payment...",
+          "Registration Successful"
+        );
+        // Small delay to ensure toast is visible before redirect
+        setTimeout(() => {
+          console.log("Redirecting to payment:", paymentLink);
+          window.location.href = paymentLink;
+        }, 500);
+      } else {
+        // Authenticated registration (no payment needed)
+        showSuccessToast(
+          "You have been successfully registered for this event!",
+          "Registration Successful"
+        );
+      }
     },
   });
 };

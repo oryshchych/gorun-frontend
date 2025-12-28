@@ -1,5 +1,5 @@
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { locales } from "@/i18n";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
@@ -7,10 +7,25 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
+import { generateMetadata as generateSEOMetadata, siteConfig } from "@/lib/seo";
+import { Analytics } from "@vercel/analytics/next";
+import type { Metadata } from "next";
 import "../globals.css";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  return generateSEOMetadata({
+    locale,
+  });
 }
 
 export default async function LocaleLayout({
@@ -49,6 +64,7 @@ export default async function LocaleLayout({
             </NextIntlClientProvider>
           </QueryProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );

@@ -79,16 +79,32 @@ export const getMyRegistrations = async (
 };
 
 /**
- * Create a new registration for an event (public, no auth required)
+ * Create a new registration for an event
+ * - Public registration: requires name, surname, email, city (no auth)
+ * - Authenticated registration: only requires eventId and optional promoCode
  */
 export const createRegistration = async (
   data: CreateRegistrationRequest
-): Promise<Registration> => {
-  const response = await apiClient.post<ApiResponse<Registration>>(
-    "/registrations",
-    data
-  );
-  return response.data.data;
+): Promise<{ registration: Registration; paymentLink?: string }> => {
+  const response = await apiClient.post<
+    ApiResponse<Registration> & { paymentLink?: string }
+  >("/registrations", data);
+
+  // Backend returns { success: true, data: Registration, paymentLink?: string }
+  // paymentLink is at the root level of response.data, not nested in data
+  const responseData = response.data as any;
+
+  // Debug: log the response structure
+  console.log("Registration response:", {
+    hasData: !!responseData.data,
+    hasPaymentLink: !!responseData.paymentLink,
+    paymentLink: responseData.paymentLink,
+  });
+
+  return {
+    registration: responseData.data,
+    paymentLink: responseData.paymentLink,
+  };
 };
 
 /**

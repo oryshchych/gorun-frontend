@@ -111,16 +111,10 @@ export function EventDetails({ event }: EventDetailsProps) {
       return;
     }
 
-    const { first, last } = getNameParts(user?.name);
-    const email = user?.email || "guest@example.com";
-
+    // Authenticated registration: only requires eventId (user data comes from profile)
     try {
       await createRegistration.mutateAsync({
         eventId: event.id,
-        name: first,
-        surname: last,
-        email,
-        city: "Kyiv",
       });
     } catch (error) {
       // Error is handled by the mutation

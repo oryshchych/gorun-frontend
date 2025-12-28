@@ -75,7 +75,8 @@ export default function HomePageClient({
         eventId: event.id,
       });
 
-      if (!result.isValid) {
+      // validatePromoCode returns null if invalid/expired
+      if (!result) {
         setPromoCodeDiscount(null);
         throw new Error(t("event.promoCodeInvalid"));
       }
@@ -91,9 +92,11 @@ export default function HomePageClient({
   const handleRegistrationSubmit = async (data: RegistrationFormData) => {
     try {
       await createRegistration.mutateAsync(data);
-      toast.success(t("event.registrationSuccess"));
+      // Don't show toast here - it's handled in useCreateRegistration hook
+      // The hook will redirect to payment if paymentLink exists
     } catch (error: any) {
       console.error("Registration error:", error);
+      // Error is already handled by the mutation
     }
   };
 

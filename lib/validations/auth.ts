@@ -1,6 +1,15 @@
 import { z } from "zod";
 
-// Login schema
+type TranslationFunction = (key: string) => string;
+
+// Login schema generator
+export const createLoginSchema = (t: TranslationFunction) =>
+  z.object({
+    email: z.string().min(1, t("emailRequired")).email(t("emailInvalid")),
+    password: z.string().min(1, t("passwordRequired")).min(8, t("passwordMin")),
+  });
+
+// Default login schema for backward compatibility
 export const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
   password: z
@@ -11,7 +20,29 @@ export const loginSchema = z.object({
 
 export type LoginFormData = z.infer<typeof loginSchema>;
 
-// Register schema
+// Register schema generator
+export const createRegisterSchema = (t: TranslationFunction) =>
+  z
+    .object({
+      name: z
+        .string()
+        .min(1, t("nameRequired"))
+        .min(2, t("nameMin"))
+        .max(50, t("nameMax")),
+      email: z.string().min(1, t("emailRequired")).email(t("emailInvalid")),
+      password: z
+        .string()
+        .min(1, t("passwordRequired"))
+        .min(8, t("passwordMin"))
+        .max(100, t("passwordMax")),
+      confirmPassword: z.string().min(1, t("confirmPasswordRequired")),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("passwordsDontMatch"),
+      path: ["confirmPassword"],
+    });
+
+// Default register schema for backward compatibility
 export const registerSchema = z
   .object({
     name: z

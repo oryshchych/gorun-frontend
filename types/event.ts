@@ -29,6 +29,11 @@ export interface EventTranslations {
   location: TranslationField;
   speakers?: SpeakerTranslations[];
   date: TranslationField;
+  partners?: Array<{
+    uk: string;
+    en: string;
+    imageUrl: string;
+  }>;
 }
 
 export interface EventImageUrl {
@@ -52,6 +57,7 @@ export interface Event {
   organizer?: User;
   imageUrl?: EventImageUrl;
   speakers?: Speaker[]; // Array of speaker objects
+
   gallery?: string[]; // For future expansion
   basePrice?: number;
   createdAt: Date;

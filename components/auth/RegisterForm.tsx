@@ -6,7 +6,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/hooks/useAuth";
-import { registerSchema, type RegisterFormData } from "@/lib/validations/auth";
+import {
+  createRegisterSchema,
+  type RegisterFormData,
+} from "@/lib/validations/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -25,9 +28,10 @@ export function RegisterForm() {
   const { register } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations("auth");
+  const tValidation = useTranslations("validation");
 
   const form = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(createRegisterSchema(tValidation)),
     defaultValues: {
       name: "",
       email: "",
