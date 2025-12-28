@@ -26,6 +26,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations("auth");
   const tValidation = useTranslations("validation");
+  const tApiCodes = useTranslations("apiCodes");
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(createLoginSchema(tValidation)),
@@ -39,10 +40,14 @@ export function LoginForm() {
     setIsLoading(true);
     try {
       await login(data);
-      showSuccessToast(t("welcomeBack"), t("loginSuccessful"));
+      showSuccessToast(
+        "SUCCESS_AUTH_LOGGED_IN",
+        t("loginSuccessful"),
+        tApiCodes
+      );
       router.push("/");
     } catch (error: any) {
-      handleApiError(error, t("loginFailed"));
+      handleApiError(error, t("loginFailed"), tApiCodes);
     } finally {
       setIsLoading(false);
     }

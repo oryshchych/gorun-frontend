@@ -22,6 +22,11 @@ import {
   showSuccessToast,
   showErrorToast,
 } from "@/lib/error-handler";
+import { useTranslations } from "next-intl";
+import {
+  handleApiError as handleApiErrorWithCode,
+  handleValidationErrors,
+} from "@/lib/api-response-handler";
 import { eventKeys } from "./useEvents";
 
 // Query keys for cache management
@@ -96,6 +101,7 @@ export const useCheckRegistration = (eventId: string) => {
  */
 export const useCreateRegistration = () => {
   const queryClient = useQueryClient();
+  const t = useTranslations("apiCodes");
 
   return useMutation<
     { registration: Registration; paymentLink?: string },
@@ -149,27 +155,20 @@ export const useCreateRegistration = () => {
         );
       }
 
-      // Handle backend error structure
-      const errorMessage =
-        error?.response?.data?.error?.message ||
-        error?.message ||
-        "Registration failed";
+      // Handle backend error structure with code-based translations
+      const errorInfo = handleApiErrorWithCode(error, t);
 
-      const errors = error?.response?.data?.error?.errors as
-        | Record<string, string[]>
-        | undefined;
-
-      if (errors) {
+      if (errorInfo.errors) {
         // Show field-specific errors
-        const errorArrays = Object.values(errors);
-        const firstError = errorArrays[0]?.[0];
-        if (firstError) {
-          showErrorToast(firstError, "Validation Error");
+        const fieldErrors = handleValidationErrors(errorInfo.errors, t);
+        const firstFieldError = Object.values(fieldErrors)[0];
+        if (firstFieldError) {
+          showErrorToast(firstFieldError, "Validation Error", t);
         } else {
-          showErrorToast(errorMessage, "Registration Failed");
+          showErrorToast(errorInfo.message, "Registration Failed", t);
         }
       } else {
-        showErrorToast(errorMessage, "Registration Failed");
+        showErrorToast(errorInfo.message, "Registration Failed", t);
       }
     },
     onSuccess: (result) => {
@@ -202,8 +201,9 @@ export const useCreateRegistration = () => {
       // If paymentLink exists, redirect to payment (public registration)
       if (paymentLink && typeof window !== "undefined") {
         showSuccessToast(
-          "Registration successful! Redirecting to payment...",
-          "Registration Successful"
+          "SUCCESS_REGISTRATION_CREATED",
+          "Registration Successful",
+          t
         );
         // Small delay to ensure toast is visible before redirect
         setTimeout(() => {
@@ -213,8 +213,9 @@ export const useCreateRegistration = () => {
       } else {
         // Authenticated registration (no payment needed)
         showSuccessToast(
-          "You have been successfully registered for this event!",
-          "Registration Successful"
+          "SUCCESS_REGISTRATION_CREATED",
+          "Registration Successful",
+          t
         );
       }
     },
@@ -226,6 +227,7 @@ export const useCreateRegistration = () => {
  */
 export const useCancelRegistration = () => {
   const queryClient = useQueryClient();
+  const t = useTranslations("apiCodes");
 
   return useMutation<
     void,
@@ -263,7 +265,7 @@ export const useCancelRegistration = () => {
           context.previousEvent
         );
       }
-      handleApiError(error, "Failed to Cancel Registration");
+      handleApiError(error, "Failed to Cancel Registration", t);
     },
     onSuccess: (_, { eventId }) => {
       // Invalidate relevant queries
@@ -284,8 +286,9 @@ export const useCancelRegistration = () => {
       });
 
       showSuccessToast(
-        "Your registration has been cancelled successfully.",
-        "Registration Cancelled"
+        "SUCCESS_REGISTRATION_CANCELLED",
+        "Registration Cancelled",
+        t
       );
     },
   });

@@ -98,6 +98,7 @@ interface FormattedError {
   message: string;
   statusCode?: number;
   errors?: Record<string, string[]>;
+  code?: string; // Add code field for API code-based errors
 }
 
 function formatErrorResponse(error: AxiosError): FormattedError {
@@ -106,20 +107,23 @@ function formatErrorResponse(error: AxiosError): FormattedError {
     const data = error.response.data as any;
 
     return {
-      message: data?.message || data?.error || "An error occurred",
+      message: data?.message || data?.error?.message || "An error occurred",
       statusCode: error.response.status,
-      errors: data?.errors,
+      errors: data?.errors || data?.error?.errors,
+      code: data?.code, // Preserve API code if present
     };
   } else if (error.request) {
     // Request made but no response received
     return {
       message: "No response from server. Please check your connection.",
       statusCode: 0,
+      code: "ERROR_INTERNAL_SERVER",
     };
   } else {
     // Error in request setup
     return {
       message: error.message || "An unexpected error occurred",
+      code: "ERROR_INTERNAL_SERVER",
     };
   }
 }

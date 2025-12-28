@@ -29,6 +29,7 @@ export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations("auth");
   const tValidation = useTranslations("validation");
+  const tApiCodes = useTranslations("apiCodes");
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(createRegisterSchema(tValidation)),
@@ -48,10 +49,14 @@ export function RegisterForm() {
         email: data.email,
         password: data.password,
       });
-      showSuccessToast(t("accountCreated"), t("registrationSuccessful"));
+      showSuccessToast(
+        "SUCCESS_AUTH_REGISTERED",
+        t("registrationSuccessful"),
+        tApiCodes
+      );
       router.push("/");
     } catch (error: any) {
-      handleApiError(error, t("registrationFailed"));
+      handleApiError(error, t("registrationFailed"), tApiCodes);
     } finally {
       setIsLoading(false);
     }
