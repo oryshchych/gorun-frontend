@@ -210,7 +210,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Calendar className="w-4 h-4" />
-              {t("when")}
+              {t("date")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -238,7 +238,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <MapPin className="w-4 h-4" />
-              {t("where")}
+              {t("location")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">

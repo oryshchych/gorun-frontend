@@ -50,6 +50,7 @@ export function EventRegistrationForm({
   const tCommon = useTranslations("common");
   const tFooter = useTranslations("footer");
   const tValidation = useTranslations("validation");
+  const tApiCodes = useTranslations("apiCodes");
   const locale = useLocale();
   const [isCheckingPromoCode, setIsCheckingPromoCode] = useState(false);
   const [promoCodeError, setPromoCodeError] = useState<string | null>(null);
@@ -92,11 +93,8 @@ export function EventRegistrationForm({
     try {
       await onPromoCodeCheck(promoCode);
     } catch (error: any) {
-      setPromoCodeError(
-        error?.response?.data?.message ||
-          error?.message ||
-          t("promoCodeInvalid")
-      );
+      // Use error message directly (it's already translated in handlePromoCodeCheck)
+      setPromoCodeError(error?.message || t("promoCodeInvalid"));
     } finally {
       setIsCheckingPromoCode(false);
     }
@@ -416,7 +414,9 @@ export function EventRegistrationForm({
             {/* Price Summary */}
             <div className="border-t pt-4 space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{t("basePrice")}:</span>
+                <span className="text-muted-foreground">
+                  {t("registrationFee")}:
+                </span>
                 <span>{basePrice} UAH</span>
               </div>
               {promoCodeDiscount && discountAmount > 0 && (

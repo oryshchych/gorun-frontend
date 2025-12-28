@@ -66,7 +66,9 @@ export function ParticipantsList({
                   key={participant.id}
                   className="border-b border-table-row-divider hover:bg-table-row-hover transition-colors even:bg-table-zebra"
                 >
-                  <td className="p-3 text-text-primary">{index + 1}</td>
+                  <td className="p-3 text-text-primary w-12 text-center">
+                    {index + 1}
+                  </td>
                   <td className="p-3 text-text-primary">{participant.name}</td>
                   <td className="p-3 text-text-primary">
                     {participant.surname}
@@ -75,7 +77,7 @@ export function ParticipantsList({
                     {participant.city || "-"}
                   </td>
                   <td className="p-3 text-text-secondary">
-                    {participant.runningClub || "-"}
+                    {participant.runningClub || ""}
                   </td>
                 </tr>
               ))}
