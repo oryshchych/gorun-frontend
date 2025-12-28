@@ -4,7 +4,11 @@ import {
   CreateRegistrationRequest,
   Participant,
 } from "@/types/registration";
-import { ApiResponse, PaginatedResponse } from "@/types/api";
+import {
+  ApiResponse,
+  ApiSuccessResponse,
+  PaginatedResponse,
+} from "@/types/api";
 
 export interface GetRegistrationsParams {
   page?: number;
@@ -87,12 +91,12 @@ export const createRegistration = async (
   data: CreateRegistrationRequest
 ): Promise<{ registration: Registration; paymentLink?: string }> => {
   const response = await apiClient.post<
-    ApiResponse<Registration> & { paymentLink?: string }
+    ApiSuccessResponse<Registration> & { paymentLink?: string }
   >("/registrations", data);
 
   // Backend returns { success: true, data: Registration, paymentLink?: string }
   // paymentLink is at the root level of response.data, not nested in data
-  const responseData = response.data as any;
+  const responseData = response.data;
 
   // Debug: log the response structure
   console.log("Registration response:", {
@@ -113,7 +117,7 @@ export const createRegistration = async (
 export const getEventParticipants = async (
   eventId: string
 ): Promise<Participant[]> => {
-  const response = await apiClient.get<ApiResponse<Participant[]>>(
+  const response = await apiClient.get<ApiSuccessResponse<Participant[]>>(
     `/events/${eventId}/participants`
   );
   return response.data.data;
@@ -132,7 +136,7 @@ export const cancelRegistration = async (id: string): Promise<void> => {
 export const checkRegistration = async (eventId: string): Promise<boolean> => {
   try {
     const response = await apiClient.get<
-      ApiResponse<{ isRegistered: boolean }>
+      ApiSuccessResponse<{ isRegistered: boolean }>
     >(`/events/${eventId}/check-registration`);
     return response.data.data.isRegistered;
   } catch (error) {
