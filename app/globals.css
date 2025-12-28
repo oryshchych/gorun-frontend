@@ -138,3 +138,21 @@ html:not(.dark) body {
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
+
+/* Autofill styles - override browser defaults to make it transparent */
+/* Prevent any visual changes when autofill is applied */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+input:-internal-autofill-selected,
+input:-internal-autofill-previewed {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-text-fill-color: white !important;
+  box-shadow: 0 0 0 1000px transparent inset !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  color: inherit !important;
+  caret-color: inherit !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
