@@ -7,9 +7,15 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
-import { generateMetadata as generateSEOMetadata, siteConfig } from "@/lib/seo";
+import {
+  generateMetadata as generateSEOMetadata,
+  generateOrganizationStructuredData,
+  generateWebsiteStructuredData,
+  siteConfig,
+} from "@/lib/seo";
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
+import { defaultLocale } from "@/i18n";
 import "../globals.css";
 
 export function generateStaticParams() {
@@ -23,8 +29,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
 
+  // Get translations for default title
+  const t = await getTranslations({ locale });
+
   return generateSEOMetadata({
     locale,
+    title: t("home.title") || siteConfig.name,
+    description: undefined, // Will use default from siteConfig
   });
 }
 
@@ -46,9 +57,25 @@ export default async function LocaleLayout({
   // side is the easiest way to get started
   const messages = await getMessages();
 
+  // Generate structured data for Organization and Website
+  const organizationData = generateOrganizationStructuredData();
+  const websiteData = generateWebsiteStructuredData();
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <body suppressHydrationWarning>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationData),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteData),
+          }}
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
