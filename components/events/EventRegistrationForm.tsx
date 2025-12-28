@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  registrationSchema,
+  createRegistrationSchema,
   RegistrationFormData,
 } from "@/lib/validations/registration";
 import { Button } from "@/components/ui/button";
@@ -61,7 +61,7 @@ export function EventRegistrationForm({
   const [termsContent, setTermsContent] = useState<string>("");
 
   const form = useForm<RegistrationFormData>({
-    resolver: zodResolver(registrationSchema) as any,
+    resolver: zodResolver(createRegistrationSchema(tValidation)) as any,
     defaultValues: {
       eventId: event.id,
       name: "",

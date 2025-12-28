@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  registrationSchema,
+  createRegistrationSchema,
   RegistrationFormData,
 } from "@/lib/validations/registration";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,7 @@ export function PublicRegistrationForm({
   const tValidation = useTranslations("validation");
 
   const form = useForm<RegistrationFormData>({
-    resolver: zodResolver(registrationSchema),
+    resolver: zodResolver(createRegistrationSchema(tValidation)),
     defaultValues: {
       eventId,
       name: "",
@@ -265,4 +265,3 @@ export function PublicRegistrationForm({
     </Form>
   );
 }
-
