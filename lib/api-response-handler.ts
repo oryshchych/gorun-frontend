@@ -29,16 +29,28 @@ export function getMessageFromCode(
   t: (key: string) => string,
   fallback?: string
 ): string {
-  const translationKey = `apiCodes.${code}`;
-  const translated = t(translationKey);
+  // If code already starts with "apiCodes.", remove the prefix
+  // (translation function is already scoped to "apiCodes" namespace)
+  const cleanCode = code.startsWith("apiCodes.")
+    ? code.replace("apiCodes.", "")
+    : code;
+
+  // Translation function is already scoped to "apiCodes" namespace,
+  // so we just pass the code directly
+  const translated = t(cleanCode);
 
   // If translation exists and is different from the key, return it
-  if (translated && translated !== translationKey) {
+  // (next-intl returns the key if translation is missing)
+  if (
+    translated &&
+    translated !== cleanCode &&
+    !translated.startsWith("apiCodes.")
+  ) {
     return translated;
   }
 
   // Fallback to provided message or code itself
-  return fallback || code;
+  return fallback || cleanCode;
 }
 
 /**
@@ -91,19 +103,49 @@ export function handleApiError(
   errors?: Record<string, string[]>;
   statusCode?: number;
 } {
-  // If error has response data (from axios/fetch)
-  if (error?.response?.data) {
-    const apiError = error.response.data as
-      | ApiErrorResponse
-      | {
-          error?: { message: string; errors?: Record<string, string[]> };
-          code?: string;
-          message?: string;
-          statusCode?: number;
-        };
+  // First, try to get the original response data (before axios interceptor formatting)
+  let apiError: any = null;
+  let statusCode: number | undefined;
 
-    // Check if it's the new format with code
-    if ("code" in apiError && apiError.code) {
+  // Check if error has original response data (from axios, before formatting)
+  if (error?.response?.data) {
+    apiError = error.response.data;
+    statusCode = error.response.status;
+    console.log("handleApiError - using response.data:", {
+      apiError,
+      statusCode,
+    });
+  }
+  // Check if error is already formatted (from axios interceptor)
+  // The interceptor formats errors but preserves the code field
+  else if (error?.code || error?.statusCode || error?.message) {
+    // Error was already formatted by axios interceptor
+    // The formatted error has: { message, statusCode, errors?, code? }
+    apiError = {
+      code: error.code,
+      message: error.message,
+      errors: error.errors,
+      statusCode: error.statusCode,
+    };
+    statusCode = error.statusCode;
+    console.log("handleApiError - using formatted error:", {
+      apiError,
+      statusCode,
+      originalError: error,
+    });
+  }
+
+  if (apiError) {
+    console.log(
+      "handleApiError - apiError.code:",
+      apiError.code,
+      "type:",
+      typeof apiError.code
+    );
+    // Check if it's the new format with code (prioritize code field)
+    // This handles both new format and mixed format (with both code and error fields)
+    if (apiError.code && typeof apiError.code === "string") {
+      console.log("handleApiError - found code, translating:", apiError.code);
       return {
         message: getMessageFromCode(
           apiError.code,
@@ -111,16 +153,18 @@ export function handleApiError(
           apiError.message || "An error occurred"
         ),
         code: apiError.code,
-        errors: "errors" in apiError ? apiError.errors : undefined,
-        statusCode:
-          "statusCode" in apiError
-            ? apiError.statusCode
-            : error.response.status,
+        errors: apiError.errors,
+        statusCode: apiError.statusCode || statusCode,
       };
     }
 
-    // Legacy format support
-    if ("error" in apiError && apiError.error) {
+    // Legacy format support - error is an object with message and errors
+    if (
+      "error" in apiError &&
+      apiError.error &&
+      typeof apiError.error === "object" &&
+      !Array.isArray(apiError.error)
+    ) {
       return {
         message: getMessageFromCode(
           apiError.code || "ERROR_INTERNAL_SERVER",
@@ -129,7 +173,7 @@ export function handleApiError(
         ),
         code: apiError.code,
         errors: apiError.error.errors,
-        statusCode: apiError.statusCode || error.response.status,
+        statusCode: apiError.statusCode || statusCode,
       };
     }
 
@@ -141,7 +185,7 @@ export function handleApiError(
         (apiError as any).message || "An error occurred"
       ),
       code: apiError.code,
-      statusCode: error.response.status,
+      statusCode: statusCode,
     };
   }
 

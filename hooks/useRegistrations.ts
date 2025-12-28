@@ -102,6 +102,7 @@ export const useCheckRegistration = (eventId: string) => {
 export const useCreateRegistration = () => {
   const queryClient = useQueryClient();
   const t = useTranslations("apiCodes");
+  const tAuth = useTranslations("auth");
 
   return useMutation<
     { registration: Registration; paymentLink?: string },
@@ -163,12 +164,15 @@ export const useCreateRegistration = () => {
         const fieldErrors = handleValidationErrors(errorInfo.errors, t);
         const firstFieldError = Object.values(fieldErrors)[0];
         if (firstFieldError) {
-          showErrorToast(firstFieldError, "Validation Error", t);
+          // Field errors are already translated, don't pass t again
+          showErrorToast(firstFieldError, tAuth("validationError"));
         } else {
-          showErrorToast(errorInfo.message, "Registration Failed", t);
+          // Message is already translated, don't pass t again
+          showErrorToast(errorInfo.message, tAuth("registrationFailed"));
         }
       } else {
-        showErrorToast(errorInfo.message, "Registration Failed", t);
+        // Message is already translated, don't pass t again
+        showErrorToast(errorInfo.message, tAuth("registrationFailed"));
       }
     },
     onSuccess: (result) => {
