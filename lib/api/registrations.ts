@@ -89,12 +89,16 @@ export const getMyRegistrations = async (
  */
 export const createRegistration = async (
   data: CreateRegistrationRequest
-): Promise<{ registration: Registration; paymentLink?: string }> => {
+): Promise<{
+  registration: Registration;
+  paymentLink?: string;
+  code?: string;
+}> => {
   const response = await apiClient.post<
     ApiSuccessResponse<Registration> & { paymentLink?: string }
   >("/registrations", data);
 
-  // Backend returns { success: true, data: Registration, paymentLink?: string }
+  // Backend returns { success: true, code: string, data: Registration, paymentLink?: string }
   // paymentLink is at the root level of response.data, not nested in data
   const responseData = response.data;
 
@@ -103,11 +107,13 @@ export const createRegistration = async (
     hasData: !!responseData.data,
     hasPaymentLink: !!responseData.paymentLink,
     paymentLink: responseData.paymentLink,
+    code: responseData.code,
   });
 
   return {
     registration: responseData.data,
     paymentLink: responseData.paymentLink,
+    code: responseData.code,
   };
 };
 

@@ -22,7 +22,8 @@ import {
   showSuccessToast,
   showErrorToast,
 } from "@/lib/error-handler";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 import {
   handleApiError as handleApiErrorWithCode,
   handleValidationErrors,
@@ -102,10 +103,12 @@ export const useCheckRegistration = (eventId: string) => {
 export const useCreateRegistration = () => {
   const queryClient = useQueryClient();
   const t = useTranslations("apiCodes");
+  const locale = useLocale();
+  const router = useRouter();
   const tAuth = useTranslations("auth");
 
   return useMutation<
-    { registration: Registration; paymentLink?: string },
+    { registration: Registration; paymentLink?: string; code?: string },
     Error,
     CreateRegistrationRequest,
     { previousEvent?: Event }
@@ -176,13 +179,14 @@ export const useCreateRegistration = () => {
       }
     },
     onSuccess: (result) => {
-      const { registration, paymentLink } = result;
+      const { registration, paymentLink, code } = result;
 
       // Debug: log payment link
       console.log("Registration success:", {
         registrationId: registration.id,
         hasPaymentLink: !!paymentLink,
         paymentLink: paymentLink,
+        code: code,
       });
 
       // Invalidate relevant queries
@@ -221,6 +225,17 @@ export const useCreateRegistration = () => {
           "Registration Successful",
           t
         );
+
+        // If code is SUCCESS_REGISTRATION_CREATED and no payment needed,
+        // redirect to home page with participants tab
+        if (
+          code === "SUCCESS_REGISTRATION_CREATED" &&
+          typeof window !== "undefined"
+        ) {
+          setTimeout(() => {
+            window.location.href = `/${locale}/?tab=participants`;
+          }, 1500); // Small delay to show success toast
+        }
       }
     },
   });
