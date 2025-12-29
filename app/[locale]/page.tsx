@@ -55,6 +55,9 @@ export async function generateMetadata({
     // If event not found, return default metadata
   }
 
+  // Get translations for fallback title
+  const t = await getTranslations({ locale });
+
   if (event) {
     const localizedTitle = getLocalizedString(
       event.translations?.title,
@@ -69,10 +72,14 @@ export async function generateMetadata({
       event.description || ""
     );
 
+    // Use home.title as the main title, event title as description context
     return generateSEOMetadata({
       locale,
-      title: localizedTitle,
-      description: localizedDescription,
+      title: t("home.title") || siteConfig.name,
+      description:
+        localizedDescription ||
+        t("home.subtitle") ||
+        siteConfig.description[locale as keyof typeof siteConfig.description],
       image: event.imageUrl?.landscape || event.imageUrl?.portrait,
       path: "",
     });
@@ -80,6 +87,8 @@ export async function generateMetadata({
 
   return generateSEOMetadata({
     locale,
+    title: t("home.title") || siteConfig.name,
+    description: t("home.subtitle") || undefined,
     path: "",
   });
 }
