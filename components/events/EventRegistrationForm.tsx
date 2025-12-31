@@ -8,6 +8,8 @@ import {
 } from "@/lib/validations/registration";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 import {
   Form,
   FormControl,
@@ -324,12 +326,15 @@ export function EventRegistrationForm({
                       {t("phone")}
                     </FormLabel>
                     <FormControl>
-                      <Input
+                      <PhoneInput
                         id="registration-phone"
-                        type="tel"
+                        international
+                        defaultCountry="UA"
                         placeholder={t("phonePlaceholder")}
-                        {...field}
+                        value={field.value}
+                        onChange={field.onChange}
                         disabled={isLoading}
+                        className={fieldState.error ? "phone-error" : ""}
                         aria-invalid={!!fieldState.error}
                       />
                     </FormControl>
