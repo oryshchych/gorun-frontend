@@ -61,26 +61,34 @@ export function ParticipantsList({
               </tr>
             </thead> */}
             <tbody>
-              {participants.map((participant, index) => (
-                <tr
-                  key={participant.id}
-                  className="border-b border-table-row-divider hover:bg-table-row-hover transition-colors even:bg-table-zebra"
-                >
-                  <td className="p-3 text-text-primary w-12 text-center">
-                    {index + 1}
-                  </td>
-                  <td className="p-3 text-text-primary">{participant.name}</td>
-                  <td className="p-3 text-text-primary">
-                    {participant.surname}
-                  </td>
-                  <td className="p-3 text-text-secondary">
-                    {participant.city || "-"}
-                  </td>
-                  <td className="p-3 text-text-secondary">
-                    {participant.runningClub || ""}
-                  </td>
-                </tr>
-              ))}
+              {[...participants]
+                .sort(
+                  (a, b) =>
+                    new Date(a.registeredAt).getTime() -
+                    new Date(b.registeredAt).getTime()
+                )
+                .map((participant, index) => (
+                  <tr
+                    key={participant.id}
+                    className="border-b border-table-row-divider hover:bg-table-row-hover transition-colors even:bg-table-zebra"
+                  >
+                    <td className="p-3 text-text-primary w-12 text-center">
+                      {index + 1}
+                    </td>
+                    <td className="p-3 text-text-primary">
+                      {participant.name}
+                    </td>
+                    <td className="p-3 text-text-primary">
+                      {participant.surname}
+                    </td>
+                    <td className="p-3 text-text-secondary">
+                      {participant.city || "-"}
+                    </td>
+                    <td className="p-3 text-text-secondary">
+                      {participant.runningClub || ""}
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
