@@ -186,18 +186,16 @@ export function EventDescription({ event }: EventDescriptionProps) {
     <div className="space-y-6">
       {/* Event Image */}
       {mainImage && (
-        <div className="relative w-full h-144 lg:h-[700px] rounded-lg overflow-hidden border">
+        <div className="relative w-full rounded-lg overflow-hidden border flex justify-center bg-black/5">
           <Image
             src={mainImage.trim()}
             alt={localizedTitle}
-            fill
-            className="object-cover object-bottom"
-            sizes="(max-width: 768px) 100vw, 1200px"
+            width={1200}
+            height={700}
+            className="w-full h-auto object-contain"
+            sizes="(max-width: 1024px) 100vw, auto"
             priority
           />
-          {/* Gradient overlay for better text readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
-          <EventImageOverlay event={event} variant="full" />
         </div>
       )}
 
