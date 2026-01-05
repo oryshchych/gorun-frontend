@@ -85,7 +85,12 @@ export function AccordionItem({
   const isOpen = openItems.has(value);
 
   return (
-    <div className={cn("border rounded-lg overflow-hidden", className)}>
+    <div
+      className={cn(
+        "border rounded-lg overflow-hidden *:border-0 divide-y-0",
+        className
+      )}
+    >
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
           if (child.type === AccordionTrigger) {
@@ -117,7 +122,7 @@ export function AccordionTrigger({
       type="button"
       onClick={onClick}
       className={cn(
-        "flex w-full items-center justify-between p-4 text-left font-medium transition-all hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer",
+        "flex w-full items-center justify-between p-4 text-left font-medium transition-all hover:bg-accent cursor-pointer border-0",
         className
       )}
       aria-expanded={isOpen}
@@ -146,9 +151,11 @@ export function AccordionContent({
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="overflow-hidden"
+          className="overflow-hidden border-0 border-t-0"
         >
-          <div className={cn("px-4 pb-4 pt-0", className)}>{children}</div>
+          <div className={cn("px-4 pb-4 pt-0 border-0 border-t-0", className)}>
+            {children}
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

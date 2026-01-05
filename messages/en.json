@@ -190,7 +190,8 @@
     "iAccept": "I accept the",
     "when": "When",
     "where": "Where",
-    "viewOnMap": "View on Map"
+    "viewOnMap": "View on Map",
+    "currency": "UAH"
   },
   "validation": {
     "required": "This field is required",
