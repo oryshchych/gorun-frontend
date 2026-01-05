@@ -22,7 +22,8 @@ import {
 } from "@/lib/utils";
 import { useResponsiveImage } from "@/hooks/useResponsiveImage";
 import { EventImageOverlay } from "./EventImageOverlay";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
@@ -42,9 +43,14 @@ interface EventDescriptionProps {
 export function EventDescription({ event }: EventDescriptionProps) {
   const t = useTranslations("event");
   const locale = useLocale();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
     null
   );
+  const [isRegisterButtonSticky, setIsRegisterButtonSticky] = useState(false);
+  const registerButtonRef = useRef<HTMLDivElement>(null);
+  const registerButtonPlaceholderRef = useRef<HTMLDivElement>(null);
 
   const localizedTitle = getLocalizedString(
     event.translations?.title,
@@ -139,6 +145,27 @@ export function EventDescription({ event }: EventDescriptionProps) {
     );
   }, []);
 
+  // Handle sticky register button
+  useEffect(() => {
+    const placeholder = registerButtonPlaceholderRef.current;
+    if (!placeholder) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Only make sticky when scrolled PAST the button (top is above viewport)
+        const isScrolledPast = entry.boundingClientRect.top < 0;
+        setIsRegisterButtonSticky(!entry.isIntersecting && isScrolledPast);
+      },
+      {
+        threshold: 0,
+        rootMargin: "0px 0px 0px 0px",
+      }
+    );
+
+    observer.observe(placeholder);
+    return () => observer.disconnect();
+  }, []);
+
   // Handle keyboard navigation in gallery
   useEffect(() => {
     if (selectedImageIndex === null || !event.gallery) return;
@@ -180,6 +207,13 @@ export function EventDescription({ event }: EventDescriptionProps) {
           : null
       );
     }
+  };
+
+  const handleRegisterClick = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", "registration");
+    router.push(`?${params.toString()}`, { scroll: false });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -291,6 +325,33 @@ export function EventDescription({ event }: EventDescriptionProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Register Button - Sticky CTA */}
+      <div ref={registerButtonPlaceholderRef} className="w-full">
+        <div
+          ref={registerButtonRef}
+          className={`
+            w-full transition-all duration-300 z-50
+            ${
+              isRegisterButtonSticky
+                ? "fixed top-0 left-0 right-0 px-4 py-3 backdrop-blur-md bg-background/80 border-b shadow-lg"
+                : ""
+            }
+          `}
+        >
+          <div className="max-w-xl mx-auto">
+            <Button
+              onClick={handleRegisterClick}
+              size="lg"
+              className="w-full cursor-pointer bg-[#48C773] hover:bg-[#3fa962] text-white font-bold text-lg py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              {t("register")}
+            </Button>
+          </div>
+        </div>
+      </div>
+      {/* Spacer when button is sticky to prevent layout shift */}
+      {isRegisterButtonSticky && <div className="h-[72px]" />}
 
       {/* Description */}
       {localizedDescription && (
