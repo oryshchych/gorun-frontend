@@ -399,7 +399,7 @@ export function EventRegistrationForm({
                             {t("promoCodeApplied")}:{" "}
                             {promoCodeDiscount.discountType === "percentage"
                               ? `${promoCodeDiscount.discountValue}%`
-                              : `${promoCodeDiscount.discountValue} UAH`}{" "}
+                              : `${promoCodeDiscount.discountValue} ${t("currency")}`}{" "}
                             {t("discount")}
                           </p>
                         )}
@@ -422,23 +422,27 @@ export function EventRegistrationForm({
                 <span className="text-muted-foreground">
                   {t("registrationFee")}:
                 </span>
-                <span>{basePrice} UAH</span>
+                <span>
+                  {basePrice} {t("currency")}
+                </span>
               </div>
               {promoCodeDiscount && discountAmount > 0 && (
                 <div className="flex justify-between text-sm text-brand">
                   <span>{t("discount")}:</span>
                   <span>
-                    -{discountAmount} UAH (
+                    -{discountAmount} {t("currency")} (
                     {promoCodeDiscount.discountType === "percentage"
                       ? `${promoCodeDiscount.discountValue}%`
-                      : `${promoCodeDiscount.discountValue} UAH`}
+                      : `${promoCodeDiscount.discountValue} ${t("currency")}`}
                     )
                   </span>
                 </div>
               )}
               <div className="flex justify-between text-lg font-semibold pt-2 border-t">
                 <span>{t("total")}:</span>
-                <span>{finalPrice} UAH</span>
+                <span>
+                  {finalPrice} {t("currency")}
+                </span>
               </div>
             </div>
 

@@ -326,6 +326,22 @@ export function EventDescription({ event }: EventDescriptionProps) {
         </Card>
       </div>
 
+      {/* Event Price Card */}
+      {event.basePrice !== undefined && (
+        <Card className="bg-linear-to-r from-[#48C773]/10 to-[#48C773]/5 border-[#48C773]/30">
+          <CardContent className="py-6">
+            <div className="flex flex-col items-center justify-center gap-2">
+              <span className="text-sm text-muted-foreground uppercase tracking-wide">
+                {t("registrationFee")}
+              </span>
+              <span className="text-4xl font-bold text-[#48C773]">
+                {event.basePrice} {t("currency")}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Register Button - Sticky CTA */}
       <div ref={registerButtonPlaceholderRef} className="w-full">
         <div

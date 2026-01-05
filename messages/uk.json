@@ -190,7 +190,8 @@
     "iAccept": "Я приймаю",
     "when": "Коли",
     "where": "Де",
-    "viewOnMap": "Переглянути на карті"
+    "viewOnMap": "Переглянути на карті",
+    "currency": "грн"
   },
   "validation": {
     "required": "Це поле обов'язкове",
