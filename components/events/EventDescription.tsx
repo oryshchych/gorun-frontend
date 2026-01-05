@@ -434,7 +434,9 @@ export function EventDescription({ event }: EventDescriptionProps) {
                             components={
                               {
                                 p: ({ children }) => (
-                                  <p className="mb-3 last:mb-0">{children}</p>
+                                  <p className="mb-3 last:mb-0 text-sm">
+                                    {children}
+                                  </p>
                                 ),
                                 strong: ({ children }) => (
                                   <strong className="font-semibold text-foreground">
