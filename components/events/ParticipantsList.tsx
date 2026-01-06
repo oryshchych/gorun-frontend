@@ -81,9 +81,9 @@ export function ParticipantsList({
                     <td className="p-3 text-text-primary">
                       {participant.surname}
                     </td>
-                    <td className="p-3 text-text-secondary">
+                    {/* <td className="p-3 text-text-secondary">
                       {participant.city || "-"}
-                    </td>
+                    </td> */}
                     <td className="p-3 text-text-secondary">
                       {participant.runningClub || ""}
                     </td>
