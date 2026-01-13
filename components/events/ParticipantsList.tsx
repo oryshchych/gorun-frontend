@@ -72,19 +72,19 @@ export function ParticipantsList({
                     key={participant.id}
                     className="border-b border-table-row-divider hover:bg-table-row-hover transition-colors even:bg-table-zebra"
                   >
-                    <td className="p-3 text-text-primary w-12 text-center">
+                    <td className="p-3 text-text-primary w-12 text-center whitespace-nowrap">
                       {index + 1}
                     </td>
-                    <td className="p-3 text-text-primary">
+                    <td className="p-3 text-text-primary whitespace-nowrap">
                       {participant.name}
                     </td>
-                    <td className="p-3 text-text-primary">
+                    <td className="p-3 text-text-primary whitespace-nowrap">
                       {participant.surname}
                     </td>
-                    {/* <td className="p-3 text-text-secondary">
+                    {/* <td className="p-3 text-text-secondary whitespace-nowrap">
                       {participant.city || "-"}
                     </td> */}
-                    <td className="p-3 text-text-secondary">
+                    <td className="p-3 text-text-secondary whitespace-nowrap">
                       {participant.runningClub || ""}
                     </td>
                   </tr>
