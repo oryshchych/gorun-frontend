@@ -86,10 +86,10 @@ export default function Footer() {
 
   return (
     <footer className="border-t bg-background" role="contentinfo">
-      <div className="container mx-auto py-8 md:py-12 px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="container mx-auto py-8 md:py-12 px-4 sm:px-6 lg:px-8 flex flex-col gap-2">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-2">
           {/* Contact Information */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-2">
             {/* Phone */}
             {/* <a
               href={`tel:${contactInfo.phone}`}
