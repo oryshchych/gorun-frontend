@@ -12,20 +12,13 @@ import {
   register as apiRegister,
   logout as apiLogout,
   getCurrentUser,
+  exchangeOAuthCode,
+  type AuthUserPayload,
+  type LoginRequest,
+  type RegisterRequest,
 } from "@/lib/api/auth";
 import { tokenManager } from "@/lib/api/client";
-import type {
-  LoginRequest,
-  RegisterRequest,
-  AuthResponse,
-} from "@/lib/api/auth";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  image?: string;
-}
+import type { User } from "@/types/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -35,15 +28,35 @@ interface AuthContextType {
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  /** Complete session after backend OAuth redirect + one-time code */
+  exchangeOAuthCallback: (code: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+function mapPayloadToUser(payload: AuthUserPayload): User {
+  const fromParts = [payload.firstName, payload.lastName]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+  const name =
+    payload.name?.trim() || (fromParts.length > 0 ? fromParts : undefined);
+  return {
+    id: payload.id,
+    email: payload.email,
+    name,
+    firstName: payload.firstName,
+    lastName: payload.lastName,
+    phone: payload.phone,
+    image: payload.image,
+    provider: "credentials",
+  };
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load user on mount if token exists
   useEffect(() => {
     const loadUser = async () => {
       if (tokenManager.hasToken()) {
@@ -61,29 +74,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loadUser();
   }, []);
 
-  // Login function
   const login = useCallback(async (credentials: LoginRequest) => {
     setIsLoading(true);
     try {
       const response = await apiLogin(credentials);
-      setUser(response.data.user);
+      setUser(mapPayloadToUser(response.data.user));
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Register function
   const register = useCallback(async (data: RegisterRequest) => {
     setIsLoading(true);
     try {
       const response = await apiRegister(data);
-      setUser(response.data.user);
+      setUser(mapPayloadToUser(response.data.user));
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Logout function
+  const exchangeOAuthCallback = useCallback(async (code: string) => {
+    setIsLoading(true);
+    try {
+      const response = await exchangeOAuthCode(code);
+      setUser(mapPayloadToUser(response.data.user));
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -94,7 +114,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Refresh user data
   const refreshUser = useCallback(async () => {
     if (tokenManager.hasToken()) {
       try {
@@ -116,12 +135,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     register,
     logout,
     refreshUser,
+    exchangeOAuthCallback,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-// Hook to use auth context
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
