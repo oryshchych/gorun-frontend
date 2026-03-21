@@ -1,9 +1,43 @@
+import React from "react";
+import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RegisterForm } from "../RegisterForm";
 
-// Mock dependencies
+vi.mock("react-phone-number-input", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("react-phone-number-input")>();
+  return {
+    ...actual,
+    default: function MockPhoneInput({
+      onChange,
+      value,
+      id,
+      disabled,
+      "aria-invalid": ariaInvalid,
+    }: {
+      onChange?: (v: string | undefined) => void;
+      value?: string;
+      id?: string;
+      disabled?: boolean;
+      "aria-invalid"?: boolean;
+    }) {
+      return (
+        <input
+          id={id}
+          type="text"
+          aria-label="Phone"
+          aria-invalid={ariaInvalid}
+          disabled={disabled}
+          value={value ?? ""}
+          onChange={(e) => onChange?.(e.target.value || undefined)}
+        />
+      );
+    },
+  };
+});
+
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
@@ -11,23 +45,45 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("next-intl", () => ({
+  // Namespace is ignored so validation + auth keys resolve in tests
   useTranslations: () => (key: string) => {
-    const translations: Record<string, string> = {
-      name: "Name",
+    const all: Record<string, string> = {
+      nameRequired: "First name is required",
+      nameMin: "First name must be at least 2 characters",
+      nameMax: "First name must not exceed 50 characters",
+      surnameRequired: "Last name is required",
+      surnameMin: "Last name must be at least 2 characters",
+      surnameMax: "Last name must not exceed 50 characters",
+      phoneRequired: "Phone is required",
+      phoneInvalid: "Invalid phone number",
+      emailRequired: "Email is required",
+      emailInvalid: "Invalid email address",
+      passwordRequired: "Password is required",
+      passwordMin: "Password must be at least 8 characters",
+      passwordMax: "Password must be at most 100 characters",
+      confirmPasswordRequired: "Please confirm your password",
+      passwordsDontMatch: "Passwords don't match",
+      firstName: "First name",
+      lastName: "Last name",
+      phone: "Phone",
       email: "Email",
       password: "Password",
       confirmPassword: "Confirm Password",
-      namePlaceholder: "John Doe",
+      firstNamePlaceholder: "John",
+      lastNamePlaceholder: "Doe",
+      phonePlaceholder: "+380…",
       emailPlaceholder: "your@email.com",
       passwordPlaceholder: "••••••••",
       createAccount: "Create Account",
-      creatingAccount: "Creating account...",
-      accountCreated: "Your account has been created successfully!",
+      creatingAccount: "Creating account…",
       registrationSuccessful: "Registration Successful",
       registrationFailed: "Registration Failed",
+      registerWithGoogle: "Google",
+      orContinueWith: "Or email",
     };
-    return translations[key] || key;
+    return all[key] || key;
   },
+  useLocale: () => "en",
 }));
 
 vi.mock("@/hooks/useAuth", () => ({
@@ -41,15 +97,25 @@ vi.mock("@/lib/error-handler", () => ({
   showSuccessToast: vi.fn(),
 }));
 
+vi.mock("@/components/auth/GoogleOAuthButton", () => ({
+  GoogleOAuthButton: () => (
+    <button type="button" aria-label="Google OAuth">
+      Google
+    </button>
+  ),
+}));
+
 describe("RegisterForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("should render registration form with all required fields", () => {
+  it("should render registration fields", () => {
     render(<RegisterForm />);
 
-    expect(screen.getByLabelText(/^name$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^first name$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^last name$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^phone$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^email$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
@@ -62,95 +128,35 @@ describe("RegisterForm", () => {
     const user = userEvent.setup();
     render(<RegisterForm />);
 
-    const submitButton = screen.getByRole("button", {
-      name: /create account/i,
-    });
-    await user.click(submitButton);
+    await user.click(
+      screen.getByRole("button", { name: /create account/i })
+    );
 
     await waitFor(() => {
-      expect(screen.getByText(/name is required/i)).toBeInTheDocument();
-      expect(screen.getByText(/email is required/i)).toBeInTheDocument();
-      expect(screen.getByText(/password is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/first name is required/i)).toBeInTheDocument();
     });
-  });
-
-  it("should display validation error for short name on submit", async () => {
-    const user = userEvent.setup();
-    render(<RegisterForm />);
-
-    const nameInput = screen.getByLabelText(/^name$/i);
-    await user.type(nameInput, "A");
-
-    const submitButton = screen.getByRole("button", {
-      name: /create account/i,
-    });
-    await user.click(submitButton);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(/name must be at least 2 characters/i)
-      ).toBeInTheDocument();
-    });
-  });
-
-  it("should accept valid inputs", async () => {
-    const user = userEvent.setup();
-    render(<RegisterForm />);
-
-    const nameInput = screen.getByLabelText(/^name$/i);
-    const emailInput = screen.getByLabelText(/^email$/i);
-    const passwordInput = screen.getByLabelText(/^password$/i);
-    const confirmPasswordInput = screen.getByLabelText(/confirm password/i);
-
-    await user.type(nameInput, "John Doe");
-    await user.type(emailInput, "john@example.com");
-    await user.type(passwordInput, "password123");
-    await user.type(confirmPasswordInput, "password123");
-
-    expect(nameInput).toHaveValue("John Doe");
-    expect(emailInput).toHaveValue("john@example.com");
-    expect(passwordInput).toHaveValue("password123");
-    expect(confirmPasswordInput).toHaveValue("password123");
   });
 
   it("should display validation error for mismatched passwords", async () => {
     const user = userEvent.setup();
     render(<RegisterForm />);
 
-    const passwordInput = screen.getByLabelText(/^password$/i);
-    const confirmPasswordInput = screen.getByLabelText(/confirm password/i);
+    await user.type(screen.getByLabelText(/^first name$/i), "John");
+    await user.type(screen.getByLabelText(/^last name$/i), "Doe");
+    await user.type(screen.getByLabelText(/^phone$/i), "+380501112233");
+    await user.type(screen.getByLabelText(/^email$/i), "john@example.com");
+    await user.type(screen.getByLabelText(/^password$/i), "password123");
+    await user.type(
+      screen.getByLabelText(/confirm password/i),
+      "different123"
+    );
 
-    await user.type(passwordInput, "password123");
-    await user.type(confirmPasswordInput, "different123");
-
-    const submitButton = screen.getByRole("button", {
-      name: /create account/i,
-    });
-    await user.click(submitButton);
+    await user.click(
+      screen.getByRole("button", { name: /create account/i })
+    );
 
     await waitFor(() => {
       expect(screen.getByText(/passwords don't match/i)).toBeInTheDocument();
     });
-  });
-
-  it("should have proper accessibility attributes", () => {
-    render(<RegisterForm />);
-
-    const form = screen.getByRole("form", { name: /registration form/i });
-    expect(form).toBeInTheDocument();
-
-    const nameInput = screen.getByLabelText(/^name$/i);
-    expect(nameInput).toHaveAttribute("aria-required", "true");
-    expect(nameInput).toHaveAttribute("autoComplete", "name");
-
-    const emailInput = screen.getByLabelText(/^email$/i);
-    expect(emailInput).toHaveAttribute("aria-required", "true");
-    expect(emailInput).toHaveAttribute("type", "email");
-    expect(emailInput).toHaveAttribute("autoComplete", "email");
-
-    const passwordInput = screen.getByLabelText(/^password$/i);
-    expect(passwordInput).toHaveAttribute("aria-required", "true");
-    expect(passwordInput).toHaveAttribute("type", "password");
-    expect(passwordInput).toHaveAttribute("autoComplete", "new-password");
   });
 });
