@@ -8,6 +8,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import Image from "next/image";
 import { Instagram, User, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { getUserDisplayName } from "@/lib/get-user-display-name";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -72,7 +73,7 @@ export default function Header() {
                   <DropdownMenuContent align="end" className="w-56">
                     <DropdownMenuLabel className="font-normal">
                       <span className="truncate block">
-                        {user?.name || user?.email || ""}
+                        {getUserDisplayName(user)}
                       </span>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
