@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useAuth } from "@/hooks/useAuth";
 import { createLoginSchema, type LoginFormData } from "@/lib/validations/auth";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import { handleApiError, showSuccessToast } from "@/lib/error-handler";
 
 export function LoginForm() {
   const router = useRouter();
+  const locale = useLocale();
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations("auth");
@@ -45,7 +46,7 @@ export function LoginForm() {
         t("loginSuccessful"),
         tApiCodes
       );
-      router.push("/");
+      router.push(`/${locale}/events`);
     } catch (error: any) {
       handleApiError(error, t("loginFailed"), tApiCodes);
     } finally {

@@ -2,13 +2,26 @@
 
 import Link from "next/link";
 import { useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { ThemeToggle } from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
 import Image from "next/image";
-import { Instagram } from "lucide-react";
+import { Instagram, User, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Header() {
   const locale = useLocale();
+  const t = useTranslations("nav");
+  const { isAuthenticated, isLoading, user, logout } = useAuth();
 
   const instagramUrl = "https://instagram.com/gorun.lviv";
 
@@ -41,6 +54,49 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Auth: Login / Register or User menu */}
+          {!isLoading && (
+            <>
+              {isAuthenticated ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon-sm"
+                      className="rounded-full"
+                      aria-label={t("profile")}
+                    >
+                      <User className="h-4 w-4" aria-hidden="true" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel className="font-normal">
+                      <span className="truncate block">
+                        {user?.name || user?.email || ""}
+                      </span>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onSelect={() => logout()}
+                      className="cursor-pointer"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
+                      {t("logout")}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button variant="ghost" size="sm" asChild>
+                  <Link
+                    href={`/${locale}/login`}
+                    className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
+                  >
+                    {t("login")}
+                  </Link>
+                </Button>
+              )}
+            </>
+          )}
           {/* Instagram */}
           <a
             href={instagramUrl}

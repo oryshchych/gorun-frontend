@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Header from "@/components/layout/Header";
 
 export default function AuthLayout({
   children,
@@ -9,6 +10,7 @@ export default function AuthLayout({
 }) {
   return (
     <div className="min-h-screen bg-background">
+      <Header />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

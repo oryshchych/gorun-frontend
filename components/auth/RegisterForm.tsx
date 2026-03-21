@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useAuth } from "@/hooks/useAuth";
 import {
   createRegisterSchema,
@@ -25,6 +25,7 @@ import { handleApiError, showSuccessToast } from "@/lib/error-handler";
 
 export function RegisterForm() {
   const router = useRouter();
+  const locale = useLocale();
   const { register } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations("auth");
@@ -54,7 +55,7 @@ export function RegisterForm() {
         t("registrationSuccessful"),
         tApiCodes
       );
-      router.push("/");
+      router.push(`/${locale}/events`);
     } catch (error: any) {
       handleApiError(error, t("registrationFailed"), tApiCodes);
     } finally {
