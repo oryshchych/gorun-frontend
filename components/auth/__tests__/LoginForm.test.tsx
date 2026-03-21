@@ -1,3 +1,5 @@
+import React from "react";
+import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -12,7 +14,11 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => {
-    const translations: Record<string, string> = {
+    const all: Record<string, string> = {
+      emailRequired: "Email is required",
+      emailInvalid: "Invalid email address",
+      passwordRequired: "Password is required",
+      passwordMin: "Password must be at least 8 characters",
       email: "Email",
       password: "Password",
       emailPlaceholder: "your@email.com",
@@ -22,9 +28,15 @@ vi.mock("next-intl", () => ({
       welcomeBack: "Welcome back!",
       loginSuccessful: "Login Successful",
       loginFailed: "Login Failed",
+      loginWithGoogle: "Google sign-in",
+      orContinueWith: "Or email",
+      rememberMe: "Remember me",
+      rememberMeHint: "Stay signed in longer",
+      forgotPassword: "Forgot password?",
     };
-    return translations[key] || key;
+    return all[key] || key;
   },
+  useLocale: () => "en",
 }));
 
 vi.mock("@/hooks/useAuth", () => ({
@@ -36,6 +48,14 @@ vi.mock("@/hooks/useAuth", () => ({
 vi.mock("@/lib/error-handler", () => ({
   handleApiError: vi.fn(),
   showSuccessToast: vi.fn(),
+}));
+
+vi.mock("@/components/auth/GoogleOAuthButton", () => ({
+  GoogleOAuthButton: () => (
+    <button type="button" aria-label="Google OAuth">
+      Google
+    </button>
+  ),
 }));
 
 describe("LoginForm", () => {
