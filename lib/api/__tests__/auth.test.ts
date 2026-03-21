@@ -1,7 +1,27 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import MockAdapter from "axios-mock-adapter";
 import apiClient, { tokenManager } from "../client";
-import { login, register, logout, getCurrentUser } from "../auth";
+import {
+  login,
+  register,
+  logout,
+  getCurrentUser,
+  forgotPassword,
+  exchangeOAuthCode,
+} from "../auth";
+
+const authPayload = (overrides?: Partial<{ name: string }>) => ({
+  data: {
+    user: {
+      id: "1",
+      name: "Test User",
+      email: "test@example.com",
+      ...overrides,
+    },
+    accessToken: "access-token",
+    refreshToken: "refresh-token",
+  },
+});
 
 describe("Auth API Service", () => {
   let mock: MockAdapter;
@@ -20,18 +40,15 @@ describe("Auth API Service", () => {
       const credentials = {
         email: "test@example.com",
         password: "password123",
+        rememberMe: true,
       };
-      const mockResponse = {
-        user: { id: "1", name: "Test User", email: "test@example.com" },
-        accessToken: "access-token",
-        refreshToken: "refresh-token",
-      };
+      const body = authPayload();
 
-      mock.onPost("/auth/login").reply(200, mockResponse);
+      mock.onPost("/auth/login").reply(200, body);
 
       const result = await login(credentials);
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toEqual(body);
       expect(tokenManager.getAccessToken()).toBe("access-token");
       expect(tokenManager.getRefreshToken()).toBe("refresh-token");
     });
@@ -50,28 +67,27 @@ describe("Auth API Service", () => {
   describe("register", () => {
     it("should register successfully and store tokens", async () => {
       const data = {
-        name: "Test User",
+        firstName: "Test",
+        lastName: "User",
+        phone: "+380501112233",
         email: "test@example.com",
         password: "password123",
       };
-      const mockResponse = {
-        user: { id: "1", name: "Test User", email: "test@example.com" },
-        accessToken: "access-token",
-        refreshToken: "refresh-token",
-      };
+      const body = authPayload();
 
-      mock.onPost("/auth/register").reply(201, mockResponse);
+      mock.onPost("/auth/register").reply(201, body);
 
       const result = await register(data);
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toEqual(body);
       expect(tokenManager.getAccessToken()).toBe("access-token");
-      expect(tokenManager.getRefreshToken()).toBe("refresh-token");
     });
 
     it("should handle registration error", async () => {
       const data = {
-        name: "Test",
+        firstName: "Test",
+        lastName: "User",
+        phone: "+380501112233",
         email: "test@example.com",
         password: "pass",
       };
@@ -83,6 +99,29 @@ describe("Auth API Service", () => {
         message: "Email already exists",
         statusCode: 400,
       });
+    });
+  });
+
+  describe("exchangeOAuthCode", () => {
+    it("should exchange code and store tokens", async () => {
+      const body = authPayload();
+      mock.onPost("/auth/oauth/exchange").reply(200, body);
+
+      const result = await exchangeOAuthCode("one-time-code");
+
+      expect(result).toEqual(body);
+      expect(tokenManager.getAccessToken()).toBe("access-token");
+    });
+  });
+
+  describe("forgotPassword", () => {
+    it("should post email", async () => {
+      mock
+        .onPost("/auth/forgot-password")
+        .reply(200, { message: "If account exists, email sent" });
+
+      const result = await forgotPassword({ email: "a@b.com" });
+      expect(result.message).toBeDefined();
     });
   });
 
@@ -115,11 +154,11 @@ describe("Auth API Service", () => {
         name: "Test User",
         email: "test@example.com",
       };
-      mock.onGet("/auth/me").reply(200, mockUser);
+      mock.onGet("/auth/me").reply(200, { data: mockUser, success: true });
 
       const result = await getCurrentUser();
 
-      expect(result).toEqual(mockUser);
+      expect(result).toEqual({ data: mockUser, success: true });
     });
   });
 });

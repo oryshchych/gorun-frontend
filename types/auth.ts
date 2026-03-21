@@ -1,27 +1,14 @@
+/** Authenticated user from `/auth/me` or embedded in login/register responses */
 export interface User {
   id: string;
   email: string;
-  name: string;
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
   image?: string;
-  provider: "credentials" | "google";
+  provider?: "credentials" | "google";
   providerId?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface RegisterRequest {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
-
-export interface AuthResponse {
-  user: User;
-  token: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
