@@ -8,10 +8,16 @@ import axios, {
 const ACCESS_TOKEN_KEY = "access_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
 
+/** Normalized API origin (…/api) for axios and OAuth redirect URLs. */
+export function getApiBaseUrl(): string {
+  const raw = (process.env.NEXT_PUBLIC_API_URL ?? "").trim().replace(/\/$/, "");
+  const host = raw || "http://localhost:3001";
+  return host.endsWith("/api") ? host : `${host}/api`;
+}
+
 // Create axios instance with base configuration
 const apiClient: AxiosInstance = axios.create({
-  baseURL:
-    `${process.env.NEXT_PUBLIC_API_URL}/api` || "http://localhost:3001/api",
+  baseURL: getApiBaseUrl(),
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
