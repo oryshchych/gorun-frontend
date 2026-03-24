@@ -33,7 +33,7 @@ export function GoogleOAuthButton({
     <Button
       type="button"
       variant="outline"
-      className="w-full cursor-pointer"
+      className="w-full cursor-pointer font-bold"
       onClick={handleClick}
       disabled={disabled}
     >

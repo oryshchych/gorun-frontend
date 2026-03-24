@@ -272,7 +272,7 @@ export function RegisterForm() {
 
           <Button
             type="submit"
-            className="w-full"
+            className="w-full font-bold"
             variant="outline"
             disabled={isLoading}
             aria-label={isLoading ? t("creatingAccount") : t("createAccount")}
