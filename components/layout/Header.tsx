@@ -55,6 +55,18 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Instagram */}
+          <a
+            href={instagramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md p-1"
+            aria-label="Follow us on Instagram"
+          >
+            <Instagram className="w-5 h-5" aria-hidden="true" />
+          </a>
+          <LanguageSwitcher />
+          <ThemeToggle />
           {/* Auth: Login / Register or User menu */}
           {!isLoading && (
             <>
@@ -97,18 +109,6 @@ export default function Header() {
               )}
             </>
           )}
-          {/* Instagram */}
-          <a
-            href={instagramUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md p-1"
-            aria-label="Follow us on Instagram"
-          >
-            <Instagram className="w-5 h-5" aria-hidden="true" />
-          </a>
-          <LanguageSwitcher />
-          <ThemeToggle />
         </div>
       </div>
     </header>
