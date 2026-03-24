@@ -62,12 +62,11 @@ export default function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      variant="outline"
-                      size="icon-sm"
+                      size="icon-lg"
                       className="rounded-full"
                       aria-label={t("profile")}
                     >
-                      <User className="h-4 w-4" aria-hidden="true" />
+                      <User className="size-5" aria-hidden="true" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
