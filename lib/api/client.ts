@@ -3,6 +3,13 @@ import axios, {
   AxiosInstance,
   InternalAxiosRequestConfig,
 } from "axios";
+import { defaultLocale, locales, type Locale } from "@/i18n";
+
+function getLocaleForClientRedirect(): Locale {
+  if (typeof window === "undefined") return defaultLocale;
+  const first = window.location.pathname.split("/").filter(Boolean)[0];
+  return locales.includes(first as Locale) ? (first as Locale) : defaultLocale;
+}
 
 // Token storage keys
 const ACCESS_TOKEN_KEY = "access_token";
@@ -87,7 +94,8 @@ apiClient.interceptors.response.use(
         console.log("🚀 ~ refreshError:", refreshError);
         tokenManager.clearTokens();
         if (typeof window !== "undefined") {
-          window.location.href = "/login";
+          const locale = getLocaleForClientRedirect();
+          window.location.href = `/${locale}/login`;
         }
         return Promise.reject(refreshError);
       }
