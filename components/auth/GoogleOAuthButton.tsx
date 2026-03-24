@@ -1,5 +1,6 @@
 "use client";
 
+import { GoogleIcon } from "@/assets/icons/GoogleIcon";
 import { Button } from "@/components/ui/button";
 import { buildGoogleOAuthStartUrl } from "@/lib/api/auth";
 
@@ -32,10 +33,11 @@ export function GoogleOAuthButton({
     <Button
       type="button"
       variant="outline"
-      className="w-full"
+      className="w-full cursor-pointer"
       onClick={handleClick}
       disabled={disabled}
     >
+      <GoogleIcon className="size-5 shrink-0 text-white" />
       {label}
     </Button>
   );
