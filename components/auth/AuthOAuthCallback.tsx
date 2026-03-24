@@ -29,7 +29,7 @@ export function AuthOAuthCallback() {
       try {
         await exchangeOAuthCallback(code);
         if (!cancelled) {
-          router.replace(`/${locale}/events`);
+          router.replace(`/${locale}`);
         }
       } catch (err: unknown) {
         if (!cancelled) {
@@ -42,14 +42,7 @@ export function AuthOAuthCallback() {
     return () => {
       cancelled = true;
     };
-  }, [
-    searchParams,
-    exchangeOAuthCallback,
-    router,
-    locale,
-    t,
-    tApiCodes,
-  ]);
+  }, [searchParams, exchangeOAuthCallback, router, locale, t, tApiCodes]);
 
   if (error) {
     return (
