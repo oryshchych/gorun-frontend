@@ -70,15 +70,11 @@ export function LoginForm() {
         label={t("loginWithGoogle")}
         disabled={isLoading}
       />
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-2 text-muted-foreground">
-            {t("orContinueWith")}
-          </span>
-        </div>
+      <div className="flex flex-col items-center gap-4">
+        <div className="border-t w-full" />
+        <span className="text-xs uppercase text-muted-foreground">
+          {t("orContinueWith")}
+        </span>
       </div>
 
       <Form {...form}>
@@ -168,18 +164,13 @@ export function LoginForm() {
               >
                 {t("rememberMe")}
               </label>
-              <p
-                id="login-remember-hint"
-                className="text-xs text-muted-foreground"
-              >
-                {t("rememberMeHint")}
-              </p>
             </div>
           </div>
 
           <Button
             type="submit"
             className="w-full"
+            variant="outline"
             disabled={isLoading}
             aria-label={isLoading ? t("loggingIn") : t("login")}
           >

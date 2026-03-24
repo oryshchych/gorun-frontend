@@ -77,15 +77,11 @@ export function RegisterForm() {
         label={t("registerWithGoogle")}
         disabled={isLoading}
       />
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-2 text-muted-foreground">
-            {t("orContinueWith")}
-          </span>
-        </div>
+      <div className="flex flex-col items-center gap-4">
+        <div className="border-t w-full" />
+        <span className="text-xs uppercase text-muted-foreground">
+          {t("orContinueWith")}
+        </span>
       </div>
 
       <Form {...form}>
@@ -231,9 +227,7 @@ export function RegisterForm() {
                       aria-required="true"
                       aria-invalid={!!fieldState.error}
                       aria-describedby={
-                        fieldState.error
-                          ? "register-password-error"
-                          : undefined
+                        fieldState.error ? "register-password-error" : undefined
                       }
                       {...field}
                     />
@@ -279,6 +273,7 @@ export function RegisterForm() {
           <Button
             type="submit"
             className="w-full"
+            variant="outline"
             disabled={isLoading}
             aria-label={isLoading ? t("creatingAccount") : t("createAccount")}
           >
