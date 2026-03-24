@@ -7,7 +7,7 @@ export default function LoginPage() {
   const t = useTranslations("auth");
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+    <div className="flex flex-1 flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
       <div className="w-full max-w-md space-y-6 sm:space-y-8">
         <div className="text-center">
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
@@ -27,7 +27,7 @@ export default function LoginPage() {
             </span>
             <Link
               href={`/${locale}/register`}
-              className="font-medium text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
+              className="font-bold text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
               aria-label="Sign up for a new account"
             >
               {t("signUp")}

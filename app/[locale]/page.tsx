@@ -113,7 +113,7 @@ export default async function HomePage({
 
   if (!event) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="flex min-h-dvh flex-col">
         <Header />
         <main className="flex-1 flex items-center justify-center">
           <Card className="p-8 text-center">
@@ -169,7 +169,7 @@ export default async function HomePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <div className="min-h-screen flex flex-col">
+      <div className="flex min-h-dvh flex-col">
         <Header />
         <main className="flex-1">
           <div className="container mx-auto px-4 py-8 md:py-12">
