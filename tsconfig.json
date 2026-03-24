@@ -35,6 +35,8 @@
     "hooks/**/*.tsx",
     "types/**/*.ts",
     "types/**/*.tsx",
+    "assets/**/*.ts",
+    "assets/**/*.tsx",
     "middleware.ts",
     "i18n.ts",
     "tailwind.config.ts",
