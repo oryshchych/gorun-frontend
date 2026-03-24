@@ -62,7 +62,7 @@ export function RegisterForm() {
         t("registrationSuccessful"),
         tApiCodes
       );
-      router.push(`/${locale}/events`);
+      router.push(`/${locale}`);
     } catch (error: unknown) {
       handleApiError(error, t("registrationFailed"), tApiCodes);
     } finally {

@@ -54,7 +54,7 @@ export function LoginForm() {
         t("loginSuccessful"),
         tApiCodes
       );
-      router.push(`/${locale}/events`);
+      router.push(`/${locale}`);
     } catch (error: unknown) {
       handleApiError(error, t("loginFailed"), tApiCodes);
     } finally {
