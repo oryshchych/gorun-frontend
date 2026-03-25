@@ -36,9 +36,7 @@ apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // Get token using tokenManager
     const token = tokenManager.getAccessToken();
-    console.log("🚀 ~ token:", token);
 
-    console.log("🚀 ~ config:", config);
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -68,7 +66,6 @@ apiClient.interceptors.response.use(
       try {
         // Attempt to refresh the token
         const refreshToken = tokenManager.getRefreshToken();
-        console.log("🚀 ~ refreshToken:", refreshToken);
 
         if (refreshToken) {
           const response = await axios.post(
@@ -91,7 +88,6 @@ apiClient.interceptors.response.use(
         }
       } catch (refreshError) {
         // Refresh failed, clear tokens and redirect to login
-        console.log("🚀 ~ refreshError:", refreshError);
         tokenManager.clearTokens();
         if (typeof window !== "undefined") {
           const locale = getLocaleForClientRedirect();
