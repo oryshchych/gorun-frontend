@@ -57,6 +57,7 @@ export default function middleware(request: NextRequest) {
     "/events/[id]/edit",
     "/my-events",
     "/my-registrations",
+    "/profile",
   ];
 
   const authRoutes = ["/login", "/register"];
