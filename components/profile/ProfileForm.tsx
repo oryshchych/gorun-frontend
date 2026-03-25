@@ -34,7 +34,7 @@ import {
 import { AnimatedFormField } from "@/components/shared/AnimatedFormField";
 import { handleApiError, showSuccessToast } from "@/lib/error-handler";
 
-const GENDER_VALUES = ["female", "male", "other", "prefer_not_to_say"] as const;
+const GENDER_VALUES = ["female", "male"] as const;
 
 function userToFormDefaults(user: {
   firstName?: string;
