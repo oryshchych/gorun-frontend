@@ -6,6 +6,7 @@ import {
   register,
   logout,
   getCurrentUser,
+  updateProfile,
   forgotPassword,
   exchangeOAuthCode,
 } from "../auth";
@@ -159,6 +160,34 @@ describe("Auth API Service", () => {
       const result = await getCurrentUser();
 
       expect(result).toEqual({ data: mockUser, success: true });
+    });
+  });
+
+  describe("updateProfile", () => {
+    it("should patch profile and return user", async () => {
+      tokenManager.setTokens("access-token", "refresh-token");
+      const body = {
+        firstName: "Jane",
+        lastName: "Doe",
+        phone: "+380501112233",
+        dateOfBirth: "1990-01-15",
+        gender: "female" as const,
+        emergencyContactName: null,
+        emergencyContactPhone: null,
+        runningClub: null,
+        city: "Lviv",
+        deliveryAddress: null,
+      };
+      const updated = {
+        id: "1",
+        email: "test@example.com",
+        ...body,
+      };
+      mock.onPatch("/auth/me").reply(200, { data: updated, success: true });
+
+      const result = await updateProfile(body);
+
+      expect(result).toEqual({ data: updated, success: true });
     });
   });
 });

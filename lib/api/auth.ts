@@ -1,4 +1,4 @@
-import { User } from "@/types/auth";
+import type { UpdateProfileRequest, User } from "@/types/auth";
 import apiClient, { getApiBaseUrl, tokenManager } from "./client";
 
 /** User payload returned with login/register/OAuth (subset of full User) */
@@ -118,9 +118,7 @@ export async function register(data: RegisterRequest): Promise<AuthResponse> {
 }
 
 /** Exchange one-time code from OAuth redirect for JWT pair (same shape as login). */
-export async function exchangeOAuthCode(
-  code: string
-): Promise<AuthResponse> {
+export async function exchangeOAuthCode(code: string): Promise<AuthResponse> {
   const response = await apiClient.post<AuthResponse>("/auth/oauth/exchange", {
     code,
   } satisfies OAuthExchangeRequest);
@@ -143,9 +141,7 @@ export async function forgotPassword(
   return response.data;
 }
 
-export async function resetPassword(
-  body: ResetPasswordRequest
-): Promise<void> {
+export async function resetPassword(body: ResetPasswordRequest): Promise<void> {
   await apiClient.post("/auth/reset-password", body);
 }
 
@@ -161,6 +157,14 @@ export async function logout(): Promise<void> {
 
 export async function getCurrentUser(): Promise<CurrentUserResponse> {
   const response = await apiClient.get<CurrentUserResponse>("/auth/me");
+  return response.data;
+}
+
+/** Update editable profile fields (email is not accepted). */
+export async function updateProfile(
+  body: UpdateProfileRequest
+): Promise<CurrentUserResponse> {
+  const response = await apiClient.patch<CurrentUserResponse>("/auth/me", body);
   return response.data;
 }
 
