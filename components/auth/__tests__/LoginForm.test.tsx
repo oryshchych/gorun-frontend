@@ -28,6 +28,7 @@ vi.mock("next-intl", () => ({
       welcomeBack: "Welcome back!",
       loginSuccessful: "Login Successful",
       loginFailed: "Login Failed",
+      invalidCredentials: "Invalid credentials",
       loginWithGoogle: "Google sign-in",
       orContinueWith: "Or email",
       rememberMe: "Remember me",
@@ -46,8 +47,8 @@ vi.mock("@/hooks/useAuth", () => ({
 }));
 
 vi.mock("@/lib/error-handler", () => ({
-  handleApiError: vi.fn(),
   showSuccessToast: vi.fn(),
+  showErrorToast: vi.fn(),
 }));
 
 vi.mock("@/components/auth/GoogleOAuthButton", () => ({

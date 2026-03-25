@@ -20,8 +20,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { AnimatedFormField } from "@/components/shared/AnimatedFormField";
-import { handleApiError, showSuccessToast } from "@/lib/error-handler";
+import { handleApiError as resolveApiError } from "@/lib/api-response-handler";
+import { AUTH_CODES } from "@/lib/constants/auth-codes";
+import { showErrorToast, showSuccessToast } from "@/lib/error-handler";
 import { GoogleOAuthButton } from "@/components/auth/GoogleOAuthButton";
+
+const LOGIN_CREDENTIAL_ERROR_CODES: readonly string[] = [
+  AUTH_CODES.ERROR_AUTH_INVALID_CREDENTIALS,
+  AUTH_CODES.ERROR_AUTH_USER_NOT_FOUND,
+];
 
 export function LoginForm() {
   const router = useRouter();
@@ -50,13 +57,18 @@ export function LoginForm() {
         rememberMe,
       });
       showSuccessToast(
-        "SUCCESS_AUTH_LOGGED_IN",
+        AUTH_CODES.SUCCESS_AUTH_LOGGED_IN,
         t("loginSuccessful"),
         tApiCodes
       );
       router.push(`/${locale}`);
     } catch (error: unknown) {
-      handleApiError(error, t("loginFailed"), tApiCodes);
+      console.error("Login error:", error);
+      const info = resolveApiError(error, tApiCodes);
+      const toastTitle = LOGIN_CREDENTIAL_ERROR_CODES.includes(info.code ?? "")
+        ? t("invalidCredentials")
+        : t("loginFailed");
+      showErrorToast(info.message, toastTitle, tApiCodes);
     } finally {
       setIsLoading(false);
     }
