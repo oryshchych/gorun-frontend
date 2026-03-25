@@ -52,34 +52,15 @@ export default function middleware(request: NextRequest) {
   const token = request.cookies.get("auth_token")?.value;
   const isAuthenticated = !!token;
 
-  const protectedRoutes = [
-    "/events/create",
-    "/events/[id]/edit",
-    "/my-events",
-    "/my-registrations",
-    "/profile",
-  ];
+  // Dashboard routes use JWT in localStorage (see tokenManager); auth_token cookie is not set
+  // by the app today, so server-side protectedRoutes here would always redirect to login.
+  // Auth gating runs in client layouts (e.g. app/[locale]/(dashboard)/layout.tsx).
 
   const authRoutes = ["/login", "/register"];
-
-  const isProtectedRoute = protectedRoutes.some((route) => {
-    if (route.includes("[id]")) {
-      const regex = new RegExp(`^${route.replace("[id]", "[^/]+")}$`);
-      return regex.test(pathWithoutLocale);
-    }
-    return pathWithoutLocale.startsWith(route);
-  });
 
   const isAuthRoute = authRoutes.some((route) =>
     pathWithoutLocale.startsWith(route)
   );
-
-  if (isProtectedRoute && !isAuthenticated) {
-    const locale = pathnameLocale || defaultLocale;
-    const loginUrl = new URL(`/${locale}/login`, request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
 
   if (isAuthRoute && isAuthenticated) {
     const locale = pathnameLocale || defaultLocale;
