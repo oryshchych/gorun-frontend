@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { ThemeToggle } from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
 import Image from "next/image";
-import { Instagram, User, LogOut } from "lucide-react";
+import { Instagram, User, LogOut, UserCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { getUserDisplayName } from "@/lib/get-user-display-name";
 import { Button } from "@/components/ui/button";
@@ -88,6 +88,12 @@ export default function Header() {
                       </span>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link href={`/${locale}/profile`}>
+                        <UserCircle className="mr-2 h-4 w-4" aria-hidden="true" />
+                        {t("profile")}
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem
                       onSelect={() => logout()}
                       className="cursor-pointer"
