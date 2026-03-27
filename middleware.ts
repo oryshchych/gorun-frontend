@@ -71,5 +71,10 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/(uk|en)/:path*", "/content/:path*"],
+  matcher: [
+    "/",
+    "/(uk|en)/:path*",
+    "/content/:path*",
+    "/((?!_next|content|images|favicon\\.ico|.*\\..*).*)",
+  ],
 };
