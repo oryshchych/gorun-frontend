@@ -6,8 +6,9 @@ import { useTranslations } from "next-intl";
 import { ThemeToggle } from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
 import Image from "next/image";
-import { Instagram, User, LogOut, UserCircle } from "lucide-react";
+import { Instagram, User, LogOut, UserCircle, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { isAdminUser } from "@/lib/admin/access";
 import { getUserDisplayName } from "@/lib/get-user-display-name";
 import { Button } from "@/components/ui/button";
 import {
@@ -88,6 +89,14 @@ export default function Header() {
                       </span>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    {isAdminUser(user) && (
+                      <DropdownMenuItem asChild className="cursor-pointer">
+                        <Link href={`/${locale}/admin`}>
+                          <Shield className="mr-2 h-4 w-4" aria-hidden="true" />
+                          {t("admin")}
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem asChild className="cursor-pointer">
                       <Link href={`/${locale}/profile`}>
                         <UserCircle className="mr-2 h-4 w-4" aria-hidden="true" />
