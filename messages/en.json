@@ -47,7 +47,8 @@
     "closeMenu": "Close menu",
     "userMenu": "User menu",
     "mainNavigation": "Main navigation",
-    "mobileNavigation": "Mobile navigation"
+    "mobileNavigation": "Mobile navigation",
+    "admin": "Admin"
   },
   "auth": {
     "login": "Login",
@@ -483,5 +484,59 @@
     "ERROR_FORBIDDEN": "Access forbidden",
     "ERROR_BAD_REQUEST": "Bad request",
     "ERROR_RATE_LIMIT_EXCEEDED": "Rate limit exceeded"
+  },
+  "admin": {
+    "accessDenied": "You don't have access to the admin panel.",
+    "nav": {
+      "adminNav": "Admin navigation",
+      "dashboard": "Dashboard",
+      "promoCodes": "Promo codes",
+      "events": "Events",
+      "backToSite": "Back to site"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "placeholder": "More here soon."
+    },
+    "events": {
+      "title": "Events",
+      "placeholder": "More here soon."
+    },
+    "promoCodes": {
+      "title": "Promo codes",
+      "description": "Create and manage discount codes for events.",
+      "create": "Create promo code",
+      "edit": "Edit promo code",
+      "listEmpty": "No promo codes yet.",
+      "loading": "Loading promo codes…",
+      "loadError": "Could not load promo codes.",
+      "codeLabel": "Code",
+      "discountTypeLabel": "Discount type",
+      "discountTypePercentage": "Percentage",
+      "discountTypeFixed": "Fixed amount",
+      "discountValueLabel": "Discount value",
+      "eventLabel": "Event",
+      "selectEvent": "Select an event",
+      "eventsLoadError": "Could not load events.",
+      "isActiveLabel": "Active",
+      "inactiveLabel": "Inactive",
+      "usageLimitLabel": "Usage limit",
+      "usageLimitHint": "Leave empty for unlimited.",
+      "expirationLabel": "Expiration date",
+      "expirationHint": "Optional. End of day in your timezone.",
+      "saved": "Promo code saved.",
+      "page": "Page {current} of {total}",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "promoValidation": {
+      "codeRequired": "Code is required.",
+      "codeMax": "Code must be at most 50 characters.",
+      "discountValuePositive": "Discount must be greater than zero.",
+      "percentageMax": "Percentage cannot exceed 100.",
+      "eventRequired": "Select an event.",
+      "usageLimitPositive": "Usage limit must be a positive integer.",
+      "expirationInvalid": "Invalid expiration date."
+    }
   }
 }

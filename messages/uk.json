@@ -47,7 +47,8 @@
     "closeMenu": "Закрити меню",
     "userMenu": "Меню користувача",
     "mainNavigation": "Головна навігація",
-    "mobileNavigation": "Мобільна навігація"
+    "mobileNavigation": "Мобільна навігація",
+    "admin": "Адмінка"
   },
   "auth": {
     "login": "Вхід",
@@ -483,5 +484,59 @@
     "ERROR_FORBIDDEN": "Доступ заборонено",
     "ERROR_BAD_REQUEST": "Невірний запит",
     "ERROR_RATE_LIMIT_EXCEEDED": "Перевищено ліміт запитів"
+  },
+  "admin": {
+    "accessDenied": "У вас немає доступу до адмін-панелі.",
+    "nav": {
+      "adminNav": "Навігація адмінки",
+      "dashboard": "Дашборд",
+      "promoCodes": "Промокоди",
+      "events": "Події",
+      "backToSite": "На сайт"
+    },
+    "dashboard": {
+      "title": "Дашборд",
+      "placeholder": "Незабаром тут буде більше."
+    },
+    "events": {
+      "title": "Події",
+      "placeholder": "Незабаром тут буде більше."
+    },
+    "promoCodes": {
+      "title": "Промокоди",
+      "description": "Створення й керування знижками для подій.",
+      "create": "Створити промокод",
+      "edit": "Редагувати промокод",
+      "listEmpty": "Промокодів ще немає.",
+      "loading": "Завантаження промокодів…",
+      "loadError": "Не вдалося завантажити промокоди.",
+      "codeLabel": "Код",
+      "discountTypeLabel": "Тип знижки",
+      "discountTypePercentage": "Відсоток",
+      "discountTypeFixed": "Фіксована сума",
+      "discountValueLabel": "Значення знижки",
+      "eventLabel": "Подія",
+      "selectEvent": "Оберіть подію",
+      "eventsLoadError": "Не вдалося завантажити події.",
+      "isActiveLabel": "Активний",
+      "inactiveLabel": "Неактивний",
+      "usageLimitLabel": "Ліміт використань",
+      "usageLimitHint": "Залиште порожнім для необмеженого.",
+      "expirationLabel": "Діє до",
+      "expirationHint": "Необов'язково. Кінець дня за вашим часом.",
+      "saved": "Промокод збережено.",
+      "page": "Сторінка {current} з {total}",
+      "prev": "Назад",
+      "next": "Далі"
+    },
+    "promoValidation": {
+      "codeRequired": "Код обов'язковий.",
+      "codeMax": "Код має містити максимум 50 символів.",
+      "discountValuePositive": "Знижка має бути більшою за нуль.",
+      "percentageMax": "Відсоток не може перевищувати 100.",
+      "eventRequired": "Оберіть подію.",
+      "usageLimitPositive": "Ліміт має бути додатним цілим числом.",
+      "expirationInvalid": "Некоректна дата закінчення."
+    }
   }
 }
