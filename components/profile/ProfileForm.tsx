@@ -266,7 +266,12 @@ export function ProfileForm() {
                         <SelectValue placeholder={t("genderPlaceholder")} />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent
+                      style={{
+                        backgroundColor: "#489994",
+                        color: "hsl(var(--foreground))",
+                      }}
+                    >
                       <SelectItem value="unspecified">
                         {t("genderPlaceholder")}
                       </SelectItem>
@@ -274,10 +279,6 @@ export function ProfileForm() {
                         {t("genderFemale")}
                       </SelectItem>
                       <SelectItem value="male">{t("genderMale")}</SelectItem>
-                      <SelectItem value="other">{t("genderOther")}</SelectItem>
-                      <SelectItem value="prefer_not_to_say">
-                        {t("genderPreferNot")}
-                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
