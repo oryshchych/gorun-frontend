@@ -1,6 +1,8 @@
 /** Values accepted by API / profile form (must stay in sync with backend OpenAPI). */
 export type UserGender = "female" | "male" | "other" | "prefer_not_to_say";
 
+export type AdminRole = "admin" | "super_admin";
+
 /** Authenticated user from `/auth/me` or embedded in login/register responses */
 export interface User {
   id: string;
@@ -10,6 +12,10 @@ export interface User {
   lastName?: string;
   phone?: string;
   image?: string;
+  /** When true, user may access `/admin/*`. Set on the backend / in DB. */
+  isAdmin?: boolean;
+  /** Present when `isAdmin` is true. Permissions may diverge by role later. */
+  adminRole?: AdminRole | null;
   provider?: "credentials" | "google";
   providerId?: string;
   dateOfBirth?: string | null;

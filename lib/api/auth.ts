@@ -1,4 +1,4 @@
-import type { UpdateProfileRequest, User } from "@/types/auth";
+import type { AdminRole, UpdateProfileRequest, User } from "@/types/auth";
 import apiClient, { getApiBaseUrl, tokenManager } from "./client";
 
 /** User payload returned with login/register/OAuth (subset of full User) */
@@ -11,6 +11,8 @@ export interface AuthUserPayload {
   lastName?: string;
   phone?: string;
   image?: string;
+  isAdmin?: boolean;
+  adminRole?: AdminRole | null;
 }
 
 export interface LoginRequest {

@@ -49,6 +49,8 @@ function mapPayloadToUser(payload: AuthUserPayload): User {
     lastName: payload.lastName,
     phone: payload.phone,
     image: payload.image,
+    isAdmin: payload.isAdmin ?? false,
+    adminRole: payload.adminRole ?? null,
     provider: "credentials",
   };
 }
