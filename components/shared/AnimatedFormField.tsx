@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 
 interface AnimatedFormFieldProps {
   children: ReactNode;
@@ -9,20 +9,10 @@ interface AnimatedFormFieldProps {
 }
 
 export function AnimatedFormField({ children, error }: AnimatedFormFieldProps) {
-  const [shake, setShake] = useState(false);
-
-  useEffect(() => {
-    if (error) {
-      setShake(true);
-      const timer = setTimeout(() => setShake(false), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [error]);
-
   return (
     <motion.div
       animate={
-        shake
+        error
           ? {
               x: [0, -10, 10, -10, 10, 0],
               transition: { duration: 0.4 },
