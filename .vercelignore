@@ -29,6 +29,7 @@ Thumbs.db
 # Documentation (optional - remove if you want docs in deployment)
 *.md
 !README.md
+!content/*.md
 
 # Git
 .git
