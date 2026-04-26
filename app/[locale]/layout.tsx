@@ -1,5 +1,5 @@
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages, getTranslations } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { locales } from "@/i18n";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
@@ -52,6 +52,8 @@ export default async function LocaleLayout({
   if (!locales.includes(locale as any)) {
     notFound();
   }
+
+  setRequestLocale(locale);
 
   // Providing all messages to the client
   // side is the easiest way to get started
