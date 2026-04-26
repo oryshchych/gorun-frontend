@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { AuthOAuthCallback } from "@/components/auth/AuthOAuthCallback";
 
+export const dynamic = "force-dynamic";
+
 export default async function AuthOAuthCallbackPage({
   params,
 }: {
