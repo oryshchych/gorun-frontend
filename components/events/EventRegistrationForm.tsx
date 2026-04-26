@@ -20,15 +20,13 @@ import {
 } from "@/components/ui/form";
 import { AnimatedFormField } from "@/components/shared/AnimatedFormField";
 import { useTranslations, useLocale } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Event } from "@/types/event";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import ReactMarkdown from "react-markdown";
-import type { Components } from "react-markdown";
-import { agreements } from "@/content/agreements";
+import { LegalMarkdown } from "@/components/legal/LegalMarkdown";
 
 interface EventRegistrationFormProps {
   event: Event;
@@ -106,13 +104,18 @@ export function EventRegistrationForm({
     await onSubmit(data);
   };
 
+  useEffect(() => {
+    setPrivacyContent("");
+    setTermsContent("");
+  }, [locale]);
+
   const loadMarkdownContent = async (
-    filePath: string,
+    document: "privacy-policy" | "terms-of-service",
     errorMessageUk: string,
     errorMessageEn: string
   ): Promise<string> => {
     try {
-      const response = await fetch(filePath, {
+      const response = await fetch(`/${locale}/legal-content/${document}`, {
         headers: {
           Accept: "text/plain",
         },
@@ -138,12 +141,11 @@ export function EventRegistrationForm({
   const handlePrivacyClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!privacyContent) {
-      // const content = await loadMarkdownContent(
-      //   "/content/privacy-policy-uk.md",
-      //   "Контент політики конфіденційності не вдалося завантажити.",
-      //   "Privacy policy content could not be loaded."
-      // );
-      const content = agreements.privacyPolicy;
+      const content = await loadMarkdownContent(
+        "privacy-policy",
+        "Контент політики конфіденційності не вдалося завантажити.",
+        "Privacy policy content could not be loaded."
+      );
       setPrivacyContent(content);
     }
     setIsPrivacyOpen(true);
@@ -152,12 +154,11 @@ export function EventRegistrationForm({
   const handleTermsClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!termsContent) {
-      // const content = await loadMarkdownContent(
-      //   "/content/terms-of-service-uk.md",
-      //   "Контент умов використання не вдалося завантажити.",
-      //   "Terms of service content could not be loaded."
-      // );
-      const content = agreements.termsOfService;
+      const content = await loadMarkdownContent(
+        "terms-of-service",
+        "Контент умов використання не вдалося завантажити.",
+        "Terms of service content could not be loaded."
+      );
       setTermsContent(content);
     }
     setIsTermsOpen(true);
@@ -526,47 +527,7 @@ export function EventRegistrationForm({
             </DialogTitle>
             <div className="flex flex-col h-full min-h-0">
               <div className="flex-1 overflow-y-auto p-6 min-h-0">
-                <div className="prose prose-neutral max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-[#48C773] prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted">
-                  <ReactMarkdown
-                    components={
-                      {
-                        p: ({ children }) => (
-                          <p className="mb-4 last:mb-0">{children}</p>
-                        ),
-                        strong: ({ children }) => (
-                          <strong className="font-semibold text-foreground">
-                            {children}
-                          </strong>
-                        ),
-                        h1: ({ children }) => (
-                          <h1 className="text-3xl font-bold mb-4 mt-6 first:mt-0">
-                            {children}
-                          </h1>
-                        ),
-                        h2: ({ children }) => (
-                          <h2 className="text-2xl font-semibold mb-3 mt-5">
-                            {children}
-                          </h2>
-                        ),
-                        ul: ({ children }) => (
-                          <ul className="list-disc list-inside mb-4 space-y-2">
-                            {children}
-                          </ul>
-                        ),
-                        ol: ({ children }) => (
-                          <ol className="list-decimal list-inside mb-4 space-y-2">
-                            {children}
-                          </ol>
-                        ),
-                        li: ({ children }) => (
-                          <li className="text-muted-foreground">{children}</li>
-                        ),
-                      } as Components
-                    }
-                  >
-                    {privacyContent}
-                  </ReactMarkdown>
-                </div>
+                <LegalMarkdown content={privacyContent} />
               </div>
               <div className="border-t p-4 flex justify-end shrink-0">
                 <Button
@@ -588,47 +549,7 @@ export function EventRegistrationForm({
             </DialogTitle>
             <div className="flex flex-col h-full min-h-0">
               <div className="flex-1 overflow-y-auto p-6 min-h-0">
-                <div className="prose prose-neutral max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-[#48C773] prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted">
-                  <ReactMarkdown
-                    components={
-                      {
-                        p: ({ children }) => (
-                          <p className="mb-4 last:mb-0">{children}</p>
-                        ),
-                        strong: ({ children }) => (
-                          <strong className="font-semibold text-foreground">
-                            {children}
-                          </strong>
-                        ),
-                        h1: ({ children }) => (
-                          <h1 className="text-3xl font-bold mb-4 mt-6 first:mt-0">
-                            {children}
-                          </h1>
-                        ),
-                        h2: ({ children }) => (
-                          <h2 className="text-2xl font-semibold mb-3 mt-5">
-                            {children}
-                          </h2>
-                        ),
-                        ul: ({ children }) => (
-                          <ul className="list-disc list-inside mb-4 space-y-2">
-                            {children}
-                          </ul>
-                        ),
-                        ol: ({ children }) => (
-                          <ol className="list-decimal list-inside mb-4 space-y-2">
-                            {children}
-                          </ol>
-                        ),
-                        li: ({ children }) => (
-                          <li className="text-muted-foreground">{children}</li>
-                        ),
-                      } as Components
-                    }
-                  >
-                    {termsContent}
-                  </ReactMarkdown>
-                </div>
+                <LegalMarkdown content={termsContent} />
               </div>
               <div className="border-t p-4 flex justify-end shrink-0">
                 <Button
