@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { useLocale } from "next-intl";
 import { useTranslations } from "next-intl";
@@ -66,7 +67,9 @@ export default function Header() {
           >
             <Instagram className="w-5 h-5" aria-hidden="true" />
           </a>
-          <LanguageSwitcher />
+          <Suspense>
+            <LanguageSwitcher />
+          </Suspense>
           <ThemeToggle />
           {/* Auth: Login / Register or User menu */}
           {!isLoading && (
