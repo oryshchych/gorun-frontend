@@ -1,12 +1,12 @@
 import { locales, type Locale } from "@/i18n";
 import {
-  getLegalDocumentPublicPath,
+  getLegalDocumentContent,
   isLegalDocumentSlug,
 } from "@/lib/legal-content";
 import { NextResponse } from "next/server";
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ locale: string; document: string }> }
 ) {
   const { locale, document } = await params;
@@ -18,21 +18,14 @@ export async function GET(
     return new NextResponse(null, { status: 404 });
   }
 
-  const contentPath = getLegalDocumentPublicPath({
+  const content = await getLegalDocumentContent({
     locale: locale as Locale,
     document,
   });
-  const contentResponse = await fetch(new URL(contentPath, request.url), {
-    headers: {
-      Accept: "text/plain",
-    },
-  });
 
-  if (!contentResponse.ok) {
+  if (!content) {
     return new NextResponse(null, { status: 404 });
   }
-
-  const content = await contentResponse.text();
 
   return new NextResponse(content, {
     headers: {

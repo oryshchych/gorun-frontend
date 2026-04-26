@@ -1,14 +1,13 @@
 import { LegalMarkdown } from "@/components/legal/LegalMarkdown";
 import { locales, type Locale } from "@/i18n";
 import {
-  getLegalDocumentPublicPath,
+  getLegalDocumentContent,
   isLegalDocumentSlug,
   legalDocumentSlugs,
   legalDocuments,
 } from "@/lib/legal-content";
 import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
-import { headers } from "next/headers";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {
@@ -55,35 +54,14 @@ export default async function LegalPage({
   }
 
   const typedLocale = locale as Locale;
-  const contentPath = getLegalDocumentPublicPath({
+  const content = await getLegalDocumentContent({
     locale: typedLocale,
     document,
   });
-  const requestHeaders = await headers();
-  const host =
-    requestHeaders.get("x-forwarded-host") || requestHeaders.get("host");
 
-  if (!host) {
+  if (!content) {
     notFound();
   }
-
-  const protocol =
-    requestHeaders.get("x-forwarded-proto") ||
-    (host.startsWith("localhost") || host.startsWith("127.0.0.1")
-      ? "http"
-      : "https");
-
-  const contentResponse = await fetch(`${protocol}://${host}${contentPath}`, {
-    headers: {
-      Accept: "text/plain",
-    },
-  });
-
-  if (!contentResponse.ok) {
-    notFound();
-  }
-
-  const content = await contentResponse.text();
 
   return (
     <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8 md:py-12">
