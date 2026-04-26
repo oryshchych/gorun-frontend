@@ -21,6 +21,7 @@ import {
   getLocalizedSpeaker,
 } from "@/lib/utils";
 import { useResponsiveImage } from "@/hooks/useResponsiveImage";
+import { useHydrated } from "@/hooks/useHydrated";
 import { EventImageOverlay } from "./EventImageOverlay";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -45,6 +46,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
   const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isHydrated = useHydrated();
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
     null
   );
@@ -133,17 +135,11 @@ export function EventDescription({ event }: EventDescriptionProps) {
   const coords = getCoordinates();
   const mapEmbedUrl = getMapEmbedUrl();
 
-  // Check if we're on localhost to avoid API referrer restrictions
-  // Use useState to avoid hydration mismatch
-  const [isLocalhost, setIsLocalhost] = useState(false);
-
-  useEffect(() => {
-    setIsLocalhost(
-      window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1" ||
-        window.location.hostname === "0.0.0.0"
-    );
-  }, []);
+  const isLocalhost =
+    isHydrated &&
+    (window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1" ||
+      window.location.hostname === "0.0.0.0");
 
   // Handle sticky register button
   useEffect(() => {

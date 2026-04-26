@@ -1,9 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useHydrated } from "@/hooks/useHydrated";
 import { Home, Search, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./globals.css";
 
 // Import translation files
@@ -32,13 +33,11 @@ function detectLanguage(): "uk" | "en" {
 }
 
 export default function RootNotFound() {
-  const [locale, setLocale] = useState<"uk" | "en">("uk");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setLocale(detectLanguage());
-    setMounted(true);
-  }, []);
+  const isHydrated = useHydrated();
+  const [localeOverride, setLocaleOverride] = useState<"uk" | "en" | null>(
+    null
+  );
+  const locale = localeOverride ?? (isHydrated ? detectLanguage() : "uk");
 
   const messages = translations[locale];
   const t = {
@@ -52,7 +51,7 @@ export default function RootNotFound() {
     myRegistrations: messages.errors.myRegistrations,
   };
 
-  if (!mounted) {
+  if (!isHydrated) {
     // Prevent hydration mismatch by showing loading state
     return (
       <html lang="uk">
@@ -123,7 +122,7 @@ export default function RootNotFound() {
             <div className="mb-8">
               <div className="flex gap-2 justify-center">
                 <button
-                  onClick={() => setLocale("uk")}
+                  onClick={() => setLocaleOverride("uk")}
                   className={`px-3 py-1 rounded text-sm transition-colors ${
                     locale === "uk"
                       ? "bg-primary text-primary-foreground"
@@ -133,7 +132,7 @@ export default function RootNotFound() {
                   Українська
                 </button>
                 <button
-                  onClick={() => setLocale("en")}
+                  onClick={() => setLocaleOverride("en")}
                   className={`px-3 py-1 rounded text-sm transition-colors ${
                     locale === "en"
                       ? "bg-primary text-primary-foreground"
