@@ -1,5 +1,37 @@
-import { useState, useEffect } from "react";
+import { useSyncExternalStore } from "react";
 import { EventImageUrl } from "@/types/event";
+
+type ViewportMode = "desktop" | "mobile-portrait" | "mobile-landscape";
+
+function getViewportMode(): ViewportMode {
+  if (window.innerWidth >= 768) {
+    return "desktop";
+  }
+
+  const isPortraitOrientation =
+    window.innerHeight > window.innerWidth ||
+    window.matchMedia("(orientation: portrait)").matches;
+
+  return isPortraitOrientation ? "mobile-portrait" : "mobile-landscape";
+}
+
+function getServerSnapshot(): ViewportMode {
+  return "mobile-portrait";
+}
+
+function subscribe(onStoreChange: () => void) {
+  window.addEventListener("resize", onStoreChange);
+  window.addEventListener("orientationchange", onStoreChange);
+
+  const orientationMediaQuery = window.matchMedia("(orientation: portrait)");
+  orientationMediaQuery.addEventListener("change", onStoreChange);
+
+  return () => {
+    window.removeEventListener("resize", onStoreChange);
+    window.removeEventListener("orientationchange", onStoreChange);
+    orientationMediaQuery.removeEventListener("change", onStoreChange);
+  };
+}
 
 /**
  * Hook to get the appropriate image URL based on device type and orientation
@@ -11,68 +43,19 @@ import { EventImageUrl } from "@/types/event";
 export function useResponsiveImage(
   imageUrl: EventImageUrl | undefined
 ): string | undefined {
-  // Default to portrait as per requirement
-  const getDefaultImage = () => {
-    if (!imageUrl) return undefined;
+  const viewportMode = useSyncExternalStore(
+    subscribe,
+    getViewportMode,
+    getServerSnapshot
+  );
+
+  if (!imageUrl) {
+    return undefined;
+  }
+
+  if (viewportMode === "mobile-portrait") {
     return imageUrl.portrait || imageUrl.landscape || undefined;
-  };
+  }
 
-  const [imageSrc, setImageSrc] = useState<string | undefined>(getDefaultImage);
-
-  useEffect(() => {
-    if (!imageUrl) {
-      setImageSrc(undefined);
-      return;
-    }
-
-    const updateImage = () => {
-      // Check if window is available (client-side only)
-      if (typeof window === "undefined") {
-        setImageSrc(imageUrl.portrait || imageUrl.landscape || undefined);
-        return;
-      }
-
-      const isDesktop = window.innerWidth >= 768; // md breakpoint
-      const isPortraitOrientation =
-        window.innerHeight > window.innerWidth ||
-        window.matchMedia("(orientation: portrait)").matches;
-
-      if (isDesktop) {
-        // Desktop: prefer landscape, fallback to portrait
-        setImageSrc(imageUrl.landscape || imageUrl.portrait || undefined);
-      } else {
-        // Mobile: use orientation-based selection
-        if (isPortraitOrientation) {
-          // Mobile portrait: prefer portrait, fallback to landscape
-          setImageSrc(imageUrl.portrait || imageUrl.landscape || undefined);
-        } else {
-          // Mobile landscape: prefer landscape, fallback to portrait
-          setImageSrc(imageUrl.landscape || imageUrl.portrait || undefined);
-        }
-      }
-    };
-
-    // Initial update
-    updateImage();
-
-    // Listen for resize and orientation changes
-    window.addEventListener("resize", updateImage);
-    window.addEventListener("orientationchange", updateImage);
-
-    // Use matchMedia for orientation changes (more reliable)
-    const orientationMediaQuery = window.matchMedia("(orientation: portrait)");
-    const handleOrientationChange = () => updateImage();
-    orientationMediaQuery.addEventListener("change", handleOrientationChange);
-
-    return () => {
-      window.removeEventListener("resize", updateImage);
-      window.removeEventListener("orientationchange", updateImage);
-      orientationMediaQuery.removeEventListener(
-        "change",
-        handleOrientationChange
-      );
-    };
-  }, [imageUrl]);
-
-  return imageSrc;
+  return imageUrl.landscape || imageUrl.portrait || undefined;
 }
