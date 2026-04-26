@@ -57,5 +57,10 @@ export async function getLegalDocumentContent({
     `${document}-${locale}.md`
   );
 
-  return readFile(filePath, "utf8");
+  try {
+    return await readFile(filePath, "utf8");
+  } catch (error) {
+    console.error(`Failed to load legal content: ${document}-${locale}`, error);
+    return null;
+  }
 }

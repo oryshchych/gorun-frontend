@@ -59,6 +59,10 @@ export default async function LegalPage({
     document,
   });
 
+  if (!content) {
+    notFound();
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8 md:py-12">
       <article className="mx-auto max-w-4xl">
