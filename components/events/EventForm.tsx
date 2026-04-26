@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { eventSchema, EventFormData } from "@/lib/validations/event";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,6 @@ import {
 import { AnimatedFormField } from "@/components/shared/AnimatedFormField";
 import { useTranslations } from "next-intl";
 import { Event } from "@/types/event";
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
@@ -30,6 +29,22 @@ interface EventFormProps {
   submitLabel?: string;
 }
 
+function getValidImagePreview(
+  imageUrl: EventFormData["imageUrl"]
+): string | undefined {
+  const candidate = imageUrl?.landscape?.trim() || imageUrl?.portrait?.trim();
+  if (!candidate) {
+    return undefined;
+  }
+
+  try {
+    new URL(candidate);
+    return candidate;
+  } catch {
+    return undefined;
+  }
+}
+
 export function EventForm({
   onSubmit,
   defaultValues,
@@ -38,9 +53,6 @@ export function EventForm({
 }: EventFormProps) {
   const t = useTranslations("events");
   const tCommon = useTranslations("common");
-  const [imagePreview, setImagePreview] = useState<string | undefined>(
-    defaultValues?.imageUrl?.landscape || defaultValues?.imageUrl?.portrait
-  );
 
   const form = useForm<EventFormData>({
     resolver: zodResolver(eventSchema) as any,
@@ -90,23 +102,11 @@ export function EventForm({
     },
   });
 
-  const watchImageUrl = form.watch("imageUrl");
-
-  useEffect(() => {
-    const candidate =
-      watchImageUrl?.landscape?.trim() || watchImageUrl?.portrait?.trim();
-    if (candidate) {
-      // Validate URL format before setting preview
-      try {
-        new URL(candidate);
-        setImagePreview(candidate);
-      } catch {
-        setImagePreview(undefined);
-      }
-    } else {
-      setImagePreview(undefined);
-    }
-  }, [watchImageUrl]);
+  const imageUrl = useWatch({
+    control: form.control,
+    name: "imageUrl",
+  });
+  const imagePreview = getValidImagePreview(imageUrl);
 
   const handleSubmit = async (data: EventFormData) => {
     const hasImage =
