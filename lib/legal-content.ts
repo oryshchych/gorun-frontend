@@ -1,3 +1,5 @@
+import { readFile } from "fs/promises";
+import path from "path";
 import type { Locale } from "@/i18n";
 
 export const legalDocumentSlugs = [
@@ -42,12 +44,31 @@ export function isLegalDocumentSlug(
   return legalDocumentSlugs.includes(value as LegalDocumentSlug);
 }
 
-export function getLegalDocumentPublicPath({
+const legalDocumentContentPaths: Record<
+  LegalDocumentSlug,
+  Record<Locale, string>
+> = {
+  "privacy-policy": {
+    uk: path.join(process.cwd(), "content/privacy-policy-uk.md"),
+    en: path.join(process.cwd(), "content/privacy-policy-en.md"),
+  },
+  "terms-of-service": {
+    uk: path.join(process.cwd(), "content/terms-of-service-uk.md"),
+    en: path.join(process.cwd(), "content/terms-of-service-en.md"),
+  },
+};
+
+export async function getLegalDocumentContent({
   locale,
   document,
 }: {
   locale: Locale;
   document: LegalDocumentSlug;
 }) {
-  return `/content/${document}-${locale}.md`;
+  try {
+    return await readFile(legalDocumentContentPaths[document][locale], "utf8");
+  } catch (error) {
+    console.error(`Failed to load legal content: ${document}-${locale}`, error);
+    return null;
+  }
 }
