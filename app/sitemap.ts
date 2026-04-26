@@ -7,7 +7,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const currentDate = new Date().toISOString();
 
   // Base pages for each locale
-  const routes = ["", "/events", "/login", "/register"];
+  const routes = [
+    "",
+    "/events",
+    "/login",
+    "/register",
+    "/privacy-policy",
+    "/terms-of-service",
+  ];
 
   // Generate sitemap entries for each locale
   const sitemapEntries: MetadataRoute.Sitemap = [];
@@ -17,8 +24,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       sitemapEntries.push({
         url: `${baseUrl}/${locale}${route}`,
         lastModified: currentDate,
-        changeFrequency: route === "" ? "daily" : "weekly",
-        priority: route === "" ? 1.0 : route === "/events" ? 0.9 : 0.7,
+        changeFrequency:
+          route === ""
+            ? "daily"
+            : route === "/privacy-policy" || route === "/terms-of-service"
+              ? "monthly"
+              : "weekly",
+        priority:
+          route === ""
+            ? 1.0
+            : route === "/events"
+              ? 0.9
+              : route === "/privacy-policy" || route === "/terms-of-service"
+                ? 0.5
+                : 0.7,
         alternates: {
           languages: Object.fromEntries(
             locales.map((loc) => [
