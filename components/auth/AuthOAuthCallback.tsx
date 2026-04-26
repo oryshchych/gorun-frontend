@@ -14,12 +14,14 @@ export function AuthOAuthCallback() {
   const { exchangeOAuthCallback } = useAuth();
   const t = useTranslations("auth");
   const tApiCodes = useTranslations("apiCodes");
-  const [error, setError] = useState<string | null>(null);
+  const code = searchParams.get("code");
+  const [exchangeError, setExchangeError] = useState<{
+    code: string;
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
-    const code = searchParams.get("code");
     if (!code) {
-      setError(t("oauthMissingCode"));
       return;
     }
 
@@ -33,8 +35,9 @@ export function AuthOAuthCallback() {
         }
       } catch (err: unknown) {
         if (!cancelled) {
-          handleApiError(err, t("oauthFailed"), tApiCodes);
-          setError(t("oauthFailed"));
+          const message = t("oauthFailed");
+          handleApiError(err, message, tApiCodes);
+          setExchangeError({ code, message });
         }
       }
     })();
@@ -42,7 +45,13 @@ export function AuthOAuthCallback() {
     return () => {
       cancelled = true;
     };
-  }, [searchParams, exchangeOAuthCallback, router, locale, t, tApiCodes]);
+  }, [code, exchangeOAuthCallback, router, locale, t, tApiCodes]);
+
+  const error = !code
+    ? t("oauthMissingCode")
+    : exchangeError?.code === code
+      ? exchangeError.message
+      : null;
 
   if (error) {
     return (
