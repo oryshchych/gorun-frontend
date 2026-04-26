@@ -4,9 +4,6 @@ const withNextIntl = createNextIntlPlugin("./i18n.ts");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  outputFileTracingIncludes: {
-    "/*": ["./content/**/*.md"],
-  },
   images: {
     remotePatterns: [
       {
