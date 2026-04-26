@@ -23,6 +23,10 @@ export async function GET(
     document,
   });
 
+  if (!content) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   return new NextResponse(content, {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
