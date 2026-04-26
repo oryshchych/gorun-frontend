@@ -1,20 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { Mail, Instagram, Facebook } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { LegalMarkdown } from "@/components/legal/LegalMarkdown";
 
 export default function Footer() {
   const locale = useLocale();
-  const t = useTranslations("common");
   const tFooter = useTranslations("footer");
-  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
-  const [privacyContent, setPrivacyContent] = useState<string>("");
-  const [isTermsOpen, setIsTermsOpen] = useState(false);
-  const [termsContent, setTermsContent] = useState<string>("");
   const currentYear = new Date().getFullYear();
 
   // Contact information - these should be moved to environment variables or config
@@ -23,64 +15,6 @@ export default function Footer() {
     email: "gorunteam.ua@gmail.com",
     instagram: "https://instagram.com/gorun.lviv",
     facebook: "https://facebook.com/profile.php?id=61584661056098",
-  };
-
-  useEffect(() => {
-    setPrivacyContent("");
-    setTermsContent("");
-  }, [locale]);
-
-  const loadMarkdownContent = async (
-    document: "privacy-policy" | "terms-of-service",
-    errorMessageUk: string,
-    errorMessageEn: string
-  ): Promise<string> => {
-    try {
-      const response = await fetch(`/${locale}/legal-content/${document}`, {
-        headers: {
-          Accept: "text/plain",
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`Failed to fetch: ${response.status}`);
-      }
-      const text = await response.text();
-      // Check if we got HTML instead of markdown
-      if (
-        text.trim().startsWith("<!DOCTYPE") ||
-        text.trim().startsWith("<html")
-      ) {
-        throw new Error("Received HTML instead of markdown");
-      }
-      return text;
-    } catch (error) {
-      console.error("Failed to load markdown:", error);
-      return locale === "uk" ? errorMessageUk : errorMessageEn;
-    }
-  };
-
-  const handlePrivacyClick = async () => {
-    if (!privacyContent) {
-      const content = await loadMarkdownContent(
-        "privacy-policy",
-        "Контент політики конфіденційності не вдалося завантажити.",
-        "Privacy policy content could not be loaded."
-      );
-      setPrivacyContent(content);
-    }
-    setIsPrivacyOpen(true);
-  };
-
-  const handleTermsClick = async () => {
-    if (!termsContent) {
-      const content = await loadMarkdownContent(
-        "terms-of-service",
-        "Контент умов використання не вдалося завантажити.",
-        "Terms of service content could not be loaded."
-      );
-      setTermsContent(content);
-    }
-    setIsTermsOpen(true);
   };
 
   return (
@@ -136,18 +70,18 @@ export default function Footer() {
           </div>
           {/* Copyright and Links */}
           <div className="flex items-center md:items-end gap-4">
-            <button
-              onClick={handlePrivacyClick}
+            <Link
+              href={`/${locale}/privacy-policy`}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md cursor-pointer"
             >
               {tFooter("privacyPolicy")}
-            </button>
-            <button
-              onClick={handleTermsClick}
+            </Link>
+            <Link
+              href={`/${locale}/terms-of-service`}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md cursor-pointer"
             >
               {tFooter("termsOfService")}
-            </button>
+            </Link>
           </div>
         </div>
         <p
@@ -157,50 +91,6 @@ export default function Footer() {
           © {currentYear} GoRun
         </p>
       </div>
-
-      {/* Privacy Policy Modal */}
-      <Dialog open={isPrivacyOpen} onOpenChange={setIsPrivacyOpen}>
-        <DialogContent className="max-w-4xl w-full max-h-[90vh] p-0 gap-0 [&>button]:hidden flex flex-col">
-          <DialogTitle className="sr-only">
-            {locale === "uk" ? "Політика конфіденційності" : "Privacy Policy"}
-          </DialogTitle>
-          <div className="flex flex-col h-full min-h-0">
-            <div className="flex-1 overflow-y-auto p-6 min-h-0">
-              <LegalMarkdown content={privacyContent} />
-            </div>
-            <div className="border-t p-4 flex justify-end shrink-0">
-              <Button
-                onClick={() => setIsPrivacyOpen(false)}
-                className="cursor-pointer"
-              >
-                {t("close")}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Terms of Service Modal */}
-      <Dialog open={isTermsOpen} onOpenChange={setIsTermsOpen}>
-        <DialogContent className="max-w-4xl w-full max-h-[90vh] p-0 gap-0 [&>button]:hidden flex flex-col">
-          <DialogTitle className="sr-only">
-            {tFooter("termsOfService")}
-          </DialogTitle>
-          <div className="flex flex-col h-full min-h-0">
-            <div className="flex-1 overflow-y-auto p-6 min-h-0">
-              <LegalMarkdown content={termsContent} />
-            </div>
-            <div className="border-t p-4 flex justify-end shrink-0">
-              <Button
-                onClick={() => setIsTermsOpen(false)}
-                className="cursor-pointer"
-              >
-                {t("close")}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </footer>
   );
 }
