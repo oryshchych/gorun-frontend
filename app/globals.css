@@ -1,5 +1,139 @@
 @import "tailwindcss";
 
+/* ─── GoRun design tokens (from tokens.css) ─────────────────────────────── */
+:root,
+.gr-light {
+  /* Brand */
+  --gr-brand: #2bc36b;
+  --gr-brand-600: #1fa958;
+  --gr-brand-700: #178a48;
+  --gr-brand-50: #e6f8ee;
+  --gr-brand-glow: rgba(43, 195, 107, 0.3);
+
+  /* Surfaces */
+  --gr-bg: #fafaf7;
+  --gr-surface: #ffffff;
+  --gr-surface-2: #f2f1eb;
+  --gr-line: rgba(26, 46, 31, 0.1);
+  --gr-line-strong: rgba(26, 46, 31, 0.18);
+
+  /* Text */
+  --gr-ink: #0f1a12;
+  --gr-ink-2: #1a2e1f;
+  --gr-ink-3: #4a5a4e;
+  --gr-ink-4: #7a857d;
+
+  /* Status */
+  --gr-warn: #e08914;
+  --gr-warn-bg: #fdf1dc;
+  --gr-danger: #d8443c;
+  --gr-info: #2e6cd9;
+  --gr-afu-blue: #0057b7;
+  --gr-afu-yellow: #ffd700;
+
+  /* Elevation */
+  --gr-shadow-sm: 0 1px 2px rgba(15, 26, 18, 0.05);
+  --gr-shadow-md: 0 4px 12px rgba(15, 26, 18, 0.08), 0 1px 2px rgba(15, 26, 18, 0.04);
+  --gr-shadow-lg: 0 16px 40px rgba(15, 26, 18, 0.14), 0 2px 6px rgba(15, 26, 18, 0.06);
+
+  /* Radius */
+  --gr-r-sm: 8px;
+  --gr-r-md: 14px;
+  --gr-r-lg: 22px;
+  --gr-r-xl: 28px;
+}
+
+.gr-dark {
+  --gr-brand: #34d679;
+  --gr-brand-600: #28be69;
+  --gr-brand-700: #1fa858;
+  --gr-brand-50: #0f2a1a;
+  --gr-brand-glow: rgba(52, 214, 121, 0.35);
+
+  --gr-bg: #0b100d;
+  --gr-surface: #131a15;
+  --gr-surface-2: #1b231d;
+  --gr-line: rgba(255, 255, 255, 0.08);
+  --gr-line-strong: rgba(255, 255, 255, 0.16);
+
+  --gr-ink: #f2f4ee;
+  --gr-ink-2: #dde3da;
+  --gr-ink-3: #a0aaa2;
+  --gr-ink-4: #6f786f;
+
+  --gr-warn: #f0a64a;
+  --gr-warn-bg: #2a1f0e;
+  --gr-danger: #e66359;
+  --gr-info: #4f8ae8;
+
+  --gr-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --gr-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.35);
+  --gr-shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+/* Subtle screen entrance animation */
+@keyframes gr-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.gr-screen-enter {
+  animation: gr-slide-in 280ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes gr-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+.gr-pulse {
+  animation: gr-pulse 2.4s ease-in-out infinite;
+}
+
+/* Typography utility classes */
+.gr-display {
+  font-family: var(--font-display), "Bricolage Grotesque", "SF Pro Display", system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+.gr-mono {
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* ─── Tailwind v4 theme extension ────────────────────────────────────────── */
+@theme {
+  /* GoRun brand colors as Tailwind utilities */
+  --color-gr-brand: #2bc36b;
+  --color-gr-brand-600: #1fa958;
+  --color-gr-brand-700: #178a48;
+  --color-gr-brand-50: #e6f8ee;
+  --color-gr-ink: #0f1a12;
+  --color-gr-ink-2: #1a2e1f;
+  --color-gr-ink-3: #4a5a4e;
+  --color-gr-ink-4: #7a857d;
+  --color-gr-warn: #e08914;
+  --color-gr-danger: #d8443c;
+  --color-gr-afu-yellow: #ffd700;
+
+  /* Font families */
+  --font-display: "Bricolage Grotesque", "SF Pro Display", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Border radius aliases */
+  --radius-gr-sm: 8px;
+  --radius-gr-md: 14px;
+  --radius-gr-lg: 22px;
+  --radius-gr-xl: 28px;
+}
+
 :root {
   /* Base colors - Light theme */
   --background: 150 8% 96%; /* #F6F8F7 */

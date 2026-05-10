@@ -16,7 +16,30 @@ import {
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { defaultLocale } from "@/i18n";
+import { Bricolage_Grotesque, Inter, JetBrains_Mono } from "next/font/google";
+import { BottomNav } from "@/components/layout/BottomNav";
 import "../globals.css";
+
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin", "latin-ext"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["500", "700"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -64,8 +87,12 @@ export default async function LocaleLayout({
   const websiteData = generateWebsiteStructuredData();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body suppressHydrationWarning>
+    <html
+      lang={locale}
+      suppressHydrationWarning
+      className={`${bricolage.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+    >
+      <body suppressHydrationWarning style={{ fontFamily: "var(--font-body, Inter, system-ui, sans-serif)" }}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -88,6 +115,7 @@ export default async function LocaleLayout({
             <NextIntlClientProvider messages={messages}>
               <AuthProvider>
                 <ErrorBoundary>{children}</ErrorBoundary>
+                <BottomNav />
                 <Toaster />
               </AuthProvider>
             </NextIntlClientProvider>
