@@ -1,64 +1,95 @@
-"use client";
+"use server";
 
-import { useEvent } from "@/hooks/useEvents";
-import { EventDetails } from "@/components/events/EventDetails";
-import { Button } from "@/components/ui/button";
-import { useTranslations, useLocale } from "next-intl";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2 } from "lucide-react";
-import { use } from "react";
-import { generateEventStructuredData } from "@/lib/seo";
+import { notFound } from "next/navigation";
+import { Event } from "@/types/event";
+import { Participant } from "@/types/registration";
 import { getLocalizedString } from "@/lib/utils";
-import { siteConfig } from "@/lib/seo";
+import { generateMetadata as generateSEOMetadata, generateEventStructuredData, siteConfig } from "@/lib/seo";
+import { EventDetailClient } from "@/components/events/EventDetailClient";
+import type { Metadata } from "next";
 
-interface EventDetailsPageProps {
-  params: Promise<{ id: string; locale: string }>;
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001").replace(
+  /\/api$/,
+  ""
+);
+
+async function fetchEvent(id: string, locale: string): Promise<Event | null> {
+  try {
+    const res = await fetch(`${API_BASE}/api/events/${id}?lang=${locale}`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json.data as Event;
+  } catch {
+    return null;
+  }
 }
 
-export default function EventDetailsPage({ params }: EventDetailsPageProps) {
-  const t = useTranslations("common");
-  const locale = useLocale();
-  const router = useRouter();
-  const resolvedParams = use(params);
-  const { id } = resolvedParams;
-
-  const { data: event, isLoading, error } = useEvent(id, locale);
-
-  const handleBack = () => {
-    router.back();
-  };
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-        </div>
-      </div>
-    );
+async function fetchParticipants(eventId: string): Promise<Participant[]> {
+  try {
+    const res = await fetch(`${API_BASE}/api/events/${eventId}/participants`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    const json = await res.json();
+    return (json.data ?? []) as Participant[];
+  } catch {
+    return [];
   }
+}
 
-  if (error || !event) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <Button variant="ghost" onClick={handleBack} className="mb-6">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          {t("back")}
-        </Button>
-        <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-lg">
-          {error?.message || "Event not found"}
-        </div>
-      </div>
-    );
-  }
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; id: string }>;
+}): Promise<Metadata> {
+  const { locale, id } = await params;
+  const event = await fetchEvent(id, locale);
+  if (!event) return {};
 
-  const localizedTitle = getLocalizedString(
+  const title = getLocalizedString(
     event.translations?.title,
     locale,
     "en",
     event.title || ""
   );
-  const localizedDescription = getLocalizedString(
+  const description = getLocalizedString(
+    event.translations?.description,
+    locale,
+    "en",
+    event.description || ""
+  );
+  return generateSEOMetadata({
+    locale,
+    title,
+    description: description.slice(0, 160),
+    image: event.imageUrl?.landscape || event.imageUrl?.portrait,
+    path: `events/${id}`,
+  });
+}
+
+export default async function EventPage({
+  params,
+}: {
+  params: Promise<{ locale: string; id: string }>;
+}) {
+  const { locale, id } = await params;
+
+  const [event, participants] = await Promise.all([
+    fetchEvent(id, locale),
+    fetchParticipants(id),
+  ]);
+
+  if (!event) notFound();
+
+  const title = getLocalizedString(
+    event.translations?.title,
+    locale,
+    "en",
+    event.title || ""
+  );
+  const description = getLocalizedString(
     event.translations?.description,
     locale,
     "en",
@@ -73,8 +104,8 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
 
   const structuredData = generateEventStructuredData({
     id: event.id,
-    title: localizedTitle,
-    description: localizedDescription,
+    title,
+    description,
     date: new Date(event.date).toISOString(),
     location: localizedLocation,
     imageUrl: event.imageUrl,
@@ -91,14 +122,7 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
-        <Button variant="ghost" onClick={handleBack} className="mb-6">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          {t("back")}
-        </Button>
-
-        <EventDetails event={event} />
-      </div>
+      <EventDetailClient event={event} participants={participants} locale={locale} />
     </>
   );
 }
