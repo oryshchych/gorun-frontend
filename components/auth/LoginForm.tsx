@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { useAuth } from "@/hooks/useAuth";
 import { createLoginSchema, type LoginFormData } from "@/lib/validations/auth";
@@ -24,6 +24,7 @@ import { handleApiError as resolveApiError } from "@/lib/api-response-handler";
 import { AUTH_CODES } from "@/lib/constants/auth-codes";
 import { showErrorToast, showSuccessToast } from "@/lib/error-handler";
 import { GoogleOAuthButton } from "@/components/auth/GoogleOAuthButton";
+import { safePostAuthRedirectPath } from "@/lib/auth-redirect";
 
 const LOGIN_CREDENTIAL_ERROR_CODES: readonly string[] = [
   AUTH_CODES.ERROR_AUTH_INVALID_CREDENTIALS,
@@ -32,6 +33,7 @@ const LOGIN_CREDENTIAL_ERROR_CODES: readonly string[] = [
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const locale = useLocale();
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -39,6 +41,24 @@ export function LoginForm() {
   const t = useTranslations("auth");
   const tValidation = useTranslations("validation");
   const tApiCodes = useTranslations("apiCodes");
+
+  useEffect(() => {
+    const redirect = searchParams.get("redirect");
+    const target = safePostAuthRedirectPath(redirect, locale);
+    if (redirect && target !== `/${locale}`) {
+      try {
+        sessionStorage.setItem("postAuthRedirect", target);
+      } catch {
+        /* ignore quota / private mode */
+      }
+    } else {
+      try {
+        sessionStorage.removeItem("postAuthRedirect");
+      } catch {
+        /* ignore */
+      }
+    }
+  }, [searchParams, locale]);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(createLoginSchema(tValidation)),
@@ -61,7 +81,11 @@ export function LoginForm() {
         t("loginSuccessful"),
         tApiCodes
       );
-      router.push(`/${locale}`);
+      const nextPath = safePostAuthRedirectPath(
+        searchParams.get("redirect"),
+        locale
+      );
+      router.push(nextPath);
     } catch (error: unknown) {
       console.error("Login error:", error);
       const info = resolveApiError(error, tApiCodes);
