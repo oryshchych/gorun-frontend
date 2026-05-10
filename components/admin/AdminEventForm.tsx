@@ -3,6 +3,7 @@
 import { useFieldArray, useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
+import { useMemo } from "react";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -27,19 +28,24 @@ import { Textarea } from "@/components/ui/textarea";
 import type { AdminEventFormData, AdminEventFormInput } from "@/lib/validations/admin-event";
 import { adminEventFormResolverSchema } from "@/lib/validations/admin-event";
 
-const LIFECYCLE = [
-  "PLANNED",
-  "FUTURE",
-  "CURRENT",
-  "FINISHED",
-] as const;
-
-const LEGACY_STATUS = [
+const EVENT_STATUS = [
   "UPCOMING",
   "LIVE",
   "FINISHED",
   "CANCELLED",
 ] as const;
+
+function intFromInput(raw: string): number | undefined {
+  if (raw === "") return undefined;
+  const n = parseInt(raw, 10);
+  return Number.isNaN(n) ? undefined : n;
+}
+
+function floatFromInput(raw: string): number | undefined {
+  if (raw === "") return undefined;
+  const n = parseFloat(raw);
+  return Number.isNaN(n) ? undefined : n;
+}
 
 interface AdminEventFormProps {
   defaultValues: AdminEventFormInput;
@@ -67,11 +73,22 @@ export function AdminEventForm({
   const t = useTranslations("admin.eventForm");
   const tCommon = useTranslations("common");
 
-  const form = useForm<AdminEventFormInput, unknown, AdminEventFormData>({
+  const mergedDefaults = useMemo(
+    () => ({
+      ...defaultValues,
+      spots: defaultValues.spots ?? {
+        taken: undefined as number | undefined,
+        total: undefined as number | undefined,
+      },
+    }),
+    [defaultValues]
+  );
+
+  const form = useForm<AdminEventFormInput, any, AdminEventFormData>({
     resolver: zodResolver(
       adminEventFormResolverSchema as Parameters<typeof zodResolver>[0]
-    ) as unknown as Resolver<AdminEventFormInput, unknown, AdminEventFormData>,
-    defaultValues,
+    ) as unknown as Resolver<AdminEventFormInput, any, AdminEventFormData>,
+    defaultValues: mergedDefaults,
   });
 
   const ga = useFieldArray({ control: form.control, name: "gallery" });
@@ -101,7 +118,7 @@ export function AdminEventForm({
       <form onSubmit={handleSubmit} className="space-y-10">
         <section className="space-y-4 rounded-lg border bg-muted/20 p-4">
           <h2 className="text-lg font-semibold">{t("sectionStatus")}</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             <FormField
               control={form.control}
               name="isActive"
@@ -125,10 +142,10 @@ export function AdminEventForm({
             />
             <FormField
               control={form.control}
-              name="lifecyclePhase"
+              name="status"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("lifecycleLabel")}</FormLabel>
+                  <FormLabel>{t("statusLabel")}</FormLabel>
                   <Select
                     value={field.value}
                     onValueChange={field.onChange}
@@ -136,44 +153,13 @@ export function AdminEventForm({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder={t("lifecycleLabel")} />
+                        <SelectValue placeholder={t("statusLabel")} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {LIFECYCLE.map((v) => (
+                      {EVENT_STATUS.map((v) => (
                         <SelectItem key={v} value={v}>
-                          {t(`lifecycle.${v}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("legacyStatusLabel")}</FormLabel>
-                  <Select
-                    value={field.value === undefined || field.value === "" ? "__unset__" : field.value}
-                    onValueChange={(v) =>
-                      field.onChange(v === "__unset__" ? "" : v)
-                    }
-                    disabled={isLoading}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("legacyStatusUnset")} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="__unset__">{t("legacyStatusUnset")}</SelectItem>
-                      {LEGACY_STATUS.map((v) => (
-                        <SelectItem key={v} value={v}>
-                          {t(`legacyStatus.${v}`)}
+                          {t(`status.${v}`)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -309,50 +295,6 @@ export function AdminEventForm({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="latitude"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("latitude")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="any"
-                      disabled={isLoading}
-                      value={field.value === null || field.value === undefined ? "" : field.value}
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        field.onChange(v === "" ? null : Number(v));
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="longitude"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("longitude")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="any"
-                      disabled={isLoading}
-                      value={field.value === null || field.value === undefined ? "" : field.value}
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        field.onChange(v === "" ? null : Number(v));
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
           <FormField
             control={form.control}
@@ -381,32 +323,6 @@ export function AdminEventForm({
           <div className="grid gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
-              name="dateLabel"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("dateLabel")}</FormLabel>
-                  <FormControl>
-                    <Input {...field} value={field.value ?? ""} disabled={isLoading} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="timeLabel"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("timeLabel")}</FormLabel>
-                  <FormControl>
-                    <Input {...field} value={field.value ?? ""} disabled={isLoading} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="capacity"
               render={({ field }) => (
                 <FormItem>
@@ -416,8 +332,14 @@ export function AdminEventForm({
                       type="number"
                       min={1}
                       disabled={isLoading}
-                      {...field}
-                      onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                      value={
+                        field.value === undefined || field.value === null
+                          ? ""
+                          : field.value
+                      }
+                      onChange={(e) =>
+                        field.onChange(intFromInput(e.target.value))
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -436,10 +358,13 @@ export function AdminEventForm({
                       min={0}
                       step="0.01"
                       disabled={isLoading}
-                      {...field}
-                      value={field.value ?? 0}
+                      value={
+                        field.value === undefined || field.value === null
+                          ? ""
+                          : field.value
+                      }
                       onChange={(e) =>
-                        field.onChange(parseFloat(e.target.value) || 0)
+                        field.onChange(floatFromInput(e.target.value))
                       }
                     />
                   </FormControl>
@@ -520,9 +445,14 @@ export function AdminEventForm({
                       type="number"
                       min={0}
                       disabled={isLoading}
-                      {...field}
-                      value={field.value ?? 0}
-                      onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                      value={
+                        field.value === undefined || field.value === null
+                          ? ""
+                          : field.value
+                      }
+                      onChange={(e) =>
+                        field.onChange(intFromInput(e.target.value))
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -540,9 +470,14 @@ export function AdminEventForm({
                       type="number"
                       min={1}
                       disabled={isLoading}
-                      {...field}
-                      value={field.value ?? 1}
-                      onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 1)}
+                      value={
+                        field.value === undefined || field.value === null
+                          ? ""
+                          : field.value
+                      }
+                      onChange={(e) =>
+                        field.onChange(intFromInput(e.target.value))
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -723,10 +658,13 @@ export function AdminEventForm({
                   id: crypto.randomUUID(),
                   label: "",
                   name: "",
-                  km: 0,
+                  km: undefined as unknown as number,
                   elevation: "",
                   laps: "",
-                  spots: { taken: 0, total: 100 },
+                  spots: {
+                    taken: undefined as unknown as number,
+                    total: undefined as unknown as number,
+                  },
                 })
               }
               disabled={isLoading}
@@ -777,8 +715,14 @@ export function AdminEventForm({
                           min={0}
                           step="0.1"
                           disabled={isLoading}
-                          {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          value={
+                            field.value === undefined || field.value === null
+                              ? ""
+                              : field.value
+                          }
+                          onChange={(e) =>
+                            field.onChange(floatFromInput(e.target.value))
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -848,9 +792,13 @@ export function AdminEventForm({
                           type="number"
                           min={0}
                           disabled={isLoading}
-                          {...field}
+                          value={
+                            field.value === undefined || field.value === null
+                              ? ""
+                              : field.value
+                          }
                           onChange={(e) =>
-                            field.onChange(parseInt(e.target.value, 10) || 0)
+                            field.onChange(intFromInput(e.target.value))
                           }
                         />
                       </FormControl>
@@ -869,9 +817,13 @@ export function AdminEventForm({
                           type="number"
                           min={1}
                           disabled={isLoading}
-                          {...field}
+                          value={
+                            field.value === undefined || field.value === null
+                              ? ""
+                              : field.value
+                          }
                           onChange={(e) =>
-                            field.onChange(parseInt(e.target.value, 10) || 1)
+                            field.onChange(intFromInput(e.target.value))
                           }
                         />
                       </FormControl>

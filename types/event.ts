@@ -4,7 +4,7 @@ export type SupportedLocale = "en" | "uk";
 
 export type EventStatus = "UPCOMING" | "LIVE" | "FINISHED" | "CANCELLED";
 
-/** Admin-managed lifecycle label (distinct from legacy `status` when both are used) */
+/** Admin API lifecycle bucket; the admin UI derives this from `status` on save. */
 export type EventLifecyclePhase =
   | "PLANNED"
   | "FUTURE"

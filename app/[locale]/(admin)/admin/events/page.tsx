@@ -77,8 +77,7 @@ export default function AdminEventsListPage() {
                   <th className="px-4 py-3 font-medium">{t("colTitle")}</th>
                   <th className="px-4 py-3 font-medium">{t("colDate")}</th>
                   <th className="px-4 py-3 font-medium">{t("colActive")}</th>
-                  <th className="px-4 py-3 font-medium">{t("colLifecycle")}</th>
-                  <th className="px-4 py-3 font-medium">{t("colLegacyStatus")}</th>
+                  <th className="px-4 py-3 font-medium">{t("colStatus")}</th>
                   <th className="w-24 px-4 py-3 font-medium" />
                 </tr>
               </thead>
@@ -87,7 +86,6 @@ export default function AdminEventsListPage() {
                   const title = eventTitle(row, locale);
                   const dateStr = format(new Date(row.date), "PP p", { locale: dateLocale });
                   const active = row.isActive !== false;
-                  const phase = row.lifecyclePhase ?? "FUTURE";
                   return (
                     <tr key={row.id} className="border-b last:border-0">
                       <td className="max-w-[220px] truncate px-4 py-3 font-medium" title={title}>
@@ -107,13 +105,8 @@ export default function AdminEventsListPage() {
                           </Badge>
                         )}
                       </td>
-                      <td className="px-4 py-3">
-                        <Badge variant="outline" className="font-normal">
-                          {tForm(`lifecycle.${phase}`)}
-                        </Badge>
-                      </td>
                       <td className="px-4 py-3 text-muted-foreground">
-                        {row.status ? tForm(`legacyStatus.${row.status}`) : "—"}
+                        {row.status ? tForm(`status.${row.status}`) : "—"}
                       </td>
                       <td className="px-4 py-3">
                         <Button variant="ghost" size="icon" asChild>

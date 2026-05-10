@@ -3,6 +3,7 @@ import {
   adminEventFormSchema,
   adminFormToCreatePayload,
   eventToAdminFormDefaults,
+  lifecyclePhaseFromStatus,
 } from "../admin-event";
 
 const minimalTranslations = {
@@ -22,11 +23,7 @@ const buildForm = (overrides: Record<string, unknown> = {}) =>
     shortDesc: "",
     venue: "",
     city: "",
-    latitude: null,
-    longitude: null,
     date: new Date("2020-01-15T10:00:00Z"),
-    dateLabel: "",
-    timeLabel: "",
     capacity: 100,
     basePrice: 0,
     fee: "",
@@ -40,9 +37,8 @@ const buildForm = (overrides: Record<string, unknown> = {}) =>
     distances: [],
     kidsDistances: [],
     speakers: [],
-    status: "",
+    status: "UPCOMING",
     isActive: true,
-    lifecyclePhase: "FINISHED",
     ...overrides,
   }) as const;
 
@@ -98,6 +94,16 @@ describe("adminFormToCreatePayload", () => {
     const payload = adminFormToCreatePayload(parsed);
     expect(payload.imageUrl).toBeUndefined();
   });
+
+  it("derives lifecyclePhase from status", () => {
+    const parsed = adminEventFormSchema.parse(
+      buildForm({ status: "LIVE" })
+    );
+    const payload = adminFormToCreatePayload(parsed);
+    expect(payload.lifecyclePhase).toBe("CURRENT");
+    expect(lifecyclePhaseFromStatus("FINISHED")).toBe("FINISHED");
+    expect(lifecyclePhaseFromStatus("CANCELLED")).toBe("FUTURE");
+  });
 });
 
 describe("eventToAdminFormDefaults", () => {
@@ -110,12 +116,21 @@ describe("eventToAdminFormDefaults", () => {
     expect(defaults.schedule).toEqual([{ time: "08:00", what: "Warm-up" }]);
   });
 
-  it("defaults isActive and lifecyclePhase", () => {
+  it("defaults isActive and status when API omits both", () => {
     const defaults = eventToAdminFormDefaults({
       date: new Date(),
       capacity: 10,
     });
     expect(defaults.isActive).toBe(true);
-    expect(defaults.lifecyclePhase).toBe("FUTURE");
+    expect(defaults.status).toBe("UPCOMING");
+  });
+
+  it("infers status from lifecyclePhase when status missing", () => {
+    const defaults = eventToAdminFormDefaults({
+      date: new Date(),
+      capacity: 10,
+      lifecyclePhase: "CURRENT",
+    });
+    expect(defaults.status).toBe("LIVE");
   });
 });

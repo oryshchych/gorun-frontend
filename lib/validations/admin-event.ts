@@ -34,16 +34,41 @@ const spotsSchema = z.object({
   total: z.number().int().min(1),
 });
 
-const distanceSchema = z.object({
-  id: z.string().min(1),
-  label: z.string().min(1, "Distance label is required"),
-  name: z.string().min(1, "Distance name is required"),
-  km: z.number().nonnegative(),
-  feeUah: z.number().nonnegative().optional(),
-  elevation: z.string().optional(),
-  laps: z.string().optional(),
-  spots: spotsSchema,
-});
+const optionalSpotsPairSchema = z
+  .object({
+    taken: z.number().int().min(0).optional(),
+    total: z.number().int().min(1).optional(),
+  })
+  .refine(
+    (s) =>
+      (s.taken === undefined && s.total === undefined) ||
+      (s.taken !== undefined && s.total !== undefined),
+    { message: "Both spots taken and total are required when setting spots" }
+  )
+  .transform((s): z.infer<typeof spotsSchema> | undefined => {
+    if (s.taken === undefined || s.total === undefined) return undefined;
+    return { taken: s.taken, total: s.total };
+  });
+
+const distanceSchema = z
+  .object({
+    id: z.string().min(1),
+    label: z.string().min(1, "Distance label is required"),
+    name: z.string().min(1, "Distance name is required"),
+    km: z.number().nonnegative().optional(),
+    feeUah: z.number().nonnegative().optional(),
+    elevation: z.string().optional(),
+    laps: z.string().optional(),
+    spots: optionalSpotsPairSchema,
+  })
+  .refine((d) => d.km !== undefined, {
+    path: ["km"],
+    message: "Distance (km) is required",
+  })
+  .refine((d) => d.spots !== undefined, {
+    path: ["spots"],
+    message: "Spots taken and total are required for each distance",
+  });
 
 const kidsDistanceSchema = z.object({
   id: z.string().min(1),
@@ -70,19 +95,49 @@ const speakerRowSchema = z.object({
   instagramLink: z.string(),
 });
 
-const lifecycleValues = [
-  "PLANNED",
-  "FUTURE",
-  "CURRENT",
-  "FINISHED",
-] as const satisfies readonly EventLifecyclePhase[];
-
 const statusValues = [
   "UPCOMING",
   "LIVE",
   "FINISHED",
   "CANCELLED",
 ] as const satisfies readonly EventStatus[];
+
+/**
+ * Admin edits `status` only; API still expects `lifecyclePhase` — derive it here.
+ * CANCELLED maps to FUTURE so cancelled events stay in “upcoming-ish” filters unless filtered by status.
+ */
+export function lifecyclePhaseFromStatus(
+  status: EventStatus | undefined
+): EventLifecyclePhase {
+  switch (status) {
+    case "LIVE":
+      return "CURRENT";
+    case "FINISHED":
+      return "FINISHED";
+    case "CANCELLED":
+      return "FUTURE";
+    case "UPCOMING":
+    default:
+      return "FUTURE";
+  }
+}
+
+/** Backfill `status` for older API rows that only had `lifecyclePhase`. */
+export function statusFromLifecyclePhase(
+  phase: EventLifecyclePhase | undefined
+): EventStatus | undefined {
+  switch (phase) {
+    case "CURRENT":
+      return "LIVE";
+    case "FINISHED":
+      return "FINISHED";
+    case "PLANNED":
+    case "FUTURE":
+      return "UPCOMING";
+    default:
+      return undefined;
+  }
+}
 
 export const adminEventFormSchema = z.object({
   translations: z.object({
@@ -98,25 +153,23 @@ export const adminEventFormSchema = z.object({
   shortDesc: z.string().max(500).optional(),
   venue: z.string().max(200).optional(),
   city: z.string().max(120).optional(),
-  latitude: z.number().min(-90).max(90).optional().nullable(),
-  longitude: z.number().min(-180).max(180).optional().nullable(),
   date: z
     .union([z.string(), z.date()])
     .transform((val) => (typeof val === "string" ? new Date(val) : val))
     .refine((d) => !Number.isNaN(d.getTime()), { message: "Invalid date" }),
-  dateLabel: z.string().max(200).optional(),
-  timeLabel: z.string().max(80).optional(),
   capacity: z
-    .number()
-    .int()
-    .positive("Capacity must be greater than 0")
-    .max(10000, "Capacity must not exceed 10,000"),
-  basePrice: z
-    .number()
-    .nonnegative()
-    .max(1_000_000)
-    .optional()
-    .default(0),
+    .union([
+      z.undefined(),
+      z
+        .number({ message: "Capacity is required" })
+        .int()
+        .positive("Capacity must be greater than 0")
+        .max(10000, "Capacity must not exceed 10,000"),
+    ])
+    .refine((v): v is number => v !== undefined, {
+      message: "Capacity is required",
+    }),
+  basePrice: z.number().nonnegative().max(1_000_000).optional(),
   fee: z.string().max(120).optional(),
   imageUrl: z
     .object({
@@ -125,7 +178,7 @@ export const adminEventFormSchema = z.object({
     })
     .optional(),
   cover: optionalUrl.optional(),
-  spots: spotsSchema.optional(),
+  spots: optionalSpotsPairSchema.optional(),
   gallery: z.array(z.object({ url: optionalUrl })).optional(),
   perks: z.array(z.object({ line: z.string() })).optional(),
   afu: z.string().max(2000).optional(),
@@ -133,18 +186,66 @@ export const adminEventFormSchema = z.object({
   distances: z.array(distanceSchema).optional(),
   kidsDistances: z.array(kidsDistanceSchema).optional(),
   speakers: z.array(speakerRowSchema).optional(),
-  status: z
-    .union([z.enum(statusValues), z.literal("")])
-    .optional()
-    .transform((v) => (v === "" || v === undefined ? undefined : v)),
+  status: z.enum(statusValues),
   isActive: z.boolean(),
-  lifecyclePhase: z.enum(lifecycleValues),
 });
 
 export type AdminEventFormData = z.output<typeof adminEventFormSchema>;
 
-/** RHF values before Zod transforms (e.g. legacy status as empty string). */
-export type AdminEventFormInput = z.input<typeof adminEventFormSchema>;
+/** RHF default values / submit values before Zod parse (allows empty number fields). */
+export type AdminEventFormInput = {
+  translations: {
+    title: { en: string; uk: string };
+    description: { en: string; uk: string };
+    location: { en: string; uk: string };
+    date: { en: string; uk: string };
+  };
+  slug?: string;
+  shortDesc?: string;
+  venue?: string;
+  city?: string;
+  date: Date | string;
+  capacity?: number;
+  basePrice?: number;
+  fee?: string;
+  imageUrl?: { portrait?: string; landscape?: string };
+  cover?: string;
+  spots?: { taken?: number; total?: number };
+  gallery?: { url: string }[];
+  perks?: { line: string }[];
+  afu?: string;
+  schedule?: { time: string; what: string }[];
+  distances?: Array<{
+    id: string;
+    label: string;
+    name: string;
+    km?: number;
+    feeUah?: number;
+    elevation?: string;
+    laps?: string;
+    spots?: { taken?: number; total?: number };
+  }>;
+  kidsDistances?: Array<{
+    id: string;
+    label: string;
+    name: string;
+    age: string;
+    feeUah?: number;
+  }>;
+  speakers?: Array<{
+    id?: string;
+    fullnameEn: string;
+    fullnameUk: string;
+    shortDescriptionEn: string;
+    shortDescriptionUk: string;
+    descriptionEn: string;
+    descriptionUk: string;
+    image: string;
+    instagramLink: string;
+  }>;
+  status: EventStatus;
+  isActive: boolean;
+};
 
 /**
  * Removes incomplete array rows so Zod validation matches normalized API payloads.
@@ -233,7 +334,8 @@ function normalizeDistances(
   distances: AdminEventFormData["distances"]
 ): Distance[] | undefined {
   if (!distances?.length) return undefined;
-  return distances.filter((d) => d.label.trim() && d.name.trim());
+  const rows = distances.filter((d) => d.label.trim() && d.name.trim());
+  return rows.length ? (rows as Distance[]) : undefined;
 }
 
 function normalizeKids(
@@ -300,11 +402,7 @@ export function adminFormToCreatePayload(
     shortDesc: data.shortDesc?.trim() || undefined,
     venue: data.venue?.trim() || undefined,
     city: data.city?.trim() || undefined,
-    latitude: data.latitude ?? undefined,
-    longitude: data.longitude ?? undefined,
     date: data.date,
-    dateLabel: data.dateLabel?.trim() || undefined,
-    timeLabel: data.timeLabel?.trim() || undefined,
     capacity: data.capacity,
     basePrice: data.basePrice,
     fee: data.fee?.trim() || undefined,
@@ -321,7 +419,7 @@ export function adminFormToCreatePayload(
     speakers: speakersToPayload(data.speakers),
     status: data.status,
     isActive: data.isActive,
-    lifecyclePhase: data.lifecyclePhase,
+    lifecyclePhase: lifecyclePhaseFromStatus(data.status),
   };
 }
 
@@ -346,11 +444,7 @@ export function eventToAdminFormDefaults(event: {
   short?: string;
   venue?: string;
   city?: string;
-  latitude?: number;
-  longitude?: number;
   date: Date | string;
-  dateLabel?: string;
-  timeLabel?: string;
   capacity: number;
   basePrice?: number;
   fee?: string;
@@ -404,6 +498,9 @@ export function eventToAdminFormDefaults(event: {
       instagramLink: s.instagramLink ?? "",
     })) ?? [];
 
+  const resolvedStatus =
+    event.status ?? statusFromLifecyclePhase(event.lifecyclePhase) ?? "UPCOMING";
+
   return {
     translations: {
       title: {
@@ -427,20 +524,16 @@ export function eventToAdminFormDefaults(event: {
     shortDesc: event.shortDesc ?? event.short ?? "",
     venue: event.venue ?? "",
     city: event.city ?? "",
-    latitude: event.latitude ?? null,
-    longitude: event.longitude ?? null,
     date: d,
-    dateLabel: event.dateLabel ?? "",
-    timeLabel: event.timeLabel ?? "",
     capacity: event.capacity,
-    basePrice: event.basePrice ?? 0,
+    basePrice: event.basePrice,
     fee: event.fee ?? "",
     imageUrl: {
       portrait: event.imageUrl?.portrait ?? "",
       landscape: event.imageUrl?.landscape ?? "",
     },
     cover: event.cover ?? "",
-    spots: event.spots ?? { taken: 0, total: event.capacity },
+    spots: event.spots,
     gallery: event.gallery?.length
       ? event.gallery.map((url) => ({ url: typeof url === "string" ? url : "" }))
       : [],
@@ -458,9 +551,8 @@ export function eventToAdminFormDefaults(event: {
       ? event.kidsDistances.map((x) => ({ ...x }))
       : [],
     speakers,
-    status: event.status ?? "",
+    status: resolvedStatus,
     isActive: event.isActive ?? true,
-    lifecyclePhase: event.lifecyclePhase ?? "FUTURE",
   };
 }
 
@@ -482,17 +574,13 @@ export function createEmptyAdminEventForm(): AdminEventFormInput {
     shortDesc: "",
     venue: "",
     city: "",
-    latitude: null,
-    longitude: null,
     date,
-    dateLabel: "",
-    timeLabel: "",
-    capacity: 100,
-    basePrice: 0,
+    capacity: undefined,
+    basePrice: undefined,
     fee: "",
     imageUrl: { portrait: "", landscape: "" },
     cover: "",
-    spots: { taken: 0, total: 100 },
+    spots: undefined,
     gallery: [],
     perks: [],
     afu: "",
@@ -500,8 +588,7 @@ export function createEmptyAdminEventForm(): AdminEventFormInput {
     distances: [],
     kidsDistances: [],
     speakers: [],
-    status: "",
+    status: "UPCOMING",
     isActive: true,
-    lifecyclePhase: "FUTURE",
   };
 }

@@ -510,14 +510,13 @@
       "colDate": "Дата",
       "inactiveLabel": "Неактивна",
       "colActive": "Видимість",
-      "colLifecycle": "Етап",
-      "colLegacyStatus": "Статус API",
+      "colStatus": "Статус",
       "page": "Сторінка {current} з {total}",
       "prev": "Назад",
       "next": "Далі"
     },
     "eventForm": {
-      "sectionStatus": "Публікація та етап",
+      "sectionStatus": "Публікація та статус",
       "sectionTranslations": "Переклади",
       "sectionCore": "Деталі",
       "sectionMedia": "Зображення",
@@ -530,16 +529,8 @@
       "sectionSpeakers": "Спікери",
       "isActiveLabel": "Активна (видно на сайті)",
       "isActiveHint": "Неактивні події лишаються в адмінці, але приховані з публічних списків, якщо API це підтримує.",
-      "lifecycleLabel": "Життєвий цикл",
-      "lifecycle": {
-        "PLANNED": "Заплановано",
-        "FUTURE": "Майбутня",
-        "CURRENT": "Поточна",
-        "FINISHED": "Завершена"
-      },
-      "legacyStatusLabel": "Застарілий статус",
-      "legacyStatusUnset": "Не задано",
-      "legacyStatus": {
+      "statusLabel": "Статус",
+      "status": {
         "UPCOMING": "Найближча",
         "LIVE": "У процесі",
         "FINISHED": "Завершена",
@@ -558,11 +549,7 @@
       "shortDesc": "Короткий опис (картки)",
       "venue": "Місце проведення",
       "city": "Місто",
-      "latitude": "Широта",
-      "longitude": "Довгота",
       "dateTime": "Дата й час початку",
-      "dateLabel": "Підпис дати",
-      "timeLabel": "Підпис часу",
       "capacity": "Місткість",
       "basePrice": "Базова ціна (грн)",
       "fee": "Текст внеску",

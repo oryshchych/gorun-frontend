@@ -510,14 +510,13 @@
       "colDate": "Date",
       "inactiveLabel": "Inactive",
       "colActive": "Visibility",
-      "colLifecycle": "Lifecycle",
-      "colLegacyStatus": "API status",
+      "colStatus": "Status",
       "page": "Page {current} of {total}",
       "prev": "Previous",
       "next": "Next"
     },
     "eventForm": {
-      "sectionStatus": "Publication and lifecycle",
+      "sectionStatus": "Publication and status",
       "sectionTranslations": "Translations",
       "sectionCore": "Details",
       "sectionMedia": "Images",
@@ -530,16 +529,8 @@
       "sectionSpeakers": "Speakers",
       "isActiveLabel": "Active (visible on site)",
       "isActiveHint": "Inactive events stay in the admin list but are hidden from public listings when the API supports it.",
-      "lifecycleLabel": "Lifecycle",
-      "lifecycle": {
-        "PLANNED": "Planned",
-        "FUTURE": "Future",
-        "CURRENT": "Current",
-        "FINISHED": "Finished"
-      },
-      "legacyStatusLabel": "Legacy status",
-      "legacyStatusUnset": "Not set",
-      "legacyStatus": {
+      "statusLabel": "Status",
+      "status": {
         "UPCOMING": "Upcoming",
         "LIVE": "Live",
         "FINISHED": "Finished",
@@ -558,11 +549,7 @@
       "shortDesc": "Short description (cards)",
       "venue": "Venue",
       "city": "City",
-      "latitude": "Latitude",
-      "longitude": "Longitude",
       "dateTime": "Start date and time",
-      "dateLabel": "Date label override",
-      "timeLabel": "Time label override",
       "capacity": "Capacity",
       "basePrice": "Base price (UAH)",
       "fee": "Fee display text",
