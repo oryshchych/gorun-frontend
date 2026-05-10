@@ -1,10 +1,12 @@
 import apiClient from "./client";
-import { Event, CreateEventRequest, UpdateEventRequest } from "@/types/event";
 import {
-  ApiResponse,
-  ApiSuccessResponse,
-  PaginatedResponse,
-} from "@/types/api";
+  Event,
+  CreateEventRequest,
+  UpdateEventRequest,
+  EventStatus,
+  EventLifecyclePhase,
+} from "@/types/event";
+import { ApiSuccessResponse, PaginatedResponse } from "@/types/api";
 
 export interface GetEventsParams {
   page?: number;
@@ -14,6 +16,11 @@ export interface GetEventsParams {
   endDate?: string;
   location?: string;
   lang?: string;
+  /** Legacy API event status filter */
+  status?: EventStatus;
+  lifecyclePhase?: EventLifecyclePhase;
+  /** When false, list only inactive events (if API supports it) */
+  isActive?: boolean;
 }
 
 /**

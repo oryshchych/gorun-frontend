@@ -82,9 +82,11 @@ export const useCreateEvent = () => {
   return useMutation<Event, Error, CreateEventRequest>({
     mutationFn: createEvent,
     onSuccess: (newEvent) => {
-      // Invalidate events lists to refetch
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
       queryClient.invalidateQueries({ queryKey: eventKeys.myEvents() });
+      queryClient.invalidateQueries({
+        queryKey: eventKeys.detailAllLocales(newEvent.id),
+      });
 
       showSuccessToast("SUCCESS_EVENTS_CREATED", "Event Created", t);
     },
@@ -138,7 +140,7 @@ export const useUpdateEvent = (id: string, lang?: string) => {
           ...previousEvent,
           ...updatedData,
           imageUrl: mergedImageUrl,
-        });
+        } as Event);
       }
 
       return { previousEvent };
@@ -154,10 +156,9 @@ export const useUpdateEvent = (id: string, lang?: string) => {
       handleApiError(error, "Failed to Update Event", t);
     },
     onSuccess: (updatedEvent) => {
-      // Update cache with server response
       queryClient.setQueryData(eventKeys.detail(id, lang), updatedEvent);
+      queryClient.setQueryData(eventKeys.detail(id, undefined), updatedEvent);
 
-      // Invalidate lists to refetch
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
       queryClient.invalidateQueries({ queryKey: eventKeys.myEvents() });
 

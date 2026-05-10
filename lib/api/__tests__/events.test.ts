@@ -49,6 +49,20 @@ describe("Events API Service", () => {
 
       await getEvents(params);
     });
+
+    it("should pass admin lifecycle and visibility filters", async () => {
+      const params = {
+        lifecyclePhase: "FINISHED" as const,
+        isActive: false,
+        status: "UPCOMING" as const,
+      };
+      mock.onGet("/events").reply((config) => {
+        expect(config.params).toMatchObject(params);
+        return [200, { data: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0 } }];
+      });
+
+      await getEvents(params);
+    });
   });
 
   describe("getEventById", () => {

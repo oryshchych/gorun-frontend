@@ -1,9 +1,8 @@
 "use client";
 
 import { Event } from "@/types/event";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin, Users } from "lucide-react";
+import { ProgressBar } from "@/components/ui/progress-bar";
+import { MapPin, Clock, Baby } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { format } from "date-fns";
@@ -11,177 +10,239 @@ import { enUS } from "date-fns/locale/en-US";
 import { uk } from "date-fns/locale/uk";
 import { useLocale } from "next-intl";
 import Link from "next/link";
-import Image from "next/image";
 import { getLocalizedString } from "@/lib/utils";
-import { useResponsiveImage } from "@/hooks/useResponsiveImage";
-import { EventImageOverlay } from "./EventImageOverlay";
 
 interface EventCardProps {
   event: Event;
 }
 
 export function EventCard({ event }: EventCardProps) {
-  const t = useTranslations("events");
+  const t = useTranslations();
   const locale = useLocale();
   const dateLocale = locale === "uk" ? uk : enUS;
-  const primaryImage = useResponsiveImage(event.imageUrl) || "";
 
-  const availableSpots = event.capacity - event.registeredCount;
-  const isFull = availableSpots <= 0;
-  const isAlmostFull =
-    availableSpots > 0 && availableSpots <= event.capacity * 0.2;
+  // Resolve cover image
+  const coverImage =
+    event.cover ||
+    event.imageUrl?.landscape ||
+    event.imageUrl?.portrait ||
+    "";
 
-  const formattedDate = format(new Date(event.date), "PPP", {
-    locale: dateLocale,
-  });
-  const localizedTitle = getLocalizedString(
+  // Resolve display title
+  const title = getLocalizedString(
     event.translations?.title,
     locale,
     "en",
-    event.title || ""
+    event.title || event.name || ""
   );
-  const localizedLocation = getLocalizedString(
-    event.translations?.location,
-    locale,
-    "en",
-    event.location || ""
-  );
-  const organizerName = event.organizer?.name;
+
+  // Resolve short description
+  const shortDesc =
+    event.shortDesc ||
+    event.short ||
+    getLocalizedString(event.translations?.description, locale, "en", "") ||
+    "";
+
+  // Resolve city
+  const city =
+    event.city ||
+    getLocalizedString(event.translations?.location, locale, "en", event.location || "");
+
+  // Spots
+  const spotsTotal = event.spots?.total ?? event.capacity;
+  const spotsTaken = event.spots?.taken ?? event.registeredCount;
+
+  // Date label
+  const dateLabel =
+    event.dateLabel ||
+    format(new Date(event.date), "EEE, MMM d yyyy", { locale: dateLocale });
+
+  const feeLabel = event.fee || (event.basePrice ? `from ${event.basePrice} UAH` : "");
 
   return (
     <Link
       href={`/${locale}/events/${event.id}`}
-      aria-label={`View details for ${localizedTitle}`}
-      className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg block"
+      className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-brand)] rounded-[var(--gr-r-xl)]"
+      aria-label={`View details for ${title}`}
     >
       <motion.div
-        whileHover={{
-          scale: 1.03,
-          y: -8,
-          transition: { duration: 0.2, ease: "easeOut" },
-        }}
+        whileHover={{ y: -4, transition: { duration: 0.18, ease: "easeOut" } }}
         whileTap={{ scale: 0.98 }}
-        className="h-full"
       >
-        <Card
-          className="h-full overflow-hidden hover:shadow-2xl transition-shadow duration-300 cursor-pointer"
-          role="article"
+        <article
+          style={{
+            borderRadius: "var(--gr-r-xl)",
+            overflow: "hidden",
+            background: "var(--gr-surface)",
+            border: "1px solid var(--gr-line)",
+            boxShadow: "var(--gr-shadow-md)",
+          }}
         >
-          {/* Event Image */}
+          {/* Cover */}
           <div
-            className="relative w-full h-48 bg-muted overflow-hidden"
-            role="img"
-            aria-label={
-              primaryImage
-                ? `Event image for ${localizedTitle}`
-                : "No event image"
-            }
+            style={{
+              position: "relative",
+              height: 180,
+              backgroundImage: coverImage
+                ? `linear-gradient(180deg, rgba(15,26,18,0) 30%, rgba(15,26,18,0.85)), url(${coverImage})`
+                : undefined,
+              background: coverImage ? undefined : "var(--gr-surface-2)",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
           >
-            {primaryImage ? (
-              <>
-                <Image
-                  src={primaryImage.trim()}
-                  alt={`Event image for ${localizedTitle}`}
-                  fill
-                  className="object-cover object-bottom"
-                  loading="eager"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-                {/* Gradient overlay for better text readability */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
-                <EventImageOverlay event={event} variant="compact" />
-              </>
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-primary/10 to-primary/5">
-                <Calendar
-                  className="w-16 h-16 text-muted-foreground/30"
-                  aria-hidden="true"
-                />
+            {/* Date chip */}
+            <div className="absolute top-3.5 left-3.5">
+              <span
+                style={{
+                  background: "rgba(255,255,255,0.95)",
+                  color: "#0F1A12",
+                  borderRadius: 999,
+                  padding: "4px 10px",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: "0.04em",
+                }}
+              >
+                {dateLabel}
+              </span>
+            </div>
+            {/* Fee chip */}
+            {feeLabel && (
+              <div className="absolute top-3.5 right-3.5">
+                <span
+                  style={{
+                    background: "rgba(255,255,255,0.95)",
+                    color: "#0F1A12",
+                    borderRadius: 12,
+                    padding: "4px 10px",
+                    fontSize: 11,
+                    fontWeight: 700,
+                  }}
+                >
+                  {feeLabel}
+                </span>
               </div>
             )}
-
-            {/* Capacity Badge */}
-            <div className="absolute top-3 right-3">
-              {isFull ? (
-                <Badge
-                  variant="destructive"
-                  className="shadow-md"
-                  aria-label="Event is full"
+            {/* Title overlay */}
+            {coverImage && (
+              <div
+                style={{
+                  position: "absolute",
+                  left: 16,
+                  right: 16,
+                  bottom: 14,
+                  color: "#fff",
+                }}
+              >
+                <div
+                  className="gr-display"
+                  style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.1 }}
                 >
-                  {t("eventFull")}
-                </Badge>
-              ) : isAlmostFull ? (
-                <Badge
-                  variant="secondary"
-                  className="shadow-md"
-                  aria-label={`${availableSpots} spots available`}
-                >
-                  {availableSpots} {t("availableSpots")}
-                </Badge>
-              ) : (
-                <Badge
-                  variant="default"
-                  className="shadow-md"
-                  aria-label={`${availableSpots} spots available`}
-                >
-                  {availableSpots} {t("availableSpots")}
-                </Badge>
-              )}
-            </div>
+                  {title}
+                </div>
+                {shortDesc && (
+                  <div style={{ fontSize: 12, opacity: 0.85, marginTop: 3 }}>
+                    {shortDesc}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          <CardContent className="p-4">
-            {/* Event Title */}
-            <h3 className="font-semibold text-lg line-clamp-2 mb-3">
-              {localizedTitle}
-            </h3>
+          {/* Body */}
+          <div style={{ padding: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+            {/* Title (when no cover image) */}
+            {!coverImage && (
+              <h3
+                className="gr-display"
+                style={{ fontSize: 18, fontWeight: 700, color: "var(--gr-ink)", margin: 0 }}
+              >
+                {title}
+              </h3>
+            )}
 
-            {/* Event Details */}
-            <div className="space-y-2 text-sm text-muted-foreground">
-              {/* Date */}
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 shrink-0" aria-hidden="true" />
-                <span
-                  className="truncate"
-                  aria-label={`Event date: ${formattedDate}`}
-                  suppressHydrationWarning
-                >
-                  {formattedDate}
+            {/* Meta row */}
+            <div style={{ display: "flex", gap: 12, fontSize: 12, color: "var(--gr-ink-3)" }}>
+              {city && (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                  <MapPin size={13} /> {city}
                 </span>
+              )}
+              {event.timeLabel && (
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                  <Clock size={13} /> {event.timeLabel}
+                </span>
+              )}
+            </div>
+
+            {/* Distance pills */}
+            {(event.distances?.length || event.kidsDistances?.length) ? (
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {event.distances?.map((d) => (
+                  <span
+                    key={d.id}
+                    style={{
+                      padding: "5px 10px",
+                      borderRadius: 999,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      background: "var(--gr-surface-2)",
+                      color: "var(--gr-ink-2)",
+                    }}
+                  >
+                    {d.label}
+                  </span>
+                ))}
+                {event.kidsDistances?.length ? (
+                  <span
+                    style={{
+                      padding: "5px 10px",
+                      borderRadius: 999,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      background: "var(--gr-brand-50)",
+                      color: "var(--gr-brand-700)",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4,
+                    }}
+                  >
+                    <Baby size={13} /> Kids
+                  </span>
+                ) : null}
               </div>
+            ) : null}
 
-              {/* Location */}
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 shrink-0" aria-hidden="true" />
-                <span
-                  className="truncate"
-                  aria-label={`Location: ${localizedLocation}`}
-                >
-                  {localizedLocation}
-                </span>
+            {/* Progress */}
+            <ProgressBar taken={spotsTaken} total={spotsTotal} />
+
+            {/* Footer row */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <div style={{ fontSize: 12, color: "var(--gr-ink-3)" }}>
+                {Math.round((spotsTaken / spotsTotal) * 100)}% full
               </div>
-
-              {/* Capacity */}
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 shrink-0" aria-hidden="true" />
-                <span
-                  aria-label={`${event.registeredCount} registered out of ${event.capacity} capacity`}
-                >
-                  {event.registeredCount} / {event.capacity}
-                </span>
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "var(--gr-ink)",
+                }}
+              >
+                View event →
               </div>
             </div>
-          </CardContent>
-
-          {organizerName && (
-            <CardFooter className="p-4 pt-0">
-              {/* Organizer */}
-              <div className="text-xs text-muted-foreground">
-                {t("organizer")}: {organizerName}
-              </div>
-            </CardFooter>
-          )}
-        </Card>
+          </div>
+        </article>
       </motion.div>
     </Link>
   );
