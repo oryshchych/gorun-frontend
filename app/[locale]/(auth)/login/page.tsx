@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { useLocale, useTranslations } from "next-intl";
@@ -19,7 +20,16 @@ export default function LoginPage() {
         </div>
 
         <div className="rounded-lg border bg-card p-6 sm:p-8 shadow-sm">
-          <LoginForm />
+          <Suspense
+            fallback={
+              <div
+                className="h-[280px] animate-pulse rounded-md bg-muted"
+                aria-hidden
+              />
+            }
+          >
+            <LoginForm />
+          </Suspense>
 
           <div className="mt-6 text-center text-sm">
             <span className="text-muted-foreground">
