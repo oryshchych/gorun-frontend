@@ -647,7 +647,8 @@
     "heroHeadline": "Two races.\nOne running summer.",
     "heroSub": "Register, bring your kids, see your results — every entry supports the Armed Forces of Ukraine.",
     "racesCount": "{count, plural, one {# race} other {# races}}",
-    "viewEvent": "View event"
+    "viewEvent": "View event →",
+    "kidsLabel": "Kids"
   },
   "eventDetail": {
     "backToEvents": "Back to events",
@@ -667,7 +668,20 @@
     "kidsRaces": "Kids' races",
     "free": "Free",
     "age": "Age {range}",
-    "ageGroup": "Age group"
+    "ageGroup": "Age group",
+    "past": {
+      "badge": "Past event",
+      "howItWas": "How it was",
+      "photos": "Photos",
+      "photoAlt": "Event photo {n}",
+      "runnersOnRecord": "on start list",
+      "viewResults": "View results",
+      "viewRunners": "View runners",
+      "sidebarTitle": "This race is over",
+      "sidebarSub": "Thanks to everyone who ran and supported.",
+      "registrationClosed": "Registration is closed",
+      "cancelled": "This event was cancelled."
+    }
   },
   "registration": {
     "title": "Registration",

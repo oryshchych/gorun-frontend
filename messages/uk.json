@@ -647,7 +647,8 @@
     "heroHeadline": "Два старти.\nОдне бігове літо.",
     "heroSub": "Реєструйся, бери дітей, дивись результати — кожна участь підтримує Збройні Сили України.",
     "racesCount": "{count} {count, plural, one {гонка} few {гонки} many {гонок} other {гонок}}",
-    "viewEvent": "Переглянути захід"
+    "viewEvent": "Переглянути →",
+    "kidsLabel": "Діти"
   },
   "eventDetail": {
     "backToEvents": "Назад до заходів",
@@ -667,7 +668,20 @@
     "kidsRaces": "Дитячі забіги",
     "free": "Безкоштовно",
     "age": "Вік {range}",
-    "ageGroup": "Вікова група"
+    "ageGroup": "Вікова група",
+    "past": {
+      "badge": "Минула подія",
+      "howItWas": "Як це було",
+      "photos": "Фото",
+      "photoAlt": "Фото з заходу {n}",
+      "runnersOnRecord": "у стартовому протоколі",
+      "viewResults": "Результати",
+      "viewRunners": "Учасники",
+      "sidebarTitle": "Забіг завершено",
+      "sidebarSub": "Дякуємо всім, хто біг і підтримував.",
+      "registrationClosed": "Реєстрацію закрито",
+      "cancelled": "Цю подію скасовано."
+    }
   },
   "registration": {
     "title": "Реєстрація",
