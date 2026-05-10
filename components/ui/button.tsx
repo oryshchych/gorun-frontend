@@ -5,25 +5,38 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-semibold transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-brand-glow)] aria-invalid:border-destructive",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        /* ── GoRun design-system variants (pill shape, use these for new UI) ── */
+        brand:
+          "rounded-full bg-[var(--gr-brand)] text-[#0b1a0f] hover:bg-[var(--gr-brand-600)] active:scale-[0.97] shadow-none",
+        primary:
+          "rounded-full bg-[var(--gr-ink)] text-[var(--gr-bg)] hover:opacity-90 active:scale-[0.97]",
+        soft:
+          "rounded-full bg-[var(--gr-surface-2)] text-[var(--gr-ink)] border border-[var(--gr-line)] hover:bg-[var(--gr-line)]",
+        "ghost-gr":
+          "rounded-full bg-transparent text-[var(--gr-ink)] border border-[var(--gr-line-strong)] hover:bg-[var(--gr-surface-2)]",
+        /* ── Legacy shadcn variants (keep for existing components) ── */
+        default: "rounded-md bg-primary text-primary-foreground hover:bg-primary/90",
         destructive:
-          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+          "rounded-md bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60",
         outline:
-          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+          "rounded-md border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost:
-          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+          "rounded-md hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
-        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
-        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
+        /* GoRun sizes: sm=h-9 md=h-12 lg=h-14 */
+        sm: "h-9 px-3.5 text-sm",
+        md: "h-12 px-[18px] text-[15px]",
+        lg: "h-14 px-[22px] text-base",
+        /* Legacy shadcn sizes */
+        default: "h-9 px-4 py-2 text-sm",
         icon: "size-9",
         "icon-sm": "size-8",
         "icon-lg": "size-10",
