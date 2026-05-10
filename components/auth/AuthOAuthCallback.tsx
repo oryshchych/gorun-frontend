@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 import { handleApiError } from "@/lib/error-handler";
+import { safePostAuthRedirectPath } from "@/lib/auth-redirect";
 
 export function AuthOAuthCallback() {
   const searchParams = useSearchParams();
@@ -31,7 +32,15 @@ export function AuthOAuthCallback() {
       try {
         await exchangeOAuthCallback(code);
         if (!cancelled) {
-          router.replace(`/${locale}`);
+          let next = `/${locale}`;
+          try {
+            const stored = sessionStorage.getItem("postAuthRedirect");
+            sessionStorage.removeItem("postAuthRedirect");
+            next = safePostAuthRedirectPath(stored, locale);
+          } catch {
+            /* ignore */
+          }
+          router.replace(next);
         }
       } catch (err: unknown) {
         if (!cancelled) {
