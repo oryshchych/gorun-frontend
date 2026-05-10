@@ -1,0 +1,990 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, ArrowRight, X, Check, Baby } from "lucide-react";
+import { Event, Distance, KidsDistance } from "@/types/event";
+import { useAuth } from "@/hooks/useAuth";
+import { useCreateRegistration } from "@/hooks/useRegistrations";
+import { toast } from "sonner";
+
+interface RegistrationWizardProps {
+  event: Event;
+  locale: string;
+}
+
+type PayMethod = "apple" | "google" | "mono" | "card";
+
+interface KidPick {
+  kidId: string;
+  distId: string;
+}
+
+const STEP_LABELS = ["Distance", "Kids", "Details", "Pay"];
+const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
+const AFU_OPTIONS = [0, 100, 250, 500, 1000];
+
+export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
+  const router = useRouter();
+  const { user } = useAuth();
+  const createRegistration = useCreateRegistration();
+
+  const [step, setStep] = useState(0);
+  const [pickedDistId, setPickedDistId] = useState(event.distances?.[0]?.id ?? "");
+  const [pickedKids, setPickedKids] = useState<KidPick[]>([]);
+  const [shirt, setShirt] = useState(user ? "M" : "M");
+  const [pace, setPace] = useState("5:30");
+  const [donate, setDonate] = useState(0);
+  const [payMethod, setPayMethod] = useState<PayMethod>("card");
+  const [done, setDone] = useState(false);
+  const [regBib, setRegBib] = useState<string | null>(null);
+
+  const selectedDist = event.distances?.find((d) => d.id === pickedDistId);
+  const kidFee = pickedKids.reduce((sum, k) => {
+    const d = event.kidsDistances?.find((x) => x.id === k.distId);
+    return sum + (d?.feeUah ?? d?.fee ?? 0);
+  }, 0);
+  const total = (selectedDist?.feeUah ?? selectedDist?.fee ?? 0) + kidFee + donate;
+
+  const handleNext = () => {
+    // Before step 1 (distance → kids), require auth
+    if (step === 0 && !user) {
+      router.push(`/${locale}/login?redirect=/${locale}/events/${event.id}/register`);
+      return;
+    }
+    if (step < STEP_LABELS.length - 1) {
+      setStep((s) => s + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (step === 0) {
+      router.push(`/${locale}/events/${event.id}`);
+    } else {
+      setStep((s) => s - 1);
+    }
+  };
+
+  const handlePay = async () => {
+    if (!selectedDist) return;
+    try {
+      const result = await createRegistration.mutateAsync({
+        eventId: event.id,
+        promoCode: undefined,
+      } as any);
+
+      if ((result as any)?.paymentLink) {
+        window.location.href = (result as any).paymentLink;
+        return;
+      }
+
+      setRegBib((result as any)?.data?.bib ?? "—");
+      setDone(true);
+    } catch {
+      // Error toast handled by mutation
+    }
+  };
+
+  if (done) {
+    return <RegSuccess event={event} bib={regBib} selectedDist={selectedDist} locale={locale} />;
+  }
+
+  const eventTitle =
+    event.title || event.name || event.translations?.title?.uk || event.translations?.title?.en || "";
+
+  return (
+    <div
+      style={{
+        background: "var(--gr-bg)",
+        color: "var(--gr-ink)",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        maxWidth: 640,
+        margin: "0 auto",
+      }}
+    >
+      {/* Header */}
+      <div style={{ padding: "14px 18px 8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <button
+            onClick={handleBack}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 999,
+              background: "var(--gr-surface)",
+              border: "1px solid var(--gr-line)",
+              display: "grid",
+              placeItems: "center",
+              cursor: "pointer",
+            }}
+            aria-label="Go back"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 11,
+                color: "var(--gr-ink-3)",
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Registering · {eventTitle}
+            </div>
+            <div
+              className="gr-display"
+              style={{ fontSize: 18, fontWeight: 800 }}
+            >
+              Step {step + 1} of {STEP_LABELS.length} · {STEP_LABELS[step]}
+            </div>
+          </div>
+          <button
+            onClick={() => router.push(`/${locale}/events/${event.id}`)}
+            style={{ color: "var(--gr-ink-3)", display: "grid", placeItems: "center" }}
+            aria-label="Close"
+          >
+            <X size={22} />
+          </button>
+        </div>
+
+        {/* Progress bar */}
+        <div style={{ display: "flex", gap: 4, marginTop: 12 }}>
+          {STEP_LABELS.map((_, i) => (
+            <div
+              key={i}
+              style={{
+                flex: 1,
+                height: 4,
+                borderRadius: 2,
+                background: i <= step ? "var(--gr-brand)" : "var(--gr-line-strong)",
+                transition: "background 300ms",
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Step body */}
+      <div
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "12px 18px 220px",
+        }}
+      >
+        {/* Step 1: Distance */}
+        {step === 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ fontSize: 14, color: "var(--gr-ink-3)", marginBottom: 4 }}>
+              Pick your distance
+            </div>
+            {event.distances?.map((d) => {
+              const sel = pickedDistId === d.id;
+              return (
+                <button
+                  key={d.id}
+                  onClick={() => setPickedDistId(d.id)}
+                  style={{
+                    padding: 16,
+                    borderRadius: "var(--gr-r-lg)",
+                    background: sel ? "var(--gr-brand-50)" : "var(--gr-surface)",
+                    border: `2px solid ${sel ? "var(--gr-brand)" : "var(--gr-line)"}`,
+                    display: "flex",
+                    gap: 14,
+                    alignItems: "center",
+                    cursor: "pointer",
+                    textAlign: "left",
+                  }}
+                >
+                  <div
+                    className="gr-display"
+                    style={{
+                      fontSize: 28,
+                      fontWeight: 800,
+                      color: sel ? "var(--gr-brand-700)" : "var(--gr-ink)",
+                      minWidth: 70,
+                    }}
+                  >
+                    {d.label}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--gr-ink)" }}>
+                      {d.name}
+                    </div>
+                    <div style={{ fontSize: 12, color: "var(--gr-ink-3)", marginTop: 2 }}>
+                      {d.elevation || d.laps}
+                      {d.spots
+                        ? ` · ${d.spots.total - d.spots.taken} spots left`
+                        : ""}
+                    </div>
+                  </div>
+                  <div className="gr-display" style={{ fontWeight: 800, fontSize: 16 }}>
+                    {d.feeUah ?? d.fee} ₴
+                  </div>
+                </button>
+              );
+            })}
+            {!event.distances?.length && (
+              <p style={{ color: "var(--gr-ink-3)", fontSize: 14 }}>
+                Distance info coming soon.
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Step 2: Kids */}
+        {step === 1 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div>
+              <div style={{ fontSize: 14, color: "var(--gr-ink-3)" }}>
+                Bring your kids? (optional)
+              </div>
+              <div style={{ fontSize: 12, color: "var(--gr-ink-4)", marginTop: 4 }}>
+                Pick a distance for each child you'd like to register.
+              </div>
+            </div>
+
+            {(user as any)?.kids?.map((kid: any) => {
+              const reg = pickedKids.find((p) => p.kidId === kid.id);
+              return (
+                <div
+                  key={kid.id}
+                  style={{
+                    background: "var(--gr-surface)",
+                    borderRadius: "var(--gr-r-lg)",
+                    border: "1px solid var(--gr-line)",
+                    padding: 16,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      marginBottom: reg ? 12 : 0,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 999,
+                        background: "var(--gr-brand-50)",
+                        display: "grid",
+                        placeItems: "center",
+                      }}
+                    >
+                      <Baby size={20} color="var(--gr-brand-700)" />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 15, fontWeight: 700 }}>{kid.name}</div>
+                      <div style={{ fontSize: 12, color: "var(--gr-ink-3)" }}>
+                        Age {kid.age}
+                        {kid.shirt ? ` · Shirt ${kid.shirt}` : ""}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        if (reg) {
+                          setPickedKids(pickedKids.filter((p) => p.kidId !== kid.id));
+                        } else {
+                          setPickedKids([
+                            ...pickedKids,
+                            {
+                              kidId: kid.id,
+                              distId: event.kidsDistances?.[0]?.id ?? "",
+                            },
+                          ]);
+                        }
+                      }}
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: 999,
+                        fontSize: 12,
+                        fontWeight: 700,
+                        background: reg ? "var(--gr-ink)" : "var(--gr-brand-50)",
+                        color: reg ? "var(--gr-bg)" : "var(--gr-brand-700)",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {reg ? "Remove" : "+ Add"}
+                    </button>
+                  </div>
+                  {reg && event.kidsDistances && (
+                    <div style={{ display: "flex", gap: 6 }}>
+                      {event.kidsDistances.map((d) => {
+                        const sel = reg.distId === d.id;
+                        return (
+                          <button
+                            key={d.id}
+                            onClick={() =>
+                              setPickedKids(
+                                pickedKids.map((p) =>
+                                  p.kidId === kid.id ? { ...p, distId: d.id } : p
+                                )
+                              )
+                            }
+                            style={{
+                              flex: 1,
+                              padding: "10px 8px",
+                              borderRadius: "var(--gr-r-md)",
+                              background: sel ? "var(--gr-brand)" : "var(--gr-surface-2)",
+                              color: sel ? "#0B1A0F" : "var(--gr-ink-2)",
+                              fontWeight: 700,
+                              fontSize: 13,
+                              cursor: "pointer",
+                            }}
+                          >
+                            <div>{d.label}</div>
+                            <div style={{ fontSize: 10, fontWeight: 600, marginTop: 2 }}>
+                              {(d.feeUah ?? d.fee) === 0
+                                ? "Free"
+                                : `${d.feeUah ?? d.fee}₴`}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {!((user as any)?.kids?.length) && (
+              <div
+                style={{
+                  padding: 18,
+                  borderRadius: "var(--gr-r-md)",
+                  border: "1.5px dashed var(--gr-line-strong)",
+                  color: "var(--gr-ink-3)",
+                  fontSize: 13,
+                  textAlign: "center",
+                }}
+              >
+                No kids saved to your profile yet.
+              </div>
+            )}
+
+            <button
+              style={{
+                padding: 14,
+                border: "1.5px dashed var(--gr-line-strong)",
+                borderRadius: "var(--gr-r-md)",
+                color: "var(--gr-ink-3)",
+                fontWeight: 600,
+                fontSize: 13,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+                cursor: "pointer",
+                background: "transparent",
+              }}
+              onClick={() => router.push(`/${locale}/profile`)}
+            >
+              + Add a child in profile
+            </button>
+          </div>
+        )}
+
+        {/* Step 3: Details */}
+        {step === 2 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {user && (
+              <div
+                style={{
+                  background: "var(--gr-surface)",
+                  borderRadius: "var(--gr-r-lg)",
+                  border: "1px solid var(--gr-line)",
+                  padding: 16,
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 999,
+                      background: "linear-gradient(135deg, var(--gr-brand), var(--gr-brand-700))",
+                      color: "#fff",
+                      display: "grid",
+                      placeItems: "center",
+                      fontWeight: 700,
+                      fontSize: 14,
+                    }}
+                  >
+                    {user.name
+                      ?.split(" ")
+                      .map((w) => w[0])
+                      .join("")
+                      .toUpperCase()
+                      .slice(0, 2)}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 15, fontWeight: 700 }}>{user.name}</div>
+                    <div style={{ fontSize: 12, color: "var(--gr-ink-3)" }}>
+                      {user.email}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div>
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "var(--gr-ink-3)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.06em",
+                  marginBottom: 8,
+                }}
+              >
+                T-shirt size
+              </div>
+              <div style={{ display: "flex", gap: 6 }}>
+                {SHIRT_SIZES.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setShirt(s)}
+                    style={{
+                      flex: 1,
+                      padding: "12px 0",
+                      borderRadius: "var(--gr-r-md)",
+                      fontWeight: 700,
+                      fontSize: 13,
+                      background: shirt === s ? "var(--gr-ink)" : "var(--gr-surface)",
+                      color: shirt === s ? "var(--gr-bg)" : "var(--gr-ink-2)",
+                      border: "1px solid var(--gr-line)",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label>
+                <div
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: "var(--gr-ink-3)",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    marginBottom: 8,
+                  }}
+                >
+                  Estimated pace (min/km)
+                </div>
+                <input
+                  value={pace}
+                  onChange={(e) => setPace(e.target.value)}
+                  placeholder="5:30"
+                  style={{
+                    width: "100%",
+                    padding: "14px 16px",
+                    borderRadius: "var(--gr-r-md)",
+                    background: "var(--gr-surface)",
+                    border: "1.5px solid var(--gr-line-strong)",
+                    fontSize: 16,
+                    color: "var(--gr-ink)",
+                    fontFamily: "inherit",
+                  }}
+                />
+                <div style={{ fontSize: 12, color: "var(--gr-ink-4)", marginTop: 6 }}>
+                  Used to seed your starting corral
+                </div>
+              </label>
+            </div>
+
+            <div>
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "var(--gr-ink-3)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.06em",
+                  marginBottom: 8,
+                }}
+              >
+                Add a donation to AFU
+              </div>
+              <div style={{ display: "flex", gap: 6 }}>
+                {AFU_OPTIONS.map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => setDonate(v)}
+                    style={{
+                      flex: 1,
+                      padding: "12px 0",
+                      borderRadius: "var(--gr-r-md)",
+                      fontWeight: 700,
+                      fontSize: 12,
+                      background: donate === v ? "var(--gr-ink)" : "var(--gr-surface)",
+                      color:
+                        donate === v ? "var(--gr-afu-yellow)" : "var(--gr-ink-2)",
+                      border: "1px solid var(--gr-line)",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {v === 0 ? "No" : `+${v}₴`}
+                  </button>
+                ))}
+              </div>
+              <div style={{ fontSize: 12, color: "var(--gr-ink-4)", marginTop: 6 }}>
+                100% goes to the Armed Forces of Ukraine
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Pay */}
+        {step === 3 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {/* Summary */}
+            <div
+              style={{
+                background: "var(--gr-surface)",
+                borderRadius: "var(--gr-r-lg)",
+                border: "1px solid var(--gr-line)",
+                padding: 16,
+              }}
+            >
+              <div
+                className="gr-display"
+                style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}
+              >
+                Summary
+              </div>
+              {selectedDist && (
+                <SummaryRow
+                  label={`${selectedDist.label} — ${selectedDist.name}`}
+                  value={`${selectedDist.feeUah ?? selectedDist.fee} ₴`}
+                />
+              )}
+              {pickedKids.map((k) => {
+                const d = event.kidsDistances?.find((x) => x.id === k.distId);
+                return d ? (
+                  <SummaryRow
+                    key={k.kidId}
+                    label={`Kid — ${d.label}`}
+                    value={
+                      (d.feeUah ?? d.fee) === 0
+                        ? "Free"
+                        : `${d.feeUah ?? d.fee} ₴`
+                    }
+                  />
+                ) : null;
+              })}
+              {donate > 0 && (
+                <SummaryRow label="Donation to AFU" value={`${donate} ₴`} />
+              )}
+              <div
+                style={{
+                  height: 1,
+                  background: "var(--gr-line)",
+                  margin: "12px 0",
+                }}
+              />
+              <SummaryRow
+                label={<strong>Total</strong>}
+                value={
+                  <strong
+                    className="gr-display"
+                    style={{ fontSize: 20 }}
+                  >
+                    {total} ₴
+                  </strong>
+                }
+              />
+            </div>
+
+            {/* Payment methods */}
+            <div>
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "var(--gr-ink-3)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.06em",
+                  marginBottom: 8,
+                }}
+              >
+                Pay with
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {(
+                  [
+                    ["apple", "Apple Pay"],
+                    ["google", "Google Pay"],
+                    ["mono", "Monobank · Privat24"],
+                    ["card", "Card · Visa / Mastercard"],
+                  ] as [PayMethod, string][]
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    onClick={() => setPayMethod(id)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      padding: 14,
+                      borderRadius: "var(--gr-r-md)",
+                      background: "var(--gr-surface)",
+                      border: `2px solid ${payMethod === id ? "var(--gr-brand)" : "var(--gr-line)"}`,
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: "var(--gr-ink)",
+                      textAlign: "left",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 999,
+                        background: "var(--gr-surface-2)",
+                        display: "grid",
+                        placeItems: "center",
+                        fontSize: 11,
+                        fontWeight: 800,
+                      }}
+                    >
+                      {id === "apple" ? "🍎" : id === "google" ? "G" : id === "mono" ? "m" : "💳"}
+                    </div>
+                    <div style={{ flex: 1 }}>{label}</div>
+                    {payMethod === id && (
+                      <Check size={18} color="var(--gr-brand-700)" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* AFU note */}
+            {donate > 0 && (
+              <div
+                style={{
+                  background: "var(--gr-ink)",
+                  color: "var(--gr-bg)",
+                  borderRadius: "var(--gr-r-lg)",
+                  padding: 16,
+                }}
+              >
+                <div style={{ fontSize: 13, lineHeight: 1.5 }}>
+                  <strong style={{ color: "var(--gr-afu-yellow)" }}>{donate} ₴</strong>{" "}
+                  from this purchase goes to the Armed Forces of Ukraine via the
+                  registered foundation.
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Sticky footer */}
+      <div
+        style={{
+          position: "fixed",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          padding: "14px 18px 32px",
+          background: "linear-gradient(180deg, transparent, var(--gr-bg) 25%)",
+          zIndex: 20,
+          maxWidth: 640,
+          margin: "0 auto",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 10,
+          }}
+        >
+          <div style={{ fontSize: 12, color: "var(--gr-ink-3)", fontWeight: 600 }}>
+            Total
+          </div>
+          <div
+            className="gr-display"
+            style={{ fontSize: 22, fontWeight: 800 }}
+          >
+            {total} ₴
+          </div>
+        </div>
+
+        {step < STEP_LABELS.length - 1 ? (
+          <button
+            onClick={handleNext}
+            style={{
+              width: "100%",
+              height: 56,
+              borderRadius: 999,
+              background: "var(--gr-brand)",
+              color: "#0b1a0f",
+              fontWeight: 700,
+              fontSize: 16,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              cursor: "pointer",
+              border: 0,
+            }}
+          >
+            Continue <ArrowRight size={18} />
+          </button>
+        ) : (
+          <button
+            onClick={handlePay}
+            disabled={createRegistration.isPending}
+            style={{
+              width: "100%",
+              height: 56,
+              borderRadius: 999,
+              background: "var(--gr-brand)",
+              color: "#0b1a0f",
+              fontWeight: 700,
+              fontSize: 16,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              cursor: "pointer",
+              border: 0,
+              boxShadow: "0 8px 28px var(--gr-brand-glow)",
+              opacity: createRegistration.isPending ? 0.7 : 1,
+            }}
+          >
+            {createRegistration.isPending ? "Processing…" : `Pay ${total} ₴`}
+            <Check size={18} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SummaryRow({
+  label,
+  value,
+}: {
+  label: React.ReactNode;
+  value: React.ReactNode;
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "6px 0",
+        fontSize: 13,
+        color: "var(--gr-ink-2)",
+      }}
+    >
+      <div>{label}</div>
+      <div>{value}</div>
+    </div>
+  );
+}
+
+function RegSuccess({
+  event,
+  bib,
+  selectedDist,
+  locale,
+}: {
+  event: Event;
+  bib: string | null;
+  selectedDist?: import("@/types/event").Distance;
+  locale: string;
+}) {
+  const router = useRouter();
+  const eventTitle =
+    event.title || event.name || event.translations?.title?.uk || event.translations?.title?.en || "";
+
+  return (
+    <div
+      className="gr-screen-enter"
+      style={{
+        background: "var(--gr-bg)",
+        color: "var(--gr-ink)",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        padding: 24,
+        maxWidth: 640,
+        margin: "0 auto",
+      }}
+    >
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
+        }}
+      >
+        <div
+          className="gr-pulse"
+          style={{
+            width: 96,
+            height: 96,
+            borderRadius: 999,
+            background: "var(--gr-brand)",
+            display: "grid",
+            placeItems: "center",
+            boxShadow: "0 12px 48px var(--gr-brand-glow)",
+          }}
+        >
+          <Check size={48} color="#0b1a0f" strokeWidth={3} />
+        </div>
+
+        <h1
+          className="gr-display"
+          style={{ fontSize: 30, fontWeight: 800, marginTop: 24, textWrap: "balance" }}
+        >
+          You&apos;re in.
+        </h1>
+        <p
+          style={{
+            fontSize: 14,
+            color: "var(--gr-ink-3)",
+            marginTop: 8,
+            lineHeight: 1.5,
+            maxWidth: 280,
+          }}
+        >
+          {bib && (
+            <>
+              Bib{" "}
+              <strong className="gr-mono" style={{ color: "var(--gr-ink)" }}>
+                #{bib}
+              </strong>{" "}
+              ·{" "}
+            </>
+          )}
+          {eventTitle}
+          <br />
+          We sent your confirmation by email.
+        </p>
+
+        {/* Race pass card */}
+        <div
+          style={{
+            width: "100%",
+            marginTop: 28,
+            padding: 18,
+            background: "var(--gr-ink)",
+            color: "var(--gr-bg)",
+            borderRadius: "var(--gr-r-xl)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 12,
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: "var(--gr-brand)",
+                  letterSpacing: "0.08em",
+                }}
+              >
+                RACE PASS
+              </div>
+              <div
+                className="gr-display"
+                style={{ fontSize: 18, fontWeight: 800 }}
+              >
+                {eventTitle}
+              </div>
+            </div>
+            <div
+              style={{
+                width: 60,
+                height: 60,
+                background: "#fff",
+                borderRadius: 8,
+                display: "grid",
+                placeItems: "center",
+                fontSize: 10,
+                color: "#000",
+                fontWeight: 700,
+              }}
+            >
+              QR
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 18 }}>
+            {[
+              ["BIB", bib ? `#${bib}` : "—"],
+              ["DIST", selectedDist?.label ?? "—"],
+              ["START", event.timeLabel ?? "—"],
+            ].map(([k, v]) => (
+              <div key={k}>
+                <div
+                  style={{
+                    fontSize: 10,
+                    opacity: 0.6,
+                    fontWeight: 700,
+                    letterSpacing: "0.08em",
+                  }}
+                >
+                  {k}
+                </div>
+                <div
+                  className="gr-mono"
+                  style={{ fontSize: 18, fontWeight: 700 }}
+                >
+                  {v}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <button
+        onClick={() => router.push(`/${locale}`)}
+        style={{
+          width: "100%",
+          height: 56,
+          borderRadius: 999,
+          background: "var(--gr-brand)",
+          color: "#0b1a0f",
+          fontWeight: 700,
+          fontSize: 16,
+          cursor: "pointer",
+          border: 0,
+        }}
+      >
+        Back to events
+      </button>
+    </div>
+  );
+}

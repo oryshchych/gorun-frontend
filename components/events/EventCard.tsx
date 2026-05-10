@@ -17,7 +17,7 @@ interface EventCardProps {
 }
 
 export function EventCard({ event }: EventCardProps) {
-  const t = useTranslations();
+  const t = useTranslations("hub");
   const locale = useLocale();
   const dateLocale = locale === "uk" ? uk : enUS;
 
@@ -57,7 +57,8 @@ export function EventCard({ event }: EventCardProps) {
     event.dateLabel ||
     format(new Date(event.date), "EEE, MMM d yyyy", { locale: dateLocale });
 
-  const feeLabel = event.fee || (event.basePrice ? `from ${event.basePrice} UAH` : "");
+  // Resolve fee label — comes from API field `event.fee`, fall back to basePrice
+  const feeLabel = event.fee || "";
 
   return (
     <Link
@@ -208,7 +209,7 @@ export function EventCard({ event }: EventCardProps) {
                       gap: 4,
                     }}
                   >
-                    <Baby size={13} /> Kids
+                    <Baby size={13} /> {t("kidsLabel")}
                   </span>
                 ) : null}
               </div>
@@ -226,8 +227,7 @@ export function EventCard({ event }: EventCardProps) {
               }}
             >
               <div style={{ fontSize: 12, color: "var(--gr-ink-3)" }}>
-                {Math.round((spotsTaken / spotsTotal) * 100)}% full
-              </div>
+                {Math.round((spotsTaken / spotsTotal) * 100)}% full              </div>
               <div
                 style={{
                   display: "inline-flex",
@@ -238,7 +238,7 @@ export function EventCard({ event }: EventCardProps) {
                   color: "var(--gr-ink)",
                 }}
               >
-                View event →
+                {t("viewEvent")}
               </div>
             </div>
           </div>
