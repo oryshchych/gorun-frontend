@@ -46,6 +46,8 @@ export interface EventSpeakerPayload {
 export interface EventTranslations {
   title: TranslationField;
   description: TranslationField;
+  /** Post-race recap / “how it was” (localized) */
+  pastDescription?: TranslationField;
   location: TranslationField;
   speakers?: SpeakerTranslations[];
   date: TranslationField;
@@ -101,6 +103,11 @@ export interface ScheduleItem {
 export interface Event {
   id: string;
   slug?: string;
+  /** Resolved localized fields returned by API when `lang` query param is provided */
+  resolvedTitle?: string;
+  resolvedDescription?: string;
+  resolvedPastDescription?: string;
+  resolvedLocation?: string;
   /** API may return either `name` or `title` */
   name?: string;
   status?: EventStatus;
@@ -108,6 +115,8 @@ export interface Event {
   // Fallback fields for backwards compatibility with pre-i18n data
   title?: string;
   description?: string;
+  /** Plain fallback when translations are absent */
+  pastDescription?: string;
   /** Short marketing blurb shown on event cards */
   shortDesc?: string;
   short?: string;
@@ -158,6 +167,7 @@ interface BaseEventPayload {
   // Optional fallbacks for legacy APIs
   title?: string;
   description?: string;
+  pastDescription?: string;
   location?: string;
   slug?: string;
   shortDesc?: string;
