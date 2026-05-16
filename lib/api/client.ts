@@ -48,58 +48,94 @@ apiClient.interceptors.request.use(
   }
 );
 
+const AUTH_PATHS_SKIP_REFRESH = [
+  "/auth/login",
+  "/auth/register",
+  "/auth/refresh",
+  "/auth/oauth/exchange",
+];
+
+function shouldAttemptTokenRefresh(
+  config: InternalAxiosRequestConfig | undefined
+): boolean {
+  if (!config?.url) return true;
+  const path = config.url.split("?")[0] ?? "";
+  return !AUTH_PATHS_SKIP_REFRESH.some((segment) => path.includes(segment));
+}
+
+interface RefreshTokenResponse {
+  success: boolean;
+  data: {
+    accessToken: string;
+    refreshToken: string;
+  };
+}
+
+let refreshPromise: Promise<string> | null = null;
+
+async function refreshTokensOnce(): Promise<string> {
+  const refreshToken = tokenManager.getRefreshToken();
+  if (!refreshToken) {
+    throw new Error("No refresh token");
+  }
+
+  const response = await axios.post<RefreshTokenResponse>(
+    `${getApiBaseUrl()}/auth/refresh`,
+    { refreshToken },
+    { headers: { "Content-Type": "application/json" } }
+  );
+
+  const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+  if (!accessToken || !newRefreshToken) {
+    throw new Error("Invalid refresh response");
+  }
+
+  tokenManager.setTokens(accessToken, newRefreshToken);
+  return accessToken;
+}
+
+function runRefreshTokensOnce(): Promise<string> {
+  if (!refreshPromise) {
+    refreshPromise = refreshTokensOnce().finally(() => {
+      refreshPromise = null;
+    });
+  }
+  return refreshPromise;
+}
+
 // Response interceptor for error handling and token refresh
 apiClient.interceptors.response.use(
-  (response) => {
-    // Return successful response
-    return response;
-  },
+  (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
     };
 
-    // Handle 401 Unauthorized errors (token expired)
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      shouldAttemptTokenRefresh(originalRequest)
+    ) {
       originalRequest._retry = true;
 
       try {
-        // Attempt to refresh the token
-        const refreshToken = tokenManager.getRefreshToken();
-
-        if (refreshToken) {
-          const response = await axios.post(
-            `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
-            {
-              refreshToken,
-            }
-          );
-
-          const { accessToken, refreshToken: newRefreshToken } = response.data;
-
-          // Store new tokens using tokenManager
-          tokenManager.setTokens(accessToken, newRefreshToken);
-
-          // Retry original request with new token
-          if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-          }
-          return apiClient(originalRequest);
+        const accessToken = await runRefreshTokensOnce();
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         }
-      } catch (refreshError) {
-        // Refresh failed, clear tokens and redirect to login
+        return apiClient(originalRequest);
+      } catch {
         tokenManager.clearTokens();
         if (typeof window !== "undefined") {
           const locale = getLocaleForClientRedirect();
           window.location.href = `/${locale}/login`;
         }
-        return Promise.reject(refreshError);
+        return Promise.reject(error);
       }
     }
 
-    // Format error response
-    const formattedError = formatErrorResponse(error);
-    return Promise.reject(formattedError);
+    return Promise.reject(formatErrorResponse(error));
   }
 );
 

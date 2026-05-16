@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
-import apiClient, { tokenManager } from "../client";
+import apiClient, { getApiBaseUrl, tokenManager } from "../client";
 
 describe("API Client", () => {
   let mock: MockAdapter;
@@ -67,6 +68,84 @@ describe("API Client", () => {
       } catch (error: any) {
         expect(error.message).toContain("Network Error");
       }
+    });
+
+    it("should refresh tokens on 401 and retry the original request", async () => {
+      tokenManager.setTokens("expired-access", "old-refresh");
+      const refreshSpy = vi.spyOn(axios, "post").mockResolvedValue({
+        data: {
+          success: true,
+          data: {
+            accessToken: "new-access",
+            refreshToken: "new-refresh",
+          },
+        },
+      } as never);
+
+      mock
+        .onGet("/events")
+        .replyOnce(401, { code: "ERROR_AUTH_TOKEN_EXPIRED" })
+        .onGet("/events")
+        .reply((config) => {
+          expect(config.headers?.Authorization).toBe("Bearer new-access");
+          return [200, { data: [] }];
+        });
+
+      const response = await apiClient.get("/events");
+
+      expect(response.status).toBe(200);
+      expect(refreshSpy).toHaveBeenCalledWith(
+        `${getApiBaseUrl()}/auth/refresh`,
+        { refreshToken: "old-refresh" },
+        { headers: { "Content-Type": "application/json" } }
+      );
+      expect(tokenManager.getAccessToken()).toBe("new-access");
+      expect(tokenManager.getRefreshToken()).toBe("new-refresh");
+
+      refreshSpy.mockRestore();
+    });
+
+    it("should not refresh on 401 from auth login", async () => {
+      const refreshSpy = vi.spyOn(axios, "post");
+      mock.onPost("/auth/login").reply(401, { message: "Invalid credentials" });
+
+      await expect(
+        apiClient.post("/auth/login", { email: "a@b.com", password: "x" })
+      ).rejects.toMatchObject({ statusCode: 401 });
+
+      expect(refreshSpy).not.toHaveBeenCalled();
+      refreshSpy.mockRestore();
+    });
+
+    it("should dedupe parallel refresh calls on concurrent 401s", async () => {
+      tokenManager.setTokens("expired-access", "old-refresh");
+      const refreshSpy = vi.spyOn(axios, "post").mockResolvedValue({
+        data: {
+          success: true,
+          data: {
+            accessToken: "new-access",
+            refreshToken: "new-refresh",
+          },
+        },
+      } as never);
+
+      mock
+        .onGet("/events")
+        .replyOnce(401)
+        .onGet("/auth/me")
+        .replyOnce(401)
+        .onGet("/events")
+        .reply(200, { data: [] })
+        .onGet("/auth/me")
+        .reply(200, { data: { id: "1" } });
+
+      await Promise.all([
+        apiClient.get("/events"),
+        apiClient.get("/auth/me"),
+      ]);
+
+      expect(refreshSpy).toHaveBeenCalledTimes(1);
+      refreshSpy.mockRestore();
     });
   });
 

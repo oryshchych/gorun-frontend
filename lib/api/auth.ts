@@ -173,9 +173,11 @@ export async function updateProfile(
 export async function refreshAccessToken(
   refreshToken: string
 ): Promise<string> {
-  const response = await apiClient.post("/auth/refresh", { refreshToken });
+  const response = await apiClient.post<AuthResponse>("/auth/refresh", {
+    refreshToken,
+  });
 
-  const { accessToken, refreshToken: newRefreshToken } = response.data;
+  const { accessToken, refreshToken: newRefreshToken } = response.data.data;
 
   tokenManager.setTokens(accessToken, newRefreshToken);
 
