@@ -447,7 +447,7 @@ export function ProfileForm() {
               type="submit"
               variant="outline"
               disabled={isLoading}
-              className="min-w-[120px]"
+              className="w-full"
             >
               {isLoading ? t("saving") : t("saveProfile")}
             </Button>
