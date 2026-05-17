@@ -13,7 +13,6 @@ import {
   logout as apiLogout,
   getCurrentUser,
   exchangeOAuthCode,
-  type AuthUserPayload,
   type LoginRequest,
   type RegisterRequest,
 } from "@/lib/api/auth";
@@ -34,37 +33,20 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function mapPayloadToUser(payload: AuthUserPayload): User {
-  const fromParts = [payload.firstName, payload.lastName]
-    .filter(Boolean)
-    .join(" ")
-    .trim();
-  const name =
-    payload.name?.trim() || (fromParts.length > 0 ? fromParts : undefined);
-  return {
-    id: payload.id,
-    email: payload.email,
-    name,
-    firstName: payload.firstName,
-    lastName: payload.lastName,
-    phone: payload.phone,
-    image: payload.image,
-    isAdmin: payload.isAdmin ?? false,
-    adminRole: payload.adminRole ?? null,
-    provider: "credentials",
-  };
-}
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const loadAuthenticatedUser = useCallback(async () => {
+    const userData = await getCurrentUser();
+    setUser(userData.data);
+  }, []);
 
   useEffect(() => {
     const loadUser = async () => {
       if (tokenManager.hasToken()) {
         try {
-          const userData = await getCurrentUser();
-          setUser(userData.data);
+          await loadAuthenticatedUser();
         } catch (error) {
           console.error("Failed to load user:", error);
           tokenManager.clearTokens();
@@ -74,37 +56,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     loadUser();
-  }, []);
+  }, [loadAuthenticatedUser]);
 
   const login = useCallback(async (credentials: LoginRequest) => {
     setIsLoading(true);
     try {
-      const response = await apiLogin(credentials);
-      setUser(mapPayloadToUser(response.data.user));
+      await apiLogin(credentials);
+      await loadAuthenticatedUser();
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [loadAuthenticatedUser]);
 
   const register = useCallback(async (data: RegisterRequest) => {
     setIsLoading(true);
     try {
-      const response = await apiRegister(data);
-      setUser(mapPayloadToUser(response.data.user));
+      await apiRegister(data);
+      await loadAuthenticatedUser();
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [loadAuthenticatedUser]);
 
   const exchangeOAuthCallback = useCallback(async (code: string) => {
     setIsLoading(true);
     try {
-      const response = await exchangeOAuthCode(code);
-      setUser(mapPayloadToUser(response.data.user));
+      await exchangeOAuthCode(code);
+      await loadAuthenticatedUser();
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [loadAuthenticatedUser]);
 
   const logout = useCallback(async () => {
     setIsLoading(true);
@@ -117,17 +99,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const refreshUser = useCallback(async () => {
-    if (tokenManager.hasToken()) {
-      try {
-        const userData = await getCurrentUser();
-        setUser(userData.data);
-      } catch (error) {
-        console.error("Failed to refresh user:", error);
-        setUser(null);
-        tokenManager.clearTokens();
-      }
+    if (!tokenManager.hasToken()) return;
+    try {
+      await loadAuthenticatedUser();
+    } catch (error) {
+      console.error("Failed to refresh user:", error);
+      setUser(null);
+      tokenManager.clearTokens();
     }
-  }, []);
+  }, [loadAuthenticatedUser]);
 
   const value: AuthContextType = {
     user,
