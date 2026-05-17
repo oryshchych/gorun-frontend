@@ -305,7 +305,8 @@ input:-internal-autofill-previewed {
   padding: 0.5rem 0.75rem;
   border: 1px solid hsl(var(--input));
   border-radius: calc(var(--radius) - 2px);
-  background: transparent;
+  background-color: hsl(var(--background));
+  color: hsl(var(--card-foreground));
   cursor: pointer;
   transition:
     border-color 0.2s,
@@ -313,13 +314,13 @@ input:-internal-autofill-previewed {
 }
 
 .PhoneInputCountry:hover {
-  border-color: white;
+  border-color: hsl(var(--ring));
 }
 
 .PhoneInputCountry:focus-within {
-  border-color: white;
-  border-width: 2px;
+  border-color: hsl(var(--ring));
   outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
 }
 
 .PhoneInputCountryIcon {
@@ -363,13 +364,13 @@ input:-internal-autofill-previewed {
   padding: 0.5rem 0.75rem;
   border: 1px solid hsl(var(--input));
   border-radius: calc(var(--radius) - 2px);
-  background: transparent;
-  color: white;
+  background-color: hsl(var(--background));
+  color: hsl(var(--card-foreground));
   font-size: 0.875rem;
   line-height: 1.25rem;
   transition:
     border-color 0.2s,
-    border-width 0.2s;
+    box-shadow 0.2s;
 }
 
 .PhoneInputInput::placeholder {
@@ -377,13 +378,13 @@ input:-internal-autofill-previewed {
 }
 
 .PhoneInputInput:hover {
-  border-color: white;
+  border-color: hsl(var(--ring));
 }
 
 .PhoneInputInput:focus {
-  border-color: white;
-  border-width: 2px;
+  border-color: hsl(var(--ring));
   outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
 }
 
 .PhoneInputInput:disabled {
@@ -404,6 +405,6 @@ input:-internal-autofill-previewed {
 
 .PhoneInput.phone-error .PhoneInputInput:focus,
 .PhoneInput.phone-error .PhoneInputCountry:focus-within {
-  border-color: white;
-  border-width: 2px;
+  border-color: hsl(var(--destructive));
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--destructive));
 }
