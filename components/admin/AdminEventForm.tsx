@@ -27,6 +27,11 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import type { AdminEventFormData, AdminEventFormInput } from "@/lib/validations/admin-event";
 import { adminEventFormResolverSchema } from "@/lib/validations/admin-event";
+import {
+  formatNumberFieldValue,
+  parseFloatFieldInput,
+  parseIntFieldInput,
+} from "@/lib/forms/number-field";
 
 const EVENT_STATUS = [
   "UPCOMING",
@@ -34,18 +39,6 @@ const EVENT_STATUS = [
   "FINISHED",
   "CANCELLED",
 ] as const;
-
-function intFromInput(raw: string): number | undefined {
-  if (raw === "") return undefined;
-  const n = parseInt(raw, 10);
-  return Number.isNaN(n) ? undefined : n;
-}
-
-function floatFromInput(raw: string): number | undefined {
-  if (raw === "") return undefined;
-  const n = parseFloat(raw);
-  return Number.isNaN(n) ? undefined : n;
-}
 
 interface AdminEventFormProps {
   defaultValues: AdminEventFormInput;
@@ -332,13 +325,9 @@ export function AdminEventForm({
                       type="number"
                       min={1}
                       disabled={isLoading}
-                      value={
-                        field.value === undefined || field.value === null
-                          ? ""
-                          : field.value
-                      }
+                      value={formatNumberFieldValue(field.value)}
                       onChange={(e) =>
-                        field.onChange(intFromInput(e.target.value))
+                        field.onChange(parseIntFieldInput(e.target.value))
                       }
                     />
                   </FormControl>
@@ -358,13 +347,9 @@ export function AdminEventForm({
                       min={0}
                       step="0.01"
                       disabled={isLoading}
-                      value={
-                        field.value === undefined || field.value === null
-                          ? ""
-                          : field.value
-                      }
+                      value={formatNumberFieldValue(field.value)}
                       onChange={(e) =>
-                        field.onChange(floatFromInput(e.target.value))
+                        field.onChange(parseFloatFieldInput(e.target.value))
                       }
                     />
                   </FormControl>
@@ -445,13 +430,9 @@ export function AdminEventForm({
                       type="number"
                       min={0}
                       disabled={isLoading}
-                      value={
-                        field.value === undefined || field.value === null
-                          ? ""
-                          : field.value
-                      }
+                      value={formatNumberFieldValue(field.value)}
                       onChange={(e) =>
-                        field.onChange(intFromInput(e.target.value))
+                        field.onChange(parseIntFieldInput(e.target.value))
                       }
                     />
                   </FormControl>
@@ -470,13 +451,9 @@ export function AdminEventForm({
                       type="number"
                       min={1}
                       disabled={isLoading}
-                      value={
-                        field.value === undefined || field.value === null
-                          ? ""
-                          : field.value
-                      }
+                      value={formatNumberFieldValue(field.value)}
                       onChange={(e) =>
-                        field.onChange(intFromInput(e.target.value))
+                        field.onChange(parseIntFieldInput(e.target.value))
                       }
                     />
                   </FormControl>
@@ -715,13 +692,9 @@ export function AdminEventForm({
                           min={0}
                           step="0.1"
                           disabled={isLoading}
-                          value={
-                            field.value === undefined || field.value === null
-                              ? ""
-                              : field.value
-                          }
+                          value={formatNumberFieldValue(field.value)}
                           onChange={(e) =>
-                            field.onChange(floatFromInput(e.target.value))
+                            field.onChange(parseFloatFieldInput(e.target.value))
                           }
                         />
                       </FormControl>
@@ -740,11 +713,10 @@ export function AdminEventForm({
                           type="number"
                           min={0}
                           disabled={isLoading}
-                          value={field.value ?? ""}
-                          onChange={(e) => {
-                            const v = e.target.value;
-                            field.onChange(v === "" ? undefined : parseFloat(v));
-                          }}
+                          value={formatNumberFieldValue(field.value)}
+                          onChange={(e) =>
+                            field.onChange(parseFloatFieldInput(e.target.value))
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -792,13 +764,9 @@ export function AdminEventForm({
                           type="number"
                           min={0}
                           disabled={isLoading}
-                          value={
-                            field.value === undefined || field.value === null
-                              ? ""
-                              : field.value
-                          }
+                          value={formatNumberFieldValue(field.value)}
                           onChange={(e) =>
-                            field.onChange(intFromInput(e.target.value))
+                            field.onChange(parseIntFieldInput(e.target.value))
                           }
                         />
                       </FormControl>
@@ -817,13 +785,9 @@ export function AdminEventForm({
                           type="number"
                           min={1}
                           disabled={isLoading}
-                          value={
-                            field.value === undefined || field.value === null
-                              ? ""
-                              : field.value
-                          }
+                          value={formatNumberFieldValue(field.value)}
                           onChange={(e) =>
-                            field.onChange(intFromInput(e.target.value))
+                            field.onChange(parseIntFieldInput(e.target.value))
                           }
                         />
                       </FormControl>
@@ -921,11 +885,10 @@ export function AdminEventForm({
                           type="number"
                           min={0}
                           disabled={isLoading}
-                          value={field.value ?? ""}
-                          onChange={(e) => {
-                            const v = e.target.value;
-                            field.onChange(v === "" ? undefined : parseFloat(v));
-                          }}
+                          value={formatNumberFieldValue(field.value)}
+                          onChange={(e) =>
+                            field.onChange(parseFloatFieldInput(e.target.value))
+                          }
                         />
                       </FormControl>
                       <FormMessage />

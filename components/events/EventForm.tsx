@@ -1,8 +1,17 @@
 "use client";
 
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { eventSchema, EventFormData } from "@/lib/validations/event";
+import {
+  eventFormResolverSchema,
+  type EventFormData,
+  type EventFormInput,
+} from "@/lib/validations/event";
+import {
+  formatNumberFieldValue,
+  parseFloatFieldInput,
+  parseIntFieldInput,
+} from "@/lib/forms/number-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -54,8 +63,10 @@ export function EventForm({
   const t = useTranslations("events");
   const tCommon = useTranslations("common");
 
-  const form = useForm<EventFormData>({
-    resolver: zodResolver(eventSchema) as any,
+  const form = useForm<EventFormInput, unknown, EventFormData>({
+    resolver: zodResolver(
+      eventFormResolverSchema
+    ) as Resolver<EventFormInput, unknown, EventFormData>,
     defaultValues: {
       translations: {
         title: {
@@ -93,12 +104,13 @@ export function EventForm({
         },
       },
       date: defaultValues?.date ? new Date(defaultValues.date) : new Date(),
-      capacity: defaultValues?.capacity || 50,
+      capacity: defaultValues?.capacity ?? 50,
       imageUrl: defaultValues?.imageUrl || {
         portrait: "",
         landscape: "",
       },
-      basePrice: defaultValues?.basePrice ?? 0,
+      basePrice:
+        defaultValues?.basePrice !== undefined ? defaultValues.basePrice : "",
     },
   });
 
@@ -361,9 +373,12 @@ export function EventForm({
                     id="event-capacity"
                     type="number"
                     placeholder={t("capacity")}
-                    {...field}
+                    name={field.name}
+                    ref={field.ref}
+                    onBlur={field.onBlur}
+                    value={formatNumberFieldValue(field.value)}
                     onChange={(e) =>
-                      field.onChange(parseInt(e.target.value, 10))
+                      field.onChange(parseIntFieldInput(e.target.value))
                     }
                     disabled={isLoading}
                     aria-required="true"
@@ -372,6 +387,7 @@ export function EventForm({
                       fieldState.error ? "event-capacity-error" : undefined
                     }
                     min="1"
+                    inputMode="numeric"
                   />
                 </FormControl>
                 <FormMessage id="event-capacity-error" />
@@ -395,13 +411,18 @@ export function EventForm({
                     id="event-base-price"
                     type="number"
                     placeholder="0"
-                    {...field}
+                    step="0.01"
+                    name={field.name}
+                    ref={field.ref}
+                    onBlur={field.onBlur}
+                    value={formatNumberFieldValue(field.value)}
                     onChange={(e) =>
-                      field.onChange(parseFloat(e.target.value) || 0)
+                      field.onChange(parseFloatFieldInput(e.target.value))
                     }
                     disabled={isLoading}
                     aria-invalid={!!fieldState.error}
                     min="0"
+                    inputMode="decimal"
                   />
                 </FormControl>
                 <FormMessage />

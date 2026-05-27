@@ -47,6 +47,18 @@ const imageUrlUpdateSchema = z
   })
   .optional();
 
+const capacityNumberSchema = z
+  .number({ message: "Capacity is required" })
+  .int("Capacity must be a whole number")
+  .positive("Capacity must be greater than 0")
+  .max(10000, "Capacity must not exceed 10,000");
+
+const basePriceNumberSchema = z
+  .number()
+  .nonnegative("Base price must be 0 or greater")
+  .max(1_000_000, "Base price is too high")
+  .optional();
+
 export const eventSchema = z.object({
   translations: z.object(translationFieldSchema),
   date: z
@@ -55,17 +67,29 @@ export const eventSchema = z.object({
     .refine((date) => date > new Date(), {
       message: "Event date must be in the future",
     }),
-  capacity: z
-    .number()
-    .int("Capacity must be a whole number")
-    .positive("Capacity must be greater than 0")
-    .max(10000, "Capacity must not exceed 10,000"),
+  capacity: capacityNumberSchema,
   imageUrl: imageUrlSchema,
-  basePrice: z
-    .number()
-    .nonnegative("Base price must be 0 or greater")
-    .max(1_000_000, "Base price is too high")
-    .optional(),
+  basePrice: basePriceNumberSchema,
+});
+
+/** Use with react-hook-form `zodResolver` so number fields can be cleared (""). */
+export const eventFormResolverSchema = z.object({
+  translations: z.object(translationFieldSchema),
+  date: z
+    .union([z.string(), z.date()])
+    .transform((val) => (typeof val === "string" ? new Date(val) : val))
+    .refine((date) => date > new Date(), {
+      message: "Event date must be in the future",
+    }),
+  capacity: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    capacityNumberSchema
+  ),
+  imageUrl: imageUrlSchema,
+  basePrice: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    basePriceNumberSchema
+  ),
 });
 
 export const updateEventSchema = z.object({
@@ -100,3 +124,9 @@ export const updateEventSchema = z.object({
 
 export type EventFormData = z.infer<typeof eventSchema>;
 export type UpdateEventFormData = z.infer<typeof updateEventSchema>;
+
+/** RHF values before Zod parse (number inputs may be "" while editing). */
+export type EventFormInput = Omit<EventFormData, "capacity" | "basePrice"> & {
+  capacity: number | "";
+  basePrice?: number | "";
+};

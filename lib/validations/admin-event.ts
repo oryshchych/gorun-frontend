@@ -1,5 +1,6 @@
 import { addDays, format } from "date-fns";
 import { z } from "zod";
+import { emptyNumberToUndefined } from "@/lib/forms/number-field";
 import type {
   CreateEventRequest,
   UpdateEventRequest,
@@ -36,8 +37,14 @@ const spotsSchema = z.object({
 
 const optionalSpotsPairSchema = z
   .object({
-    taken: z.number().int().min(0).optional(),
-    total: z.number().int().min(1).optional(),
+    taken: z.preprocess(
+      emptyNumberToUndefined,
+      z.number().int().min(0).optional()
+    ),
+    total: z.preprocess(
+      emptyNumberToUndefined,
+      z.number().int().min(1).optional()
+    ),
   })
   .refine(
     (s) =>
@@ -55,8 +62,14 @@ const distanceSchema = z
     id: z.string().min(1),
     label: z.string().min(1, "Distance label is required"),
     name: z.string().min(1, "Distance name is required"),
-    km: z.number().nonnegative().optional(),
-    feeUah: z.number().nonnegative().optional(),
+    km: z.preprocess(
+      emptyNumberToUndefined,
+      z.number().nonnegative().optional()
+    ),
+    feeUah: z.preprocess(
+      emptyNumberToUndefined,
+      z.number().nonnegative().optional()
+    ),
     elevation: z.string().optional(),
     laps: z.string().optional(),
     spots: optionalSpotsPairSchema,
@@ -75,7 +88,10 @@ const kidsDistanceSchema = z.object({
   label: z.string().min(1),
   name: z.string().min(1),
   age: z.string().min(1),
-  feeUah: z.number().nonnegative().optional(),
+  feeUah: z.preprocess(
+    emptyNumberToUndefined,
+    z.number().nonnegative().optional()
+  ),
 });
 
 const scheduleRowSchema = z.object({
@@ -157,19 +173,25 @@ export const adminEventFormSchema = z.object({
     .union([z.string(), z.date()])
     .transform((val) => (typeof val === "string" ? new Date(val) : val))
     .refine((d) => !Number.isNaN(d.getTime()), { message: "Invalid date" }),
-  capacity: z
-    .union([
-      z.undefined(),
-      z
-        .number({ message: "Capacity is required" })
-        .int()
-        .positive("Capacity must be greater than 0")
-        .max(10000, "Capacity must not exceed 10,000"),
-    ])
-    .refine((v): v is number => v !== undefined, {
-      message: "Capacity is required",
-    }),
-  basePrice: z.number().nonnegative().max(1_000_000).optional(),
+  capacity: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z
+      .union([
+        z.undefined(),
+        z
+          .number({ message: "Capacity is required" })
+          .int()
+          .positive("Capacity must be greater than 0")
+          .max(10000, "Capacity must not exceed 10,000"),
+      ])
+      .refine((v): v is number => v !== undefined, {
+        message: "Capacity is required",
+      })
+  ),
+  basePrice: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.number().nonnegative().max(1_000_000).optional()
+  ),
   fee: z.string().max(120).optional(),
   imageUrl: z
     .object({
@@ -205,12 +227,12 @@ export type AdminEventFormInput = {
   venue?: string;
   city?: string;
   date: Date | string;
-  capacity?: number;
-  basePrice?: number;
+  capacity?: number | "";
+  basePrice?: number | "";
   fee?: string;
   imageUrl?: { portrait?: string; landscape?: string };
   cover?: string;
-  spots?: { taken?: number; total?: number };
+  spots?: { taken?: number | ""; total?: number | "" };
   gallery?: { url: string }[];
   perks?: { line: string }[];
   afu?: string;
@@ -219,18 +241,18 @@ export type AdminEventFormInput = {
     id: string;
     label: string;
     name: string;
-    km?: number;
-    feeUah?: number;
+    km?: number | "";
+    feeUah?: number | "";
     elevation?: string;
     laps?: string;
-    spots?: { taken?: number; total?: number };
+    spots?: { taken?: number | ""; total?: number | "" };
   }>;
   kidsDistances?: Array<{
     id: string;
     label: string;
     name: string;
     age: string;
-    feeUah?: number;
+    feeUah?: number | "";
   }>;
   speakers?: Array<{
     id?: string;
