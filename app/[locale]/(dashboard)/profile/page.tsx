@@ -1,5 +1,5 @@
-import { ProfileClient } from "@/components/profile/ProfileClient";
+import { ProfileEditPage } from "@/components/profile/ProfileEditPage";
 
 export default function ProfilePage() {
-  return <ProfileClient />;
+  return <ProfileEditPage />;
 }
