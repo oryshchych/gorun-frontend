@@ -273,6 +273,46 @@ html:not(.dark) body {
   background-attachment: fixed;
 }
 
+/* App shell — main content & surfaces only (chrome uses site header styles) */
+[data-shell="true"] {
+  --shell-surface: #ffffff;
+  --shell-ink: var(--gr-ink);
+  --shell-ink-muted: var(--gr-ink-3);
+}
+
+.dark [data-shell="true"] {
+  --shell-surface: var(--gr-surface);
+  --shell-ink: var(--gr-ink);
+  --shell-ink-muted: var(--gr-ink-3);
+}
+
+/* Main column only — chrome (header/sidebar/footer) stays on default/home body bg */
+.shell-main {
+  background-color: var(--gr-bg);
+  color: var(--shell-ink);
+}
+
+.shell-surface {
+  background-color: var(--shell-surface);
+  color: var(--shell-ink);
+}
+
+.shell-ink-muted {
+  color: var(--shell-ink-muted);
+}
+
+.shell-nav-link--active {
+  background-color: #ffffff;
+  border-left-color: var(--gr-brand);
+  color: var(--gr-ink);
+  box-shadow: var(--gr-shadow-sm);
+}
+
+.dark .shell-nav-link--active {
+  background-color: var(--gr-surface-2);
+  color: var(--gr-ink);
+}
+
 /* Autofill — match input surface + inherited text (avoid browser yellow / white text) */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
