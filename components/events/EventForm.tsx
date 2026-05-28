@@ -231,7 +231,7 @@ export function EventForm({
                     <textarea
                       id="event-description-en"
                       placeholder={t("descriptionEn")}
-                      className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                      className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-base text-card-foreground ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                       {...field}
                       disabled={isLoading}
                       aria-required="true"
@@ -257,7 +257,7 @@ export function EventForm({
                     <textarea
                       id="event-description-uk"
                       placeholder={t("descriptionUk")}
-                      className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                      className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-base text-card-foreground ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                       {...field}
                       disabled={isLoading}
                       aria-required="true"
