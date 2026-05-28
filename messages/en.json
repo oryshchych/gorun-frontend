@@ -516,8 +516,13 @@
       "next": "Next"
     },
     "eventForm": {
+      "tabMain": "Main",
+      "tabEnglish": "English",
       "sectionStatus": "Publication and status",
       "sectionTranslations": "Translations",
+      "sectionUkrainianContent": "Ukrainian content",
+      "sectionEnglishTranslations": "English translations",
+      "sectionEnglishSpeakers": "English speaker translations",
       "sectionCore": "Details",
       "sectionMedia": "Images",
       "sectionSpots": "Event spots",

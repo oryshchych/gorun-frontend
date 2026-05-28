@@ -516,8 +516,13 @@
       "next": "Далі"
     },
     "eventForm": {
+      "tabMain": "Основне",
+      "tabEnglish": "Англійська",
       "sectionStatus": "Публікація та статус",
       "sectionTranslations": "Переклади",
+      "sectionUkrainianContent": "Український контент",
+      "sectionEnglishTranslations": "Англійські переклади",
+      "sectionEnglishSpeakers": "Англійські переклади спікерів",
       "sectionCore": "Деталі",
       "sectionMedia": "Зображення",
       "sectionSpots": "Місця на події",
