@@ -13,10 +13,21 @@ const NAV_ITEMS = [
   { id: "profile", icon: User, href: (l: string) => `/${l}/profile` },
 ] as const;
 
+function isShellRoute(pathname: string, locale: string): boolean {
+  return (
+    pathname.startsWith(`/${locale}/admin`) ||
+    pathname.startsWith(`/${locale}/profile`)
+  );
+}
+
 export function BottomNav() {
   const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations("bottomNav");
+
+  if (isShellRoute(pathname, locale)) {
+    return null;
+  }
 
   const isActive = (id: string): boolean => {
     switch (id) {

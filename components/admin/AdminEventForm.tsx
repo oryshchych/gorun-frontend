@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ShellFormSection } from "@/components/layout/shell";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import type {
@@ -115,7 +116,7 @@ export function AdminEventForm({
           </TabsList>
 
           <TabsContent value="main" className="space-y-10">
-            <section className="space-y-4 rounded-lg border bg-muted/20 p-4">
+            <ShellFormSection>
               <h2 className="text-lg font-semibold">{t("sectionStatus")}</h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField
@@ -170,9 +171,9 @@ export function AdminEventForm({
                   )}
                 />
               </div>
-            </section>
+            </ShellFormSection>
 
-            <section className="space-y-4 rounded-lg border p-4">
+            <ShellFormSection>
               <h2 className="text-lg font-semibold">
                 {t("sectionUkrainianContent")}
               </h2>
@@ -234,9 +235,9 @@ export function AdminEventForm({
                   )}
                 />
               </div>
-            </section>
+            </ShellFormSection>
 
-            <section className="space-y-4 rounded-lg border p-4">
+            <ShellFormSection>
               <h2 className="text-lg font-semibold">{t("sectionCore")}</h2>
               <div className="grid gap-4 md:grid-cols-2">
                 <FormField
@@ -396,9 +397,9 @@ export function AdminEventForm({
                   )}
                 />
               </div>
-            </section>
+            </ShellFormSection>
 
-            <section className="space-y-4 rounded-lg border p-4">
+            <ShellFormSection>
               <h2 className="text-lg font-semibold">{t("sectionMedia")}</h2>
               <FormField
                 control={form.control}
@@ -454,9 +455,9 @@ export function AdminEventForm({
                   </FormItem>
                 )}
               />
-            </section>
+            </ShellFormSection>
 
-            <section className="space-y-4 rounded-lg border p-4">
+            <ShellFormSection>
               <h2 className="text-lg font-semibold">{t("sectionSpots")}</h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField
@@ -502,9 +503,9 @@ export function AdminEventForm({
                   )}
                 />
               </div>
-            </section>
+            </ShellFormSection>
 
-            <section className="space-y-4 rounded-lg border p-4">
+            <ShellFormSection>
               <div className="flex items-center justify-between gap-2">
                 <h2 className="text-lg font-semibold">{t("sectionGallery")}</h2>
                 <Button
@@ -546,9 +547,9 @@ export function AdminEventForm({
                   </div>
                 ))}
               </div>
-            </section>
+            </ShellFormSection>
 
-            <section className="space-y-4 rounded-lg border p-4">
+            <ShellFormSection>
               <div className="flex items-center justify-between gap-2">
                 <h2 className="text-lg font-semibold">{t("sectionPerks")}</h2>
                 <Button
@@ -588,9 +589,9 @@ export function AdminEventForm({
                   </Button>
                 </div>
               ))}
-            </section>
+            </ShellFormSection>
 
-            <section className="space-y-4 rounded-lg border p-4">
+            <ShellFormSection>
               <FormField
                 control={form.control}
                 name="afu"
@@ -609,9 +610,9 @@ export function AdminEventForm({
                   </FormItem>
                 )}
               />
-            </section>
+            </ShellFormSection>
 
-            <section className="space-y-4 rounded-lg border p-4">
+            <ShellFormSection>
               <div className="flex items-center justify-between gap-2">
                 <h2 className="text-lg font-semibold">
                   {t("sectionSchedule")}
@@ -679,9 +680,9 @@ export function AdminEventForm({
                   </Button>
                 </div>
               ))}
-            </section>
+            </ShellFormSection>
 
-            <section className="space-y-4 rounded-lg border p-4">
+            <ShellFormSection>
               <div className="flex items-center justify-between gap-2">
                 <h2 className="text-lg font-semibold">
                   {t("sectionDistances")}
@@ -887,9 +888,9 @@ export function AdminEventForm({
                   </Button>
                 </div>
               ))}
-            </section>
+            </ShellFormSection>
 
-            <section className="space-y-4 rounded-lg border p-4">
+            <ShellFormSection>
               <div className="flex items-center justify-between gap-2">
                 <h2 className="text-lg font-semibold">{t("sectionKids")}</h2>
                 <Button
@@ -992,9 +993,9 @@ export function AdminEventForm({
                   </Button>
                 </div>
               ))}
-            </section>
+            </ShellFormSection>
 
-            <section className="space-y-4 rounded-lg border p-4">
+            <ShellFormSection>
               <div className="flex items-center justify-between gap-2">
                 <h2 className="text-lg font-semibold">
                   {t("sectionSpeakers")}
@@ -1110,11 +1111,11 @@ export function AdminEventForm({
                   </Button>
                 </div>
               ))}
-            </section>
+            </ShellFormSection>
           </TabsContent>
 
           <TabsContent value="english" className="space-y-4">
-            <section className="space-y-4 rounded-lg border p-4">
+            <ShellFormSection>
               <h2 className="text-lg font-semibold">
                 {t("sectionEnglishTranslations")}
               </h2>
@@ -1176,9 +1177,9 @@ export function AdminEventForm({
                   )}
                 />
               </div>
-            </section>
+            </ShellFormSection>
 
-            <section className="space-y-4 rounded-lg border p-4">
+            <ShellFormSection>
               <h2 className="text-lg font-semibold">
                 {t("sectionEnglishSpeakers")}
               </h2>
@@ -1227,7 +1228,7 @@ export function AdminEventForm({
                   />
                 </div>
               ))}
-            </section>
+            </ShellFormSection>
           </TabsContent>
         </Tabs>
 

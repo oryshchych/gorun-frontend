@@ -6,8 +6,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { AdminEventForm } from "@/components/admin/AdminEventForm";
+import { ShellPageHeader } from "@/components/layout/shell";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCreateEvent } from "@/hooks/useEvents";
 import {
   adminFormToCreatePayload,
@@ -35,27 +35,24 @@ export default function AdminNewEventPage() {
   };
 
   return (
-    <div className="p-6 md:p-8">
-      <Button variant="ghost" asChild className="mb-6 -ml-2">
+    <>
+      <Button variant="ghost" asChild className="mb-4 -ml-2">
         <Link href={`/${locale}/admin/events`}>
           <ArrowLeft className="mr-2 size-4" />
           {tCommon("back")}
         </Link>
       </Button>
 
-      <Card className="max-w-4xl">
-        <CardHeader>
-          <CardTitle className="text-2xl">{t("create")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <AdminEventForm
-            defaultValues={defaultValues}
-            onSubmit={handleSubmit}
-            isLoading={createEvent.isPending}
-            submitLabel={tCommon("create")}
-          />
-        </CardContent>
-      </Card>
-    </div>
+      <ShellPageHeader title={t("create")} className="mb-6" />
+
+      <div className="shell-surface max-w-4xl rounded-lg border p-4 shadow-sm md:p-6">
+        <AdminEventForm
+          defaultValues={defaultValues}
+          onSubmit={handleSubmit}
+          isLoading={createEvent.isPending}
+          submitLabel={tCommon("create")}
+        />
+      </div>
+    </>
   );
 }

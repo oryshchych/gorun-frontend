@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Loader2, Pencil } from "lucide-react";
 import { getAdminPromoCodes } from "@/lib/api/admin-promo-codes";
+import { ShellPageHeader, ShellTable, ShellTableHeadRow, ShellTableScroll } from "@/components/layout/shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { handleApiError } from "@/lib/error-handler";
@@ -34,29 +35,29 @@ export default function AdminPromoCodesListPage() {
   const totalPages = pagination?.totalPages ?? 1;
 
   return (
-    <div className="p-6 md:p-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-          <p className="mt-1 text-muted-foreground">{t("description")}</p>
-        </div>
-        <Button asChild>
-          <Link href={`/${locale}/admin/promo-codes/new`}>{t("create")}</Link>
-        </Button>
-      </div>
+    <>
+      <ShellPageHeader
+        title={t("title")}
+        description={t("description")}
+        actions={
+          <Button asChild>
+            <Link href={`/${locale}/admin/promo-codes/new`}>{t("create")}</Link>
+          </Button>
+        }
+      />
 
-      <div className="mt-8 rounded-md border">
+      <ShellTable>
         {isLoading ? (
           <div className="flex justify-center py-16">
-            <Loader2 className="size-8 animate-spin text-muted-foreground" />
+            <Loader2 className="size-8 animate-spin shell-ink-muted" />
           </div>
         ) : items.length === 0 ? (
-          <p className="py-12 text-center text-muted-foreground">{t("listEmpty")}</p>
+          <p className="py-12 text-center shell-ink-muted">{t("listEmpty")}</p>
         ) : (
-          <div className="overflow-x-auto">
+          <ShellTableScroll>
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b bg-muted/40 text-left">
+                <ShellTableHeadRow>
                   <th className="px-4 py-3 font-medium">{t("codeLabel")}</th>
                   <th className="px-4 py-3 font-medium">{t("discountTypeLabel")}</th>
                   <th className="px-4 py-3 font-medium">{t("discountValueLabel")}</th>
@@ -64,7 +65,7 @@ export default function AdminPromoCodesListPage() {
                   <th className="px-4 py-3 font-medium">{t("usageLimitLabel")}</th>
                   <th className="px-4 py-3 font-medium">{t("expirationLabel")}</th>
                   <th className="w-24 px-4 py-3 font-medium" />
-                </tr>
+                </ShellTableHeadRow>
               </thead>
               <tbody>
                 {items.map((row) => (
@@ -87,11 +88,11 @@ export default function AdminPromoCodesListPage() {
                         </Badge>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">
+                    <td className="px-4 py-3 shell-ink-muted">
                       {row.usedCount != null ? `${row.usedCount} / ` : ""}
                       {row.usageLimit ?? "—"}
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">
+                    <td className="px-4 py-3 shell-ink-muted">
                       {row.expirationDate
                         ? row.expirationDate.slice(0, 10)
                         : "—"}
@@ -110,13 +111,13 @@ export default function AdminPromoCodesListPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </ShellTableScroll>
         )}
-      </div>
+      </ShellTable>
 
       {pagination && totalPages > 1 && (
         <div className="mt-4 flex items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm shell-ink-muted">
             {t("page", { current: pagination.page, total: totalPages })}
           </p>
           <div className="flex gap-2">
@@ -149,6 +150,6 @@ export default function AdminPromoCodesListPage() {
           </Button>
         </div>
       )}
-    </div>
+    </>
   );
 }

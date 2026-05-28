@@ -10,6 +10,7 @@ import { Loader2, Pencil } from "lucide-react";
 import { useEvents } from "@/hooks/useEvents";
 import { getLocalizedString } from "@/lib/utils";
 import { handleApiError } from "@/lib/error-handler";
+import { ShellPageHeader, ShellTable, ShellTableHeadRow, ShellTableScroll } from "@/components/layout/shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Event } from "@/types/event";
@@ -51,35 +52,35 @@ export default function AdminEventsListPage() {
   const totalPages = pagination?.totalPages ?? 1;
 
   return (
-    <div className="p-6 md:p-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-          <p className="mt-1 text-muted-foreground">{t("description")}</p>
-        </div>
-        <Button asChild>
-          <Link href={`/${locale}/admin/events/new`}>{t("create")}</Link>
-        </Button>
-      </div>
+    <>
+      <ShellPageHeader
+        title={t("title")}
+        description={t("description")}
+        actions={
+          <Button asChild>
+            <Link href={`/${locale}/admin/events/new`}>{t("create")}</Link>
+          </Button>
+        }
+      />
 
-      <div className="mt-8 rounded-md border">
+      <ShellTable>
         {isLoading ? (
           <div className="flex justify-center py-16">
-            <Loader2 className="size-8 animate-spin text-muted-foreground" />
+            <Loader2 className="size-8 animate-spin shell-ink-muted" />
           </div>
         ) : rows.length === 0 ? (
-          <p className="py-12 text-center text-muted-foreground">{t("listEmpty")}</p>
+          <p className="py-12 text-center shell-ink-muted">{t("listEmpty")}</p>
         ) : (
-          <div className="overflow-x-auto">
+          <ShellTableScroll>
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b bg-muted/40 text-left">
+                <ShellTableHeadRow>
                   <th className="px-4 py-3 font-medium">{t("colTitle")}</th>
                   <th className="px-4 py-3 font-medium">{t("colDate")}</th>
                   <th className="px-4 py-3 font-medium">{t("colActive")}</th>
                   <th className="px-4 py-3 font-medium">{t("colStatus")}</th>
                   <th className="w-24 px-4 py-3 font-medium" />
-                </tr>
+                </ShellTableHeadRow>
               </thead>
               <tbody>
                 {rows.map((row) => {
@@ -91,7 +92,7 @@ export default function AdminEventsListPage() {
                       <td className="max-w-[220px] truncate px-4 py-3 font-medium" title={title}>
                         {title}
                       </td>
-                      <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                      <td className="whitespace-nowrap px-4 py-3 shell-ink-muted">
                         {dateStr}
                       </td>
                       <td className="px-4 py-3">
@@ -105,7 +106,7 @@ export default function AdminEventsListPage() {
                           </Badge>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground">
+                      <td className="px-4 py-3 shell-ink-muted">
                         {row.status ? tForm(`status.${row.status}`) : "—"}
                       </td>
                       <td className="px-4 py-3">
@@ -123,13 +124,13 @@ export default function AdminEventsListPage() {
                 })}
               </tbody>
             </table>
-          </div>
+          </ShellTableScroll>
         )}
-      </div>
+      </ShellTable>
 
       {pagination && totalPages > 1 && (
         <div className="mt-4 flex items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm shell-ink-muted">
             {t("page", { current: pagination.page, total: totalPages })}
           </p>
           <div className="flex gap-2">
@@ -162,6 +163,6 @@ export default function AdminEventsListPage() {
           </Button>
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -28,6 +28,13 @@
     "refresh": "Оновити",
     "retry": "Повторити"
   },
+  "shell": {
+    "collapseSidebar": "Згорнути бічну панель",
+    "expandSidebar": "Розгорнути бічну панель",
+    "openMenu": "Відкрити меню",
+    "closeMenu": "Закрити меню",
+    "navigation": "Навігація розділу"
+  },
   "nav": {
     "home": "Головна",
     "events": "Події",

@@ -132,7 +132,7 @@ export function ProfileForm() {
   }
 
   return (
-    <div className="rounded-lg border bg-card p-6 shadow-sm md:p-8">
+    <div className="shell-surface rounded-lg border p-6 shadow-sm md:p-8">
       <div className="mb-6">
         <h2 className="text-2xl font-bold tracking-tight">{t("formTitle")}</h2>
         <p className="mt-1 text-sm text-muted-foreground">

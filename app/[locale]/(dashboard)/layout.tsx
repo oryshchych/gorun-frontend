@@ -48,7 +48,7 @@ export default function DashboardLayout({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
-          className="flex-1"
+          className="flex min-h-0 flex-1 flex-col"
           role="main"
           aria-label="Main content"
         >

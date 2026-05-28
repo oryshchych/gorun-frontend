@@ -38,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ShellFormSection } from "@/components/layout/shell";
 import { toast } from "sonner";
 
 function eventDisplayName(event: Event, locale: string): string {
@@ -173,9 +174,10 @@ export function PromoCodeForm({
 
   return (
     <Form {...form}>
+      <ShellFormSection className="max-w-lg">
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="max-w-lg space-y-6"
+        className="space-y-6"
       >
         <FormField
           control={form.control}
@@ -347,6 +349,7 @@ export function PromoCodeForm({
           </Button>
         </div>
       </form>
+      </ShellFormSection>
     </Form>
   );
 }

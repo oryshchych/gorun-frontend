@@ -28,6 +28,13 @@
     "refresh": "Refresh",
     "retry": "Retry"
   },
+  "shell": {
+    "collapseSidebar": "Collapse sidebar",
+    "expandSidebar": "Expand sidebar",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "navigation": "Section navigation"
+  },
   "nav": {
     "home": "Home",
     "events": "Events",

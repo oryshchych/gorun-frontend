@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { use } from "react";
 import { PromoCodeForm } from "@/components/admin/PromoCodeForm";
+import { ShellPageHeader } from "@/components/layout/shell";
 import { getAdminPromoCodeById } from "@/lib/api/admin-promo-codes";
 
 export default function AdminEditPromoCodePage({
@@ -20,20 +21,18 @@ export default function AdminEditPromoCodePage({
   });
 
   return (
-    <div className="p-6 md:p-8">
-      <h1 className="text-2xl font-semibold tracking-tight">{t("edit")}</h1>
-      <div className="mt-8">
-        {isError ? (
-          <p className="text-destructive">{t("loadError")}</p>
-        ) : (
-          <PromoCodeForm
-            mode="edit"
-            promoId={id}
-            initial={promo ?? null}
-            isLoadingInitial={isLoading}
-          />
-        )}
-      </div>
-    </div>
+    <>
+      <ShellPageHeader title={t("edit")} className="mb-6" />
+      {isError ? (
+        <p className="text-destructive">{t("loadError")}</p>
+      ) : (
+        <PromoCodeForm
+          mode="edit"
+          promoId={id}
+          initial={promo ?? null}
+          isLoadingInitial={isLoading}
+        />
+      )}
+    </>
   );
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useMyRegistrations } from "@/hooks/useRegistrations";
 import { EventCard } from "@/components/events/EventCard";
+import { ShellPageHeader } from "@/components/layout/shell";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import {
@@ -44,10 +45,7 @@ export function ProfileEventsList({ variant }: { variant: Variant }) {
   if (isLoading) {
     return (
       <div>
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">{title}</h1>
-          <p className="text-muted-foreground">{subtitle}</p>
-        </div>
+        <ShellPageHeader title={title} description={subtitle} className="mb-8" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[...Array(4)].map((_, i) => (
             <div
@@ -63,10 +61,7 @@ export function ProfileEventsList({ variant }: { variant: Variant }) {
   if (error) {
     return (
       <div>
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">{title}</h1>
-          <p className="text-muted-foreground">{subtitle}</p>
-        </div>
+        <ShellPageHeader title={title} description={subtitle} className="mb-8" />
         <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-lg">
           {error.message || tErrors("unexpectedError")}
         </div>
@@ -76,17 +71,14 @@ export function ProfileEventsList({ variant }: { variant: Variant }) {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">{title}</h1>
-        <p className="text-muted-foreground">{subtitle}</p>
-      </div>
+      <ShellPageHeader title={title} description={subtitle} className="mb-8" />
 
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed bg-muted/20 py-12 text-center px-4">
-          <p className="text-muted-foreground text-lg mb-2">
+        <div className="shell-surface flex flex-col items-center justify-center rounded-lg border border-dashed py-12 text-center px-4">
+          <p className="text-lg mb-2 shell-ink-muted">
             {variant === "upcoming" ? t("noUpcoming") : t("noPast")}
           </p>
-          <p className="text-sm text-muted-foreground mb-6 max-w-md">
+          <p className="text-sm shell-ink-muted mb-6 max-w-md">
             {variant === "upcoming" ? t("noUpcomingHint") : t("noPastHint")}
           </p>
           <Button asChild>

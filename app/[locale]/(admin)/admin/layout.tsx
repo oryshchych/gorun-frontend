@@ -1,6 +1,8 @@
 "use client";
 
-import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminAppShell } from "@/components/admin/AdminSidebar";
+import Footer from "@/components/layout/Footer";
+import Header from "@/components/layout/Header";
 import { isAdminUser } from "@/lib/admin/access";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
@@ -49,15 +51,12 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="flex min-h-screen w-full">
-      <AdminSidebar />
-      <div
-        id="main-content"
-        className="min-w-0 flex-1 overflow-auto"
-        role="main"
-      >
-        {children}
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <div className="flex min-h-0 flex-1 flex-col">
+        <AdminAppShell>{children}</AdminAppShell>
       </div>
+      <Footer />
     </div>
   );
 }
