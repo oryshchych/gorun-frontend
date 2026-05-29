@@ -301,6 +301,23 @@ html:not(.dark) body {
   color: var(--shell-ink-muted);
 }
 
+/* Shell data tables — hover on cells (tr background is unreliable across browsers) */
+.shell-table tbody .shell-table-row {
+  border-bottom: 1px solid hsl(var(--table-row-divider));
+}
+
+.shell-table tbody .shell-table-row:last-child {
+  border-bottom: none;
+}
+
+.shell-table tbody .shell-table-row td {
+  transition: background-color 150ms ease;
+}
+
+.shell-table tbody .shell-table-row:hover td {
+  background-color: hsl(var(--table-row-hover));
+}
+
 .shell-nav-link--active {
   background-color: #ffffff;
   border-left-color: var(--gr-brand);

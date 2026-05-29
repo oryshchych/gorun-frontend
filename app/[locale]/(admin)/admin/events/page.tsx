@@ -10,7 +10,13 @@ import { Loader2, Pencil } from "lucide-react";
 import { useEvents } from "@/hooks/useEvents";
 import { getLocalizedString } from "@/lib/utils";
 import { handleApiError } from "@/lib/error-handler";
-import { ShellPageHeader, ShellTable, ShellTableHeadRow, ShellTableScroll } from "@/components/layout/shell";
+import {
+  ShellPageHeader,
+  ShellTable,
+  ShellTableBodyRow,
+  ShellTableHeadRow,
+  ShellTableScroll,
+} from "@/components/layout/shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Event } from "@/types/event";
@@ -72,7 +78,7 @@ export default function AdminEventsListPage() {
           <p className="py-12 text-center shell-ink-muted">{t("listEmpty")}</p>
         ) : (
           <ShellTableScroll>
-            <table className="w-full text-sm">
+            <table className="shell-table w-full text-sm">
               <thead>
                 <ShellTableHeadRow>
                   <th className="px-4 py-3 font-medium">{t("colTitle")}</th>
@@ -88,7 +94,7 @@ export default function AdminEventsListPage() {
                   const dateStr = format(new Date(row.date), "PP p", { locale: dateLocale });
                   const active = row.isActive !== false;
                   return (
-                    <tr key={row.id} className="border-b last:border-0">
+                    <ShellTableBodyRow key={row.id}>
                       <td className="max-w-[220px] truncate px-4 py-3 font-medium" title={title}>
                         {title}
                       </td>
@@ -119,7 +125,7 @@ export default function AdminEventsListPage() {
                           </Link>
                         </Button>
                       </td>
-                    </tr>
+                    </ShellTableBodyRow>
                   );
                 })}
               </tbody>

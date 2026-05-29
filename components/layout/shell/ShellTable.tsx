@@ -24,3 +24,7 @@ export function ShellTableHeadRow({ className, ...props }: React.HTMLAttributes<
     />
   );
 }
+
+export function ShellTableBodyRow({ className, ...props }: React.HTMLAttributes<HTMLTableRowElement>) {
+  return <tr className={cn("shell-table-row", className)} {...props} />;
+}

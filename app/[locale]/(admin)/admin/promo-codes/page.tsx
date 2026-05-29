@@ -6,7 +6,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Loader2, Pencil } from "lucide-react";
 import { getAdminPromoCodes } from "@/lib/api/admin-promo-codes";
-import { ShellPageHeader, ShellTable, ShellTableHeadRow, ShellTableScroll } from "@/components/layout/shell";
+import {
+  ShellPageHeader,
+  ShellTable,
+  ShellTableBodyRow,
+  ShellTableHeadRow,
+  ShellTableScroll,
+} from "@/components/layout/shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { handleApiError } from "@/lib/error-handler";
@@ -55,7 +61,7 @@ export default function AdminPromoCodesListPage() {
           <p className="py-12 text-center shell-ink-muted">{t("listEmpty")}</p>
         ) : (
           <ShellTableScroll>
-            <table className="w-full text-sm">
+            <table className="shell-table w-full text-sm">
               <thead>
                 <ShellTableHeadRow>
                   <th className="px-4 py-3 font-medium">{t("codeLabel")}</th>
@@ -69,7 +75,7 @@ export default function AdminPromoCodesListPage() {
               </thead>
               <tbody>
                 {items.map((row) => (
-                  <tr key={row.id} className="border-b last:border-0">
+                  <ShellTableBodyRow key={row.id}>
                     <td className="px-4 py-3 font-mono">{row.code}</td>
                     <td className="px-4 py-3 capitalize">{row.discountType}</td>
                     <td className="px-4 py-3">
@@ -107,7 +113,7 @@ export default function AdminPromoCodesListPage() {
                         </Link>
                       </Button>
                     </td>
-                  </tr>
+                  </ShellTableBodyRow>
                 ))}
               </tbody>
             </table>
