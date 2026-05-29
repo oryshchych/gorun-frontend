@@ -6,8 +6,28 @@ alwaysApply: false
 
 # TypeScript style
 
+## Code quality — non-negotiable after every change
+
+**Every touched file must be left with zero TypeScript errors, zero lint errors, and zero Prettier violations.** A task is not complete until:
+
+```
+npm run type-check && npm run lint && npm run format:check
+```
+
+all pass. Fix the root cause — never suppress with `// @ts-ignore` or `eslint-disable`.
+
+## No `any` — ever
+
+- **`any` is banned.** It silently defeats the type system. ESLint rule `@typescript-eslint/no-explicit-any` is set to `"warn"` — existing violations are tracked; new code must introduce zero new `any` warnings.
+- `noImplicitAny` is explicitly set in `tsconfig.json` (also implied by `strict: true`).
+- Alternatives:
+  - `unknown` + type narrowing for truly unknown input
+  - Generics (`<T>`) for reusable utilities
+  - `z.infer<typeof schema>` for form / API shapes derived from Zod
+
+## Other rules
+
 - **Strict mode is on.** Don't disable strictness locally.
-- **Avoid `any`.** Prefer `unknown` + narrowing or proper generics.
 - **Use the existing types** from `/types/{api,auth,event,registration,promo-code}.ts` — don't redeclare shapes that already exist there.
 - **Import via `@/...`** — the path alias is configured in `tsconfig.json`. Don't use deep `../../..` paths.
 - **Derive types from Zod schemas** with `z.infer<typeof schema>` rather than maintaining a parallel TS interface.
@@ -18,16 +38,13 @@ alwaysApply: false
 
 ## Linting
 
-- ESLint runs `eslint-config-next` + `eslint-config-prettier`. Don't add ad-hoc disables; fix the cause.
+- ESLint runs `eslint-config-next` + `eslint-config-prettier` + `@typescript-eslint/no-explicit-any: warn`. Don't add ad-hoc disables; fix the root cause instead.
 
-## Type-checking before commit
-
-```
-npm run type-check
-```
-
-Tests are checked separately:
+## Type-checking commands
 
 ```
-npm run type-check:tests
+npm run type-check        # app code
+npm run type-check:tests  # test sources
+npm run lint              # ESLint + Prettier integration
+npm run format:check      # Prettier check only
 ```

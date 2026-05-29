@@ -102,11 +102,27 @@ Node 18+. Branch off `develop`.
 | `npm run test:watch` | Vitest watch mode |
 | `npm run test:ui` | Vitest UI |
 
-**Pre-commit triad (always):** `npm run type-check && npm run lint && npm test`.
+**Pre-commit triad (always):** `npm run type-check && npm run lint && npm test && npm run format:check`.
 
 ---
 
 ## 5. Conventions
+
+### Code quality — non-negotiable after every change
+**Every touched file must be left with zero TypeScript errors, zero lint errors, and zero Prettier violations.** There are no exceptions — a change is not done until all three pass:
+```
+npm run type-check && npm run lint && npm run format:check
+```
+If any check fails, fix it before considering the task complete. Do not suppress errors with `// @ts-ignore`, `eslint-disable`, or similar — fix the root cause.
+
+### TypeScript — no `any`
+- **Never use `any`** (explicit or implicit). It silently defeats the type system. ESLint rule `@typescript-eslint/no-explicit-any` is set to `"warn"` — existing violations are being cleaned up; new code must introduce zero new warnings.
+  - Prefer `unknown` + type narrowing for truly unknown input.
+  - Prefer generics (`<T>`) for reusable utilities.
+  - Prefer `z.infer<typeof schema>` for form / API shapes.
+- Strict mode is on (`"strict": true` in `tsconfig.json`, `noImplicitAny` enforced by ESLint).
+- Do not cast with `as` to satisfy the compiler — refactor or add a real guard instead.
+- Do not suppress with `// @ts-ignore` — use `// @ts-expect-error` with an explanation only when there is a confirmed upstream bug.
 
 ### Imports & paths
 - Always use the `@/*` path alias (configured in `tsconfig.json`). Avoid `../../..` for cross-feature imports.
@@ -166,6 +182,7 @@ Node 18+. Branch off `develop`.
 - Co-locate Zod schemas in `lib/validations/<feature>.ts` and import types from there (`z.infer<typeof schema>`) rather than duplicating interfaces.
 - Use route groups (`(public)`, `(auth)`, `(dashboard)`, `(admin)`, `(legal)`) under `app/[locale]/` to organize routes without affecting URLs.
 - Run `type-check`, `lint`, `test` before commit.
+- **Leave every touched file with zero TypeScript errors, zero lint errors, and zero Prettier violations.**
 
 **Don't**
 - Don't add a `pages/` directory — this project is App Router only.
@@ -175,6 +192,8 @@ Node 18+. Branch off `develop`.
 - Don't run `npm install` / dependency upgrades without explicit user approval (they're in the deny list of `.claude/settings.json`).
 - Don't use legacy shadcn variants (`default`, `secondary`, etc.) for new UI — prefer the GoRun set.
 - Don't bypass the `[locale]` segment for user-facing routes.
+- **Don't use `any`** — ever. Use `unknown` + narrowing, generics, or `z.infer<>` instead.
+- Don't suppress errors with `// @ts-ignore` or `eslint-disable` — fix the root cause.
 
 ---
 
