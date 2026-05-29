@@ -20,6 +20,8 @@ export interface AdminPromoCodesListResult {
 export async function getAdminPromoCodes(params?: {
   page?: number;
   limit?: number;
+  search?: string;
+  eventId?: string;
 }): Promise<AdminPromoCodesListResult> {
   const page = params?.page ?? 1;
   const limit = params?.limit ?? 20;
@@ -27,7 +29,12 @@ export async function getAdminPromoCodes(params?: {
   const response = await apiClient.get<ApiSuccessResponse<AdminPromoCode[]>>(
     ADMIN_PROMO_CODES_PATH,
     {
-      params: { page, limit },
+      params: {
+        page,
+        limit,
+        ...(params?.search ? { search: params.search } : {}),
+        ...(params?.eventId ? { eventId: params.eventId } : {}),
+      },
     }
   );
 
