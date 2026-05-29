@@ -1,0 +1,56 @@
+---
+description: Component conventions — file layout, "use client" discipline, props, primitives.
+globs: components/**/*.tsx
+alwaysApply: false
+---
+
+# Components
+
+## Layout
+
+- **File naming:** PascalCase (`EventCard.tsx`, `AdminEventForm.tsx`).
+- **One main export per file**, named the same as the file.
+- **Co-locate tests** in `components/<domain>/__tests__/<Name>.test.tsx`.
+
+## Folders by domain
+
+- `components/ui/` — shadcn-style primitives (Button, Input, Form, Select, Dialog, …)
+- `components/admin/` — admin-only forms and panels
+- `components/auth/` — login/register/forgot/reset
+- `components/events/` — event card, list, details, form
+- `components/layout/` — header, navigation, shell
+- `components/profile/` — profile editor
+- `components/registration/` — event registration flow
+- `components/legal/` — legal content
+- `components/shared/` — cross-domain widgets
+- `components/providers/` — provider wrapper components (QueryProvider, etc.)
+
+## `"use client"` discipline
+
+- **Default = server component.** Only add `"use client"` when the file needs hooks, browser APIs, event handlers, or React context.
+- For mostly-static pages with one interactive bit, extract the interactive bit into its own client component and import it from the server page.
+
+## Props
+
+- Type props with an `interface <Name>Props { … }` defined just above the component.
+- Pull shared types from `types/<domain>.ts` — don't redefine them inline.
+- For polymorphic primitives (`Button`, similar), support `asChild` via `@radix-ui/react-slot` and use the CVA + `cn()` pattern.
+
+## Class merging
+
+- Always merge classNames with `cn()` from `@/lib/utils`. Never string-concat them.
+
+## Design tokens
+
+- Use CSS vars from `app/globals.css`: `var(--gr-brand)`, `var(--gr-ink)`, `var(--gr-surface-2)`, etc.
+- For new UI: prefer the GoRun variant set (`brand`, `primary`, `soft`, `ghost-gr`). Legacy shadcn variants (`default`, `secondary`, …) are kept for back-compat only.
+
+## i18n
+
+- All user-visible text goes through `useTranslations("<scope>")`. Add keys to BOTH `messages/en.json` AND `messages/uk.json` in the same edit.
+
+## Reference
+
+- Canonical primitive: `components/ui/button.tsx`
+- Canonical complex form: `components/admin/AdminEventForm.tsx`
+- Canonical context+hook: `hooks/useAuth.tsx`

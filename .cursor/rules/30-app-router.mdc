@@ -1,0 +1,58 @@
+---
+description: Next.js 16 App Router — locale routing, route groups, layouts, metadata.
+globs: app/**/*.ts,app/**/*.tsx,middleware.ts,i18n.ts
+alwaysApply: false
+---
+
+# App Router
+
+## Routing shape
+
+- Every user-facing route lives under `app/[locale]/...`. Locales: `["uk", "en"]`, default `uk` — defined in `i18n.ts`.
+- Route groups inside `app/[locale]/`:
+  - `(public)` — browse, marketing
+  - `(auth)` — login, register, forgot/reset password
+  - `(dashboard)` — `my-events`, `my-registrations`, `profile` (client-side auth-gated)
+  - `(admin)` — admin event + promo-code management
+  - `(legal)` — legal pages
+- **No `pages/` directory.** Refuse to introduce one.
+- **No `getServerSideProps` / `getStaticProps`.** App Router doesn't use them.
+
+## Params
+
+Next 16 awaits params:
+
+```ts
+interface PageProps {
+  params: Promise<{ locale: Locale; id: string /* etc. */ }>;
+}
+
+export default async function Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  // ...
+}
+```
+
+## Server vs client
+
+- Default = server component.
+- Add `"use client"` ONLY when the file needs hooks, browser APIs, event handlers, or context.
+- For interactive islands inside a server page, extract them into `components/<domain>/<Name>.tsx` (with `"use client"`) and import.
+
+## i18n in pages
+
+- Server pages / `generateMetadata`: `const t = await getTranslations({ locale, namespace: "<scope>" })`.
+- Client components: `const t = useTranslations("<scope>")`.
+- All keys must exist in BOTH `messages/en.json` and `messages/uk.json`.
+
+## Metadata
+
+- Export `generateMetadata({ params })` for any page with SEO value (title, description, OG image).
+- Pull strings via `getTranslations` — don't hardcode them.
+
+## Middleware
+
+- `middleware.ts` is responsible for next-intl locale matching and CORS. **Keep it minimal.**
+- Don't add auth logic to middleware — client-side layouts handle auth gating.
+- Don't store request-scoped state in middleware.

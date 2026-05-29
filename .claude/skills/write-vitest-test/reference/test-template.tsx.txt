@@ -1,0 +1,66 @@
+// components/<domain>/__tests__/<Name>.test.tsx
+import { describe, it, expect, beforeEach } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { NextIntlClientProvider } from "next-intl";
+
+import enMessages from "@/messages/en.json";
+import { <Name> } from "@/components/<domain>/<Name>";
+
+function renderWithProviders(ui: React.ReactElement) {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <NextIntlClientProvider locale="en" messages={enMessages as never}>
+        {ui}
+      </NextIntlClientProvider>
+    </QueryClientProvider>
+  );
+}
+
+describe("<Name>", () => {
+  it("renders the heading", () => {
+    renderWithProviders(<<Name> />);
+    expect(screen.getByRole("heading", { name: /…/i })).toBeInTheDocument();
+  });
+
+  it("submits the form on valid input", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<<Name> />);
+
+    await user.type(screen.getByLabelText(/email/i), "u@example.com");
+    await user.click(screen.getByRole("button", { name: /submit/i }));
+
+    // Assert outcome — e.g., success message, mutation called, etc.
+  });
+});
+
+// ──────────────────────────────────────────────────────────────
+// API wrapper test (lib/api/__tests__/<domain>.test.ts)
+// ──────────────────────────────────────────────────────────────
+// import { describe, it, expect, beforeEach, afterEach } from "vitest";
+// import MockAdapter from "axios-mock-adapter";
+// import apiClient from "@/lib/api/client";
+// import { get<Feature>s } from "@/lib/api/<feature>";
+//
+// describe("<feature> API", () => {
+//   let mock: MockAdapter;
+//
+//   beforeEach(() => {
+//     mock = new MockAdapter(apiClient);
+//   });
+//
+//   afterEach(() => {
+//     mock.restore();
+//   });
+//
+//   it("get<Feature>s issues GET /<feature>s with params", async () => {
+//     mock.onGet("/<feature>s").reply(200, { items: [], total: 0, page: 1, limit: 10 });
+//     const res = await get<Feature>s({ page: 1, limit: 10 });
+//     expect(mock.history.get[0].url).toBe("/<feature>s");
+//     expect(res.items).toEqual([]);
+//   });
+// });

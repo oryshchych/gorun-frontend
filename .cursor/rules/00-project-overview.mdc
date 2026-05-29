@@ -1,0 +1,38 @@
+---
+description: gorun-client project overview — always loaded. Stack snapshot, directory map, hard rules.
+alwaysApply: true
+---
+
+# gorun-client
+
+Bilingual (uk / en) events registration platform. Next.js 16 App Router, React 19, TypeScript 5.9, Tailwind v4, shadcn-style UI (Radix + CVA), RHF + Zod, next-intl, TanStack Query 5, axios with JWT-refresh interceptor, Vitest. Node 18+, npm.
+
+**For the full convention reference, see [AGENTS.md](mdc:AGENTS.md) at the repo root.** Cursor's other path-scoped rules under `.cursor/rules/` reinforce specific slices.
+
+## Directory map (high level)
+
+```
+app/[locale]/(public|auth|dashboard|admin|legal)/   # App Router with locale + route groups
+components/{ui,admin,auth,events,layout,profile,registration,legal,shared,providers}/
+lib/{api,validations,forms,admin,constants}/        # API wrappers, Zod schemas, helpers
+hooks/                                              # React Query hooks + useAuth context
+types/                                              # TypeScript types per domain
+messages/{en.json,uk.json}                          # i18n catalogs — MUST stay in sync
+middleware.ts                                       # next-intl locale routing + CORS
+i18n.ts                                             # next-intl request config
+```
+
+## Hard rules (apply everywhere)
+
+1. **Path alias:** import from `@/...`, never long relative paths.
+2. **No `pages/` dir** — this is App Router only.
+3. **Every translation key must exist in BOTH `messages/en.json` AND `messages/uk.json`.** A missing key in one locale silently breaks runtime in that locale.
+4. **No direct `fetch` or new `axios.create`** — go through `apiClient` from `lib/api/client.ts`.
+5. **No direct `localStorage` reads for tokens** — use `tokenManager` from `lib/api/client.ts`.
+6. **Server vs client components:** default to server; add `"use client"` ONLY when hooks/browser/events require it.
+7. **GoRun design variants for new UI** (`brand`, `primary`, `soft`, `ghost-gr`, sizes `sm|md|lg`). Legacy shadcn variants kept for back-compat only.
+8. **Don't run `npm install` / dependency changes** without explicit user approval.
+
+## Pre-commit triad
+
+`npm run type-check && npm run lint && npm test`

@@ -1,0 +1,33 @@
+---
+description: TypeScript style conventions for gorun-client.
+globs: **/*.ts,**/*.tsx
+alwaysApply: false
+---
+
+# TypeScript style
+
+- **Strict mode is on.** Don't disable strictness locally.
+- **Avoid `any`.** Prefer `unknown` + narrowing or proper generics.
+- **Use the existing types** from `/types/{api,auth,event,registration,promo-code}.ts` — don't redeclare shapes that already exist there.
+- **Import via `@/...`** — the path alias is configured in `tsconfig.json`. Don't use deep `../../..` paths.
+- **Derive types from Zod schemas** with `z.infer<typeof schema>` rather than maintaining a parallel TS interface.
+- **Interface vs type:** prefer `interface` for object shapes and component props; `type` for unions / function signatures / mapped types.
+- **Don't suppress with `// @ts-ignore`** — fix the underlying issue. `// @ts-expect-error` with a comment is acceptable only when there's a real upstream bug.
+- **Return types on exported functions** improve refactoring safety — add them when not trivially inferred.
+- **No `as` casts to satisfy the compiler.** Refactor the code or add a real guard.
+
+## Linting
+
+- ESLint runs `eslint-config-next` + `eslint-config-prettier`. Don't add ad-hoc disables; fix the cause.
+
+## Type-checking before commit
+
+```
+npm run type-check
+```
+
+Tests are checked separately:
+
+```
+npm run type-check:tests
+```

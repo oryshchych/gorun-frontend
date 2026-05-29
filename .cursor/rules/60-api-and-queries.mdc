@@ -1,0 +1,73 @@
+---
+description: API and React Query conventions — three-layer pipeline (types, axios wrapper, hook).
+globs: lib/api/**/*.ts,hooks/use*.ts,hooks/use*.tsx
+alwaysApply: false
+---
+
+# API & React Query
+
+## Three-layer pipeline
+
+For every backend endpoint:
+
+1. **Types** in `types/<domain>.ts` — request payload + response entity
+2. **Axios wrapper** in `lib/api/<domain>.ts` — uses `apiClient` from `./client`
+3. **React Query hook** in `hooks/use<Domain>.ts` — exposes `queryKey` factory + `useFoo` / `useFooMutation`
+
+Hard rules:
+
+- **Never** import `axios` directly in `lib/api/<domain>.ts` — use `apiClient`.
+- **Never** create a new `axios.create()` in app code.
+- **Never** call `fetch` directly anywhere.
+- **Never** read/write `localStorage` for tokens directly — use `tokenManager`.
+
+## Axios client
+
+`lib/api/client.ts` already handles:
+
+- JWT attach via request interceptor (`tokenManager.getAccessToken()`)
+- 401 → refresh + retry via response interceptor
+- Error normalization (`statusCode`, `message`, `errors`, `code`)
+- Token storage (`access_token`, `refresh_token` in `localStorage`)
+
+## React Query hook shape
+
+Canonical example: `hooks/useEvents.ts`.
+
+```ts
+export const fooKeys = {
+  all: ["foos"] as const,
+  lists: () => [...fooKeys.all, "list"] as const,
+  list: (params: GetFoosParams) => [...fooKeys.lists(), params] as const,
+  details: () => [...fooKeys.all, "detail"] as const,
+  detail: (id: string) => [...fooKeys.details(), id] as const,
+};
+
+export const useFoos = (params: GetFoosParams = {}) =>
+  useQuery<PaginatedResponse<Foo>, Error>({
+    queryKey: fooKeys.list(params),
+    queryFn: () => getFoos(params),
+    staleTime: 1000 * 60 * 5,
+  });
+
+export const useCreateFoo = () => {
+  const queryClient = useQueryClient();
+  const t = useTranslations("apiCodes");
+  return useMutation<Foo, Error, CreateFooRequest>({
+    mutationFn: createFoo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: fooKeys.lists() });
+      showSuccessToast(t("foo.created"));
+    },
+    onError: handleApiError,
+  });
+};
+```
+
+- **`staleTime`** for reads: `1000 * 60 * 5` (5 minutes).
+- **Invalidation** on mutation success: invalidate the matching `fooKeys.*()` prefix.
+- **Toasts** live in the hook, not in the component (`showSuccessToast`, `handleApiError` from `lib/error-handler`).
+
+## Test the wrapper
+
+API wrapper tests use `axios-mock-adapter` against `apiClient`. See `lib/api/__tests__/auth.test.ts`.

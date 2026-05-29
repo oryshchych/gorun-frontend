@@ -1,0 +1,52 @@
+---
+description: Internationalization rules — bilingual parity is the #1 footgun in this repo.
+globs: messages/**/*.json,**/*.tsx,**/*.ts
+alwaysApply: false
+---
+
+# i18n (next-intl)
+
+## The hard rule
+
+**Every translation key MUST exist in BOTH `messages/en.json` AND `messages/uk.json`.**
+
+A missing key in one locale silently breaks `next-intl` at runtime in that locale — no crash, just the key path shown to the user. Add to both files in the same edit, always.
+
+## Usage
+
+- **Client components:** `const t = useTranslations("scope")` then `t("key")`.
+- **Server components / `generateMetadata`:** `const t = await getTranslations({ locale, namespace: "scope" })`.
+- **Plural / interpolation:** `t("greeting", { name })`, `t("itemCount", { count })`.
+
+## Catalog structure
+
+Top-level scopes already used:
+
+| Scope | Used by |
+| --- | --- |
+| `common` | universal (Save, Cancel, Delete, Loading) |
+| `auth` | login, register, forgot/reset password |
+| `admin` | `admin.eventForm`, `admin.promoCodes`, `admin.nav` |
+| `events` | event list, details, registration |
+| `profile` | profile page + edit |
+| `registration` | registration flow |
+| `legal` | terms, privacy |
+| `apiCodes` | success/error toast text keyed by backend response code |
+
+When adding a new scope, add the empty `{}` to BOTH files first, then the keys inside.
+
+## Bilingual content ≠ i18n keys
+
+Don't confuse:
+
+- **i18n keys** — UI labels in `messages/*.json`. Static.
+- **Bilingual content** — user-generated data with separate `en` / `uk` values (event titles/descriptions). Stored in the DB. Validated by the `pair(min, max, field)` helper in `lib/validations/admin-event.ts`.
+
+## Locale config
+
+- `i18n.ts` exports `locales = ["uk", "en"] as const`, `defaultLocale = "uk"`, and the `Locale` type.
+- `middleware.ts` enforces locale prefixes (`/uk/…`, `/en/…`).
+
+## Verify parity
+
+Run `/sync-i18n` (`.claude/commands/sync-i18n.md`) to audit drift. Never delete keys from one locale to "match" the other — pad missing keys with `__TODO__` and resolve.

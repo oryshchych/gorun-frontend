@@ -1,0 +1,89 @@
+// components/<domain>/<FormName>.tsx
+"use client";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+import {
+  <feature>Schema,
+  type <Feature>FormValues,
+} from "@/lib/validations/<feature>";
+import { useCreate<Feature> } from "@/hooks/use<Feature>";
+
+interface <FormName>Props {
+  // For edit forms, pass the initial entity; for create, omit and supply empty defaults below
+  initialValues?: Partial<<Feature>FormValues>;
+  onSuccess?: () => void;
+}
+
+export function <FormName>({ initialValues, onSuccess }: <FormName>Props) {
+  const t = useTranslations("<scope>.<formName>");
+  const createMutation = useCreate<Feature>();
+
+  const form = useForm<<Feature>FormValues>({
+    resolver: zodResolver(<feature>Schema),
+    defaultValues: {
+      // ...empty / initial shape — every field MUST have a default to keep RHF controlled
+      ...initialValues,
+    },
+  });
+
+  const onSubmit = (values: <Feature>FormValues) => {
+    createMutation.mutate(values, {
+      onSuccess: () => {
+        form.reset();
+        onSuccess?.();
+      },
+    });
+  };
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-4"
+      >
+        <FormField
+          control={form.control}
+          name="<fieldName>"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("<fieldName>Label")}</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder={t("<fieldName>Placeholder")}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* repeat <FormField> per field */}
+
+        <Button
+          type="submit"
+          variant="brand"
+          size="md"
+          disabled={createMutation.isPending}
+          className="self-start"
+        >
+          {createMutation.isPending ? t("submitting") : t("submit")}
+        </Button>
+      </form>
+    </Form>
+  );
+}

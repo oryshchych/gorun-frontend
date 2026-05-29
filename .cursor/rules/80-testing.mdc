@@ -1,0 +1,84 @@
+---
+description: Vitest + Testing Library + axios-mock-adapter conventions.
+globs: **/__tests__/**,**/*.test.ts,**/*.test.tsx
+alwaysApply: false
+---
+
+# Testing
+
+## Stack
+
+- **Vitest 4** (`vitest --run` for one-shot, `vitest` for watch)
+- **jsdom** env (configured in `vitest.config.ts`)
+- **@testing-library/react** + **@testing-library/user-event** + **@testing-library/jest-dom**
+- **axios-mock-adapter** for API wrappers
+- **Setup** in `vitest.setup.ts`
+
+## Test location
+
+Colocate tests in `__tests__/` folders next to the source:
+
+```
+components/auth/LoginForm.tsx
+components/auth/__tests__/LoginForm.test.tsx
+lib/api/auth.ts
+lib/api/__tests__/auth.test.ts
+```
+
+## API wrapper test pattern
+
+Canonical: `lib/api/__tests__/auth.test.ts`.
+
+```ts
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import MockAdapter from "axios-mock-adapter";
+import apiClient from "@/lib/api/client";
+import { loginUser } from "@/lib/api/auth";
+
+describe("auth API", () => {
+  let mock: MockAdapter;
+
+  beforeEach(() => { mock = new MockAdapter(apiClient); });
+  afterEach(() => { mock.restore(); });
+
+  it("posts to /auth/login", async () => {
+    mock.onPost("/auth/login").reply(200, { /* … */ });
+    const res = await loginUser({ email: "u@x.com", password: "secret" });
+    expect(mock.history.post[0].url).toBe("/auth/login");
+    expect(res.user.email).toBe("u@x.com");
+  });
+});
+```
+
+- One `describe` per exported fn
+- Cover happy path + error normalization
+- Reset the mock in `afterEach`
+
+## Component test pattern
+
+```tsx
+function renderWithProviders(ui: React.ReactElement) {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <NextIntlClientProvider locale="en" messages={enMessages as never}>
+        {ui}
+      </NextIntlClientProvider>
+    </QueryClientProvider>
+  );
+}
+```
+
+- Fresh `QueryClient` per test (`retry: false` to avoid noise)
+- Real `NextIntlClientProvider` — DON'T mock `useTranslations`
+- Query by accessible role / label first (`getByRole`, `getByLabelText`)
+- Drive interaction with `userEvent`, not `fireEvent`
+- Assert outcomes, not implementation details
+
+## Anti-patterns
+
+- Hitting a real backend
+- Mocking `useTranslations` to return key paths — provide real messages
+- Sharing a `QueryClient` across tests (caches leak)
+- Snapshot tests for non-trivial components
+- Loose assertions (`expect(x).toBeDefined()`)

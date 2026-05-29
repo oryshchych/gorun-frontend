@@ -1,0 +1,88 @@
+// hooks/use<Feature>.ts
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+
+import {
+  get<Feature>s,
+  get<Feature>ById,
+  create<Feature>,
+  update<Feature>,
+  delete<Feature>,
+  type Get<Feature>sParams,
+} from "@/lib/api/<feature>";
+import type {
+  <Feature>,
+  Create<Feature>Request,
+  Update<Feature>Request,
+} from "@/types/<feature>";
+import type { PaginatedResponse } from "@/types/api";
+import { handleApiError, showSuccessToast } from "@/lib/error-handler";
+
+// Query keys factory — co-located, never inlined
+export const <feature>Keys = {
+  all: ["<feature>s"] as const,
+  lists: () => [...<feature>Keys.all, "list"] as const,
+  list: (params: Get<Feature>sParams) =>
+    [...<feature>Keys.lists(), params] as const,
+  details: () => [...<feature>Keys.all, "detail"] as const,
+  detail: (id: string) => [...<feature>Keys.details(), id] as const,
+};
+
+export const use<Feature>s = (params: Get<Feature>sParams = {}) =>
+  useQuery<PaginatedResponse<<Feature>>, Error>({
+    queryKey: <feature>Keys.list(params),
+    queryFn: () => get<Feature>s(params),
+    staleTime: 1000 * 60 * 5,
+  });
+
+export const use<Feature> = (id: string) =>
+  useQuery<<Feature>, Error>({
+    queryKey: <feature>Keys.detail(id),
+    queryFn: () => get<Feature>ById(id),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+  });
+
+export const useCreate<Feature> = () => {
+  const queryClient = useQueryClient();
+  const t = useTranslations("apiCodes");
+  return useMutation<<Feature>, Error, Create<Feature>Request>({
+    mutationFn: create<Feature>,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: <feature>Keys.lists() });
+      showSuccessToast(t("<feature>.created"));
+    },
+    onError: handleApiError,
+  });
+};
+
+export const useUpdate<Feature> = () => {
+  const queryClient = useQueryClient();
+  const t = useTranslations("apiCodes");
+  return useMutation<<Feature>, Error, { id: string; data: Update<Feature>Request }>({
+    mutationFn: ({ id, data }) => update<Feature>(id, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: <feature>Keys.detail(variables.id) });
+      queryClient.invalidateQueries({ queryKey: <feature>Keys.lists() });
+      showSuccessToast(t("<feature>.updated"));
+    },
+    onError: handleApiError,
+  });
+};
+
+export const useDelete<Feature> = () => {
+  const queryClient = useQueryClient();
+  const t = useTranslations("apiCodes");
+  return useMutation<void, Error, string>({
+    mutationFn: delete<Feature>,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: <feature>Keys.all });
+      showSuccessToast(t("<feature>.deleted"));
+    },
+    onError: handleApiError,
+  });
+};

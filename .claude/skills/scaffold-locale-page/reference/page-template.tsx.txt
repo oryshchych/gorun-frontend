@@ -1,0 +1,35 @@
+// app/[locale]/(<group>)/<route>/page.tsx
+import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+
+import type { Locale } from "@/i18n";
+
+interface PageProps {
+  params: Promise<{ locale: Locale }>;
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "<scope>.meta" });
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
+
+export default async function <PageName>Page({ params }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "<scope>" });
+
+  return (
+    <main className="container mx-auto px-4 py-8">
+      <h1 className="mb-4 text-3xl font-semibold text-[var(--gr-ink)]">
+        {t("heading")}
+      </h1>
+      {/* Server-rendered content here. For interactive bits, import a client component. */}
+    </main>
+  );
+}

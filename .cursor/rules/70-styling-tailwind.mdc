@@ -1,0 +1,57 @@
+---
+description: Tailwind v4 + design tokens + CVA variants for gorun-client.
+globs: **/*.tsx,app/globals.css,tailwind.config.ts,components/ui/**
+alwaysApply: false
+---
+
+# Styling
+
+## Stack
+
+- **Tailwind CSS v4** — utility-first
+- **Design tokens** as CSS vars in `app/globals.css` (`--gr-brand`, `--gr-ink`, `--gr-bg`, `--gr-surface-*`, `--gr-line`, `--gr-line-strong`, `--gr-brand-glow`, plus shadow/radius vars)
+- **CVA** (`class-variance-authority`) for component variants
+- **`cn()`** from `@/lib/utils` for merging classes
+- **`next-themes`** for light/dark mode (class strategy)
+
+## Tokens, not hex
+
+Use design tokens for any color/surface/border. Examples:
+
+```tsx
+className="bg-[var(--gr-brand)] text-[var(--gr-bg)]"
+className="border border-[var(--gr-line)]"
+className="text-[var(--gr-ink)]"
+```
+
+Don't hardcode hex colors. If a token doesn't exist for what you need, add it to `app/globals.css` (light + dark variants) FIRST.
+
+## Variant primitive pattern
+
+See `components/ui/button.tsx`. New primitives:
+
+```tsx
+const fooVariants = cva("base classes", {
+  variants: {
+    variant: { brand: "…", primary: "…", soft: "…" },
+    size: { sm: "h-9 px-3.5 text-sm", md: "h-12 px-[18px] text-[15px]", lg: "h-14 px-[22px] text-base" },
+  },
+  defaultVariants: { variant: "brand", size: "md" },
+});
+```
+
+- **GoRun variants** for NEW UI: `brand`, `primary`, `soft`, `ghost-gr`
+- **Legacy shadcn variants** (`default`, `secondary`, `destructive`, `outline`, `ghost`, `link`) — kept for back-compat only
+- **Sizes** are `sm | md | lg` (heights 9 / 12 / 14)
+
+## Dark mode
+
+- Use `next-themes` with class strategy. All `--gr-*` tokens have light + dark variants defined in `app/globals.css`.
+- Don't use `dark:` utilities for color — let the token swap handle it.
+
+## Anti-patterns
+
+- Inline `style={{ … }}` for anything that could be a utility or token
+- New CSS files outside `app/globals.css`
+- Hardcoded colors / spacings
+- Skipping `cn()` and string-concatenating classNames

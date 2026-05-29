@@ -1,0 +1,77 @@
+---
+description: Forms with react-hook-form + Zod + next-intl in gorun-client.
+globs: lib/validations/**/*.ts,components/**/*Form*.tsx,components/**/forms/**/*.tsx
+alwaysApply: false
+---
+
+# Forms & validation
+
+## Stack
+
+- **react-hook-form** (`useForm`, `Controller`, `useFieldArray`)
+- **Zod** schemas + `zodResolver` from `@hookform/resolvers/zod`
+- **UI primitives** from `components/ui/form.tsx` (`<Form>`, `<FormField>`, `<FormItem>`, `<FormLabel>`, `<FormControl>`, `<FormMessage>`)
+- **i18n** labels/buttons via `useTranslations`
+
+## Schema location
+
+- Always `lib/validations/<feature>.ts`. Export the schema AND a derived `FormValues` type:
+
+```ts
+export const fooSchema = z.object({ … });
+export type FooFormValues = z.infer<typeof fooSchema>;
+```
+
+- For bilingual user-generated content (event titles, etc.), use the `pair(min, max, field)` helper pattern from `lib/validations/admin-event.ts`:
+
+```ts
+const pair = (min: number, max: number, field: string) =>
+  z.object({
+    en: z.string().min(min, `${field} (EN) must be at least ${min} chars`).max(max, …),
+    uk: z.string().min(min, `${field} (UK) must be at least ${min} chars`).max(max, …),
+  });
+```
+
+- For numeric fields that may be empty, route through helpers in `lib/forms/number-field.ts` (`emptyNumberToUndefined`, etc.).
+
+## Form component shape
+
+```tsx
+"use client";
+
+const form = useForm<FooFormValues>({
+  resolver: zodResolver(fooSchema),
+  defaultValues: { /* every field must have a default for controlled inputs */ },
+});
+
+const onSubmit = (values: FooFormValues) => {
+  mutation.mutate(values, { onSuccess: () => form.reset() });
+};
+
+return (
+  <Form {...form}>
+    <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <FormField control={form.control} name="foo" render={({ field }) => (
+        <FormItem>
+          <FormLabel>{t("fooLabel")}</FormLabel>
+          <FormControl><Input {...field} /></FormControl>
+          <FormMessage />
+        </FormItem>
+      )} />
+      <Button variant="brand" size="md" type="submit">{t("submit")}</Button>
+    </form>
+  </Form>
+);
+```
+
+## Dynamic field sets
+
+- Use `useFieldArray`. See `components/admin/AdminEventForm.tsx` (gallery, perks, schedule, distances) for the canonical pattern.
+
+## Submission
+
+- Call the matching mutation hook from `hooks/use<Domain>.ts`. The hook handles toasts (`showSuccessToast`) and error normalization (`handleApiError`) — DON'T duplicate them in the form.
+
+## i18n
+
+- Labels, placeholders, button text go through `useTranslations`. Add keys to BOTH `messages/en.json` AND `messages/uk.json`. Zod error messages are currently English-only — keep them short and user-readable.
