@@ -19,7 +19,8 @@ const buttonVariants = cva(
         "ghost-gr":
           "rounded-full bg-transparent text-[var(--gr-ink)] border border-[var(--gr-line-strong)] hover:bg-[var(--gr-surface-2)]",
         /* ── Legacy shadcn variants (keep for existing components) ── */
-        default: "rounded-md bg-primary text-primary-foreground hover:bg-primary/90",
+        default:
+          "rounded-md bg-[var(--gr-brand)] text-white hover:bg-[var(--gr-brand-600)] active:scale-[0.98] shadow-sm",
         destructive:
           "rounded-md bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60",
         outline:

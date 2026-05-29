@@ -445,9 +445,8 @@ export function ProfileForm() {
           <div className="md:col-span-2 pt-2">
             <Button
               type="submit"
-              variant="outline"
               disabled={isLoading}
-              className="w-full"
+              className="w-full sm:max-w-xs"
             >
               {isLoading ? t("saving") : t("saveProfile")}
             </Button>

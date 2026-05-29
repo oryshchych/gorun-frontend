@@ -78,8 +78,9 @@ export default function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
+                      variant="ghost"
                       size="icon-lg"
-                      className="rounded-full"
+                      className="rounded-full text-muted-foreground hover:text-foreground"
                       aria-label={t("profile")}
                     >
                       <User className="size-5" aria-hidden="true" />
