@@ -54,14 +54,19 @@ export default function AdminPromoCodesListPage() {
 
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [eventFilterId, setEventFilterId] = useState("all");
 
   const debouncedSearch = useDebounce(searchQuery, 300);
+
+  const isActiveParam =
+    statusFilter === "active" ? true : statusFilter === "inactive" ? false : undefined;
 
   const { data, isLoading, isError, error, refetch } = useAdminPromoCodes({
     page,
     limit: PROMO_LIST_LIMIT,
     search: debouncedSearch || undefined,
+    isActive: isActiveParam,
     eventId: eventFilterId === "all" ? undefined : eventFilterId,
   });
 
@@ -105,7 +110,8 @@ export default function AdminPromoCodesListPage() {
     [events, locale]
   );
 
-  const hasActiveFilters = debouncedSearch !== "" || eventFilterId !== "all";
+  const hasActiveFilters =
+    debouncedSearch !== "" || statusFilter !== "all" || eventFilterId !== "all";
 
   return (
     <>
@@ -137,6 +143,23 @@ export default function AdminPromoCodesListPage() {
             aria-label={t("searchPlaceholder")}
           />
         </div>
+        <Select
+          value={statusFilter}
+          onValueChange={(v: "all" | "active" | "inactive") => {
+            setStatusFilter(v);
+            setPage(1);
+          }}
+        >
+          <SelectTrigger className="w-full sm:w-[min(100%,180px)]">
+            <SelectValue placeholder={t("filterAllStatuses")} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t("filterAllStatuses")}</SelectItem>
+            <SelectItem value="active">{t("filterActive")}</SelectItem>
+            <SelectItem value="inactive">{t("filterInactive")}</SelectItem>
+          </SelectContent>
+        </Select>
+
         <Select
           value={eventFilterId}
           onValueChange={(v) => {

@@ -19,6 +19,7 @@ export interface AdminPromoCodesListParams {
   limit?: number;
   search?: string;
   eventId?: string;
+  isActive?: boolean;
 }
 
 export const promoCodeKeys = {

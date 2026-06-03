@@ -22,6 +22,7 @@ export async function getAdminPromoCodes(params?: {
   limit?: number;
   search?: string;
   eventId?: string;
+  isActive?: boolean;
 }): Promise<AdminPromoCodesListResult> {
   const page = params?.page ?? 1;
   const limit = params?.limit ?? 20;
@@ -34,6 +35,7 @@ export async function getAdminPromoCodes(params?: {
         limit,
         ...(params?.search ? { search: params.search } : {}),
         ...(params?.eventId ? { eventId: params.eventId } : {}),
+        ...(params?.isActive !== undefined ? { isActive: params.isActive } : {}),
       },
     }
   );
