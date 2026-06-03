@@ -116,13 +116,21 @@ npm run type-check && npm run lint && npm run format:check
 If any check fails, fix it before considering the task complete. Do not suppress errors with `// @ts-ignore`, `eslint-disable`, or similar — fix the root cause.
 
 ### TypeScript — no `any`
-- **Never use `any`** (explicit or implicit). It silently defeats the type system. ESLint rule `@typescript-eslint/no-explicit-any` is set to `"warn"` — existing violations are being cleaned up; new code must introduce zero new warnings.
+- **Never use `any`** (explicit or implicit). It silently defeats the type system. ESLint rule `@typescript-eslint/no-explicit-any` is set to `"error"` (see `eslint.config.mjs`) — the codebase is at zero violations, so any new `any` fails `npm run lint` and blocks the build.
   - Prefer `unknown` + type narrowing for truly unknown input.
   - Prefer generics (`<T>`) for reusable utilities.
   - Prefer `z.infer<typeof schema>` for form / API shapes.
 - Strict mode is on (`"strict": true` in `tsconfig.json`, `noImplicitAny` enforced by ESLint).
 - Do not cast with `as` to satisfy the compiler — refactor or add a real guard instead.
 - Do not suppress with `// @ts-ignore` — use `// @ts-expect-error` with an explanation only when there is a confirmed upstream bug.
+
+**Patterns that replace `any` (do this, not that):**
+- **Caught errors:** write `catch (error) { … }` (TS infers `unknown`) and narrow — `error instanceof Error ? error.message : fallback`, or pass straight to `handleApiError` (its param is `unknown`). Never `catch (error: any)`.
+- **Untyped objects (API payloads, error bodies):** narrow with a guard like `isRecord(value): value is Record<string, unknown>` before reading props. Don't read off `(value as any).foo`.
+- **Backend field not on the domain type:** add it as an **optional** field to the canonical type in `types/<domain>.ts` (e.g. `bib?`, `distance?`, `kids?`) — fix it once at the source. Don't reach for `(obj as any).field` at each call site.
+- **Generic defaults:** use `<T = unknown>`, never `<T = any>` (see `types/api.ts`).
+- **react-hook-form generics:** the `TContext` slot is `unknown`, not `any` (`useForm<Input, unknown, Output>`, `Resolver<Input, unknown, Output>`).
+- **Test mocks of components:** type props as `ComponentProps<"a">` / `ComponentProps<"img">` / `ComponentProps<typeof Foo>`. For a deliberately-invalid input, cast through the real type — `undefined as unknown as Event[]` — never `as any`.
 
 ### Imports & paths
 - Always use the `@/*` path alias (configured in `tsconfig.json`). Avoid `../../..` for cross-feature imports.
