@@ -627,6 +627,7 @@
       "expirationLabel": "Expiration date",
       "expirationHint": "Optional. End of day in your timezone.",
       "saved": "Promo code saved.",
+      "status": "Status",
       "page": "Page {current} of {total}",
       "prev": "Previous",
       "next": "Next"

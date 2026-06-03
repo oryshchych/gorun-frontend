@@ -622,11 +622,12 @@
       "eventsLoadError": "Не вдалося завантажити події.",
       "isActiveLabel": "Активний",
       "inactiveLabel": "Неактивний",
-      "usageLimitLabel": "Ліміт використань",
+      "usageLimitLabel": "Використано",
       "usageLimitHint": "Залиште порожнім для необмеженого.",
       "expirationLabel": "Діє до",
       "expirationHint": "Необов'язково. Кінець дня за вашим часом.",
       "saved": "Промокод збережено.",
+      "status": "Статус",
       "page": "Сторінка {current} з {total}",
       "prev": "Назад",
       "next": "Далі"

@@ -177,9 +177,7 @@ export default function AdminPromoCodesListPage() {
                   <th className="px-4 py-3 font-medium">
                     {t("discountValueLabel")}
                   </th>
-                  <th className="px-4 py-3 font-medium">
-                    {t("isActiveLabel")}
-                  </th>
+                  <th className="px-4 py-3 font-medium">{t("status")}</th>
                   <th className="px-4 py-3 font-medium">
                     {t("usageLimitLabel")}
                   </th>
