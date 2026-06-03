@@ -5,8 +5,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { Loader2, Pencil, Search } from "lucide-react";
-import { getAdminPromoCodes } from "@/lib/api/admin-promo-codes";
 import { getEvents } from "@/lib/api/events";
+import { useAdminPromoCodes } from "@/hooks/useAdminPromoCodes";
 import { useDebounce } from "@/hooks/useDebounce";
 import {
   ShellPageHeader,
@@ -58,20 +58,11 @@ export default function AdminPromoCodesListPage() {
 
   const debouncedSearch = useDebounce(searchQuery, 300);
 
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: [
-      "admin",
-      "promo-codes",
-      "list",
-      { page, limit: PROMO_LIST_LIMIT, search: debouncedSearch, eventId: eventFilterId },
-    ],
-    queryFn: () =>
-      getAdminPromoCodes({
-        page,
-        limit: PROMO_LIST_LIMIT,
-        search: debouncedSearch || undefined,
-        eventId: eventFilterId === "all" ? undefined : eventFilterId,
-      }),
+  const { data, isLoading, isError, error, refetch } = useAdminPromoCodes({
+    page,
+    limit: PROMO_LIST_LIMIT,
+    search: debouncedSearch || undefined,
+    eventId: eventFilterId === "all" ? undefined : eventFilterId,
   });
 
   const { data: eventsResult } = useQuery({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
@@ -9,17 +9,16 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { getEvents } from "@/lib/api/events";
 import {
-  createAdminPromoCode,
-  updateAdminPromoCode,
-} from "@/lib/api/admin-promo-codes";
-import {
   createAdminPromoCodeSchema,
   type AdminPromoCodeFormValues,
 } from "@/lib/validations/admin-promo-code";
 import type { AdminPromoCode } from "@/types/promo-code";
 import type { Event } from "@/types/event";
 import { getLocalizedString } from "@/lib/utils";
-import { handleApiError } from "@/lib/error-handler";
+import {
+  useCreateAdminPromoCode,
+  useUpdateAdminPromoCode,
+} from "@/hooks/useAdminPromoCodes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -110,10 +109,12 @@ export function PromoCodeForm({
   const t = useTranslations("admin.promoCodes");
   const tCommon = useTranslations("common");
   const tVal = useTranslations("admin.promoValidation");
-  const tApi = useTranslations("apiCodes");
   const locale = useLocale();
   const router = useRouter();
-  const [submitting, setSubmitting] = useState(false);
+
+  const createMutation = useCreateAdminPromoCode();
+  const updateMutation = useUpdateAdminPromoCode(promoId ?? "");
+  const submitting = createMutation.isPending || updateMutation.isPending;
 
   const schema = useMemo(() => createAdminPromoCodeSchema(tVal), [tVal]);
 
@@ -136,31 +137,27 @@ export function PromoCodeForm({
   const events = eventsResult?.data ?? [];
 
   const onSubmit = async (values: AdminPromoCodeFormValues) => {
-    setSubmitting(true);
     try {
       const payload = formToPayload(values);
       if (mode === "create") {
-        await createAdminPromoCode(payload);
+        await createMutation.mutateAsync(payload);
       } else if (promoId) {
         const expRaw = values.expirationDate.trim();
         const limitRaw = values.usageLimit.trim();
-        await updateAdminPromoCode(promoId, {
+        await updateMutation.mutateAsync({
           code: payload.code,
           discountType: payload.discountType,
           discountValue: payload.discountValue,
           eventId: payload.eventId,
           isActive: payload.isActive,
-          usageLimit:
-            limitRaw === "" ? null : Number.parseInt(limitRaw, 10),
+          usageLimit: limitRaw === "" ? null : Number.parseInt(limitRaw, 10),
           expirationDate: expRaw === "" ? null : expRaw,
         });
       }
       toast.success(t("saved"));
       router.push(`/${locale}/admin/promo-codes`);
-    } catch (err) {
-      handleApiError(err, undefined, tApi);
-    } finally {
-      setSubmitting(false);
+    } catch {
+      /* error handled by mutation's onError */
     }
   };
 
@@ -175,180 +172,183 @@ export function PromoCodeForm({
   return (
     <Form {...form}>
       <ShellFormSection className="max-w-lg">
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-6"
-      >
-        <FormField
-          control={form.control}
-          name="code"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("codeLabel")}</FormLabel>
-              <FormControl>
-                <Input {...field} autoComplete="off" disabled={mode === "edit"} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="discountType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("discountTypeLabel")}</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value}
-                disabled={submitting}
-              >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="code"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("codeLabel")}</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
+                  <Input
+                    {...field}
+                    autoComplete="off"
+                    disabled={mode === "edit"}
+                  />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="percentage">
-                    {t("discountTypePercentage")}
-                  </SelectItem>
-                  <SelectItem value="fixed">{t("discountTypeFixed")}</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="discountValue"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("discountValueLabel")}</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={0}
-                  step="any"
-                  value={field.value}
-                  onChange={(e) => {
-                    const v = parseFloat(e.target.value);
-                    field.onChange(Number.isNaN(v) ? 0 : v);
-                  }}
-                  disabled={submitting}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="eventId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("eventLabel")}</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value}
-                disabled={submitting || eventsLoading}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t("selectEvent")} />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {events.map((ev) => (
-                    <SelectItem key={ev.id} value={ev.id}>
-                      {eventDisplayName(ev, locale)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="isActive"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center gap-2 space-y-0">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onChange={() => field.onChange(!field.value)}
-                  disabled={submitting}
-                />
-              </FormControl>
-              <FormLabel className="mt-0! font-normal cursor-pointer">
-                {t("isActiveLabel")}
-              </FormLabel>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="usageLimit"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("usageLimitLabel")}</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  inputMode="numeric"
-                  placeholder="—"
-                  disabled={submitting}
-                />
-              </FormControl>
-              <p className="text-xs text-muted-foreground">
-                {t("usageLimitHint")}
-              </p>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="expirationDate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("expirationLabel")}</FormLabel>
-              <FormControl>
-                <Input {...field} type="date" disabled={submitting} />
-              </FormControl>
-              <p className="text-xs text-muted-foreground">
-                {t("expirationHint")}
-              </p>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="flex gap-3">
-          <Button type="submit" disabled={submitting || eventsLoading}>
-            {submitting && (
-              <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
+                <FormMessage />
+              </FormItem>
             )}
-            {tCommon("save")}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={submitting}
-            onClick={() => router.push(`/${locale}/admin/promo-codes`)}
-          >
-            {tCommon("cancel")}
-          </Button>
-        </div>
-      </form>
+          />
+
+          <FormField
+            control={form.control}
+            name="discountType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("discountTypeLabel")}</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={submitting}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="percentage">
+                      {t("discountTypePercentage")}
+                    </SelectItem>
+                    <SelectItem value="fixed">
+                      {t("discountTypeFixed")}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="discountValue"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("discountValueLabel")}</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    step="any"
+                    value={field.value}
+                    onChange={(e) => {
+                      const v = parseFloat(e.target.value);
+                      field.onChange(Number.isNaN(v) ? 0 : v);
+                    }}
+                    disabled={submitting}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="eventId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("eventLabel")}</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={submitting || eventsLoading}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t("selectEvent")} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {events.map((ev) => (
+                      <SelectItem key={ev.id} value={ev.id}>
+                        {eventDisplayName(ev, locale)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="isActive"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center gap-2 space-y-0">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onChange={() => field.onChange(!field.value)}
+                    disabled={submitting}
+                  />
+                </FormControl>
+                <FormLabel className="mt-0! font-normal cursor-pointer">
+                  {t("isActiveLabel")}
+                </FormLabel>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="usageLimit"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("usageLimitLabel")}</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    inputMode="numeric"
+                    placeholder="—"
+                    disabled={submitting}
+                  />
+                </FormControl>
+                <p className="text-xs text-muted-foreground">
+                  {t("usageLimitHint")}
+                </p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="expirationDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("expirationLabel")}</FormLabel>
+                <FormControl>
+                  <Input {...field} type="date" disabled={submitting} />
+                </FormControl>
+                <p className="text-xs text-muted-foreground">
+                  {t("expirationHint")}
+                </p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex gap-3">
+            <Button type="submit" disabled={submitting || eventsLoading}>
+              {submitting && (
+                <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
+              )}
+              {tCommon("save")}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={submitting}
+              onClick={() => router.push(`/${locale}/admin/promo-codes`)}
+            >
+              {tCommon("cancel")}
+            </Button>
+          </div>
+        </form>
       </ShellFormSection>
     </Form>
   );
