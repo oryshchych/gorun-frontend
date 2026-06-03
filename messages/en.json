@@ -626,6 +626,8 @@
       "usageLimitHint": "Leave empty for unlimited.",
       "expirationLabel": "Expiration date",
       "expirationHint": "Optional. End of day in your timezone.",
+      "notesLabel": "Notes",
+      "notesPlaceholder": "Internal notes about this promo code (not visible to users).",
       "saved": "Promo code saved.",
       "status": "Status",
       "page": "Page {current} of {total}",

@@ -15,6 +15,7 @@ export const createAdminPromoCodeSchema = (tv: TranslationFunction) =>
       isActive: z.boolean(),
       usageLimit: z.string(),
       expirationDate: z.string(),
+      notes: z.string(),
     })
     .superRefine((data, ctx) => {
       if (!(data.discountValue > 0)) {

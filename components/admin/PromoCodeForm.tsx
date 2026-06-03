@@ -21,6 +21,7 @@ import {
 } from "@/hooks/useAdminPromoCodes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
@@ -64,6 +65,7 @@ function promoToFormDefaults(promo: AdminPromoCode): AdminPromoCodeFormValues {
         ? String(promo.usageLimit)
         : "",
     expirationDate: dateInput,
+    notes: promo.notes ?? "",
   };
 }
 
@@ -73,6 +75,7 @@ function formToPayload(values: AdminPromoCodeFormValues) {
     usageLimitRaw === "" ? undefined : parseInt(usageLimitRaw, 10);
   const expRaw = values.expirationDate.trim();
   const expirationDate = expRaw === "" ? undefined : expRaw;
+  const notes = values.notes.trim() === "" ? null : values.notes.trim();
 
   return {
     code: values.code.trim().toUpperCase(),
@@ -82,6 +85,7 @@ function formToPayload(values: AdminPromoCodeFormValues) {
     isActive: values.isActive,
     ...(usageLimit !== undefined ? { usageLimit } : {}),
     ...(expirationDate !== undefined ? { expirationDate } : {}),
+    notes,
   };
 }
 
@@ -93,6 +97,7 @@ const DEFAULTS: AdminPromoCodeFormValues = {
   isActive: true,
   usageLimit: "",
   expirationDate: "",
+  notes: "",
 };
 
 export function PromoCodeForm({
@@ -152,6 +157,7 @@ export function PromoCodeForm({
           isActive: payload.isActive,
           usageLimit: limitRaw === "" ? null : Number.parseInt(limitRaw, 10),
           expirationDate: expRaw === "" ? null : expRaw,
+          notes: payload.notes,
         });
       }
       toast.success(t("saved"));
@@ -327,6 +333,25 @@ export function PromoCodeForm({
                 <p className="text-xs text-muted-foreground">
                   {t("expirationHint")}
                 </p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("notesLabel")}</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    rows={3}
+                    placeholder={t("notesPlaceholder")}
+                    disabled={submitting}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

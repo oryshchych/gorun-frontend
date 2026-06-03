@@ -28,6 +28,7 @@ export interface AdminPromoCode {
   usageLimit?: number;
   usedCount?: number;
   expirationDate?: string | null;
+  notes?: string | null;
 }
 
 export interface CreatePromoCodeRequest {
@@ -39,12 +40,14 @@ export interface CreatePromoCodeRequest {
   usageLimit?: number;
   /** ISO date string (e.g. YYYY-MM-DD) or null to clear */
   expirationDate?: string | null;
+  notes?: string | null;
 }
 
 export type UpdatePromoCodeRequest = Omit<
   Partial<CreatePromoCodeRequest>,
-  "usageLimit" | "expirationDate"
+  "usageLimit" | "expirationDate" | "notes"
 > & {
   usageLimit?: number | null;
   expirationDate?: string | null;
+  notes?: string | null;
 };
