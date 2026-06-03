@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createRegistrationSchema,
@@ -62,7 +62,9 @@ export function EventRegistrationForm({
   const [termsContent, setTermsContent] = useState<string>("");
 
   const form = useForm<RegistrationFormData>({
-    resolver: zodResolver(createRegistrationSchema(tValidation)) as any,
+    resolver: zodResolver(
+      createRegistrationSchema(tValidation)
+    ) as unknown as Resolver<RegistrationFormData>,
     defaultValues: {
       eventId: event.id,
       name: "",
@@ -92,9 +94,11 @@ export function EventRegistrationForm({
 
     try {
       await onPromoCodeCheck(promoCode);
-    } catch (error: any) {
+    } catch (error) {
       // Use error message directly (it's already translated in handlePromoCodeCheck)
-      setPromoCodeError(error?.message || t("promoCodeInvalid"));
+      const message =
+        error instanceof Error ? error.message : t("promoCodeInvalid");
+      setPromoCodeError(message || t("promoCodeInvalid"));
     } finally {
       setIsCheckingPromoCode(false);
     }

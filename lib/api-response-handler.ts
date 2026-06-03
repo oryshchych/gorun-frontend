@@ -15,7 +15,54 @@
  * ```
  */
 
-import { ApiResponse, ApiSuccessResponse, ApiErrorResponse } from "@/types/api";
+import { ApiResponse, ApiSuccessResponse } from "@/types/api";
+
+/**
+ * Shape of an extracted API error payload after narrowing an unknown error.
+ * Covers axios response bodies, axios-interceptor-formatted errors, and the
+ * legacy `{ error: { message, errors } }` format.
+ */
+interface ExtractedApiError {
+  code?: string;
+  message?: string;
+  statusCode?: number;
+  errors?: Record<string, string[]>;
+  error?: {
+    message?: string;
+    errors?: Record<string, string[]>;
+  };
+}
+
+/** Type guard: value is a non-null object we can read properties from. */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+/** Coerce an unknown value into an ExtractedApiError shape via narrowing. */
+function toExtractedApiError(value: unknown): ExtractedApiError {
+  if (!isRecord(value)) return {};
+
+  const result: ExtractedApiError = {};
+
+  if (typeof value.code === "string") result.code = value.code;
+  if (typeof value.message === "string") result.message = value.message;
+  if (typeof value.statusCode === "number")
+    result.statusCode = value.statusCode;
+  if (isRecord(value.errors)) {
+    result.errors = value.errors as Record<string, string[]>;
+  }
+  if (isRecord(value.error)) {
+    const nested = value.error;
+    result.error = {
+      message: typeof nested.message === "string" ? nested.message : undefined,
+      errors: isRecord(nested.errors)
+        ? (nested.errors as Record<string, string[]>)
+        : undefined,
+    };
+  }
+
+  return result;
+}
 
 /**
  * Get user-friendly message from API code using translation function
@@ -95,7 +142,7 @@ export function handleApiResponse<T>(
  * @returns Error information with translated message
  */
 export function handleApiError(
-  error: any,
+  error: unknown,
   t: (key: string) => string
 ): {
   message: string;
@@ -104,13 +151,19 @@ export function handleApiError(
   statusCode?: number;
 } {
   // First, try to get the original response data (before axios interceptor formatting)
-  let apiError: any = null;
+  let apiError: ExtractedApiError | null = null;
   let statusCode: number | undefined;
 
+  const errorRecord = isRecord(error) ? error : undefined;
+  const response = isRecord(errorRecord?.response)
+    ? errorRecord.response
+    : undefined;
+
   // Check if error has original response data (from axios, before formatting)
-  if (error?.response?.data) {
-    apiError = error.response.data;
-    statusCode = error.response.status;
+  if (response?.data) {
+    apiError = toExtractedApiError(response.data);
+    statusCode =
+      typeof response.status === "number" ? response.status : undefined;
     console.log("handleApiError - using response.data:", {
       apiError,
       statusCode,
@@ -118,16 +171,15 @@ export function handleApiError(
   }
   // Check if error is already formatted (from axios interceptor)
   // The interceptor formats errors but preserves the code field
-  else if (error?.code || error?.statusCode || error?.message) {
+  else if (
+    errorRecord?.code ||
+    errorRecord?.statusCode ||
+    errorRecord?.message
+  ) {
     // Error was already formatted by axios interceptor
     // The formatted error has: { message, statusCode, errors?, code? }
-    apiError = {
-      code: error.code,
-      message: error.message,
-      errors: error.errors,
-      statusCode: error.statusCode,
-    };
-    statusCode = error.statusCode;
+    apiError = toExtractedApiError(errorRecord);
+    statusCode = apiError.statusCode;
     console.log("handleApiError - using formatted error:", {
       apiError,
       statusCode,
@@ -182,7 +234,7 @@ export function handleApiError(
       message: getMessageFromCode(
         apiError.code || "ERROR_INTERNAL_SERVER",
         t,
-        (apiError as any).message || "An error occurred"
+        apiError.message || "An error occurred"
       ),
       code: apiError.code,
       statusCode: statusCode,
@@ -190,7 +242,7 @@ export function handleApiError(
   }
 
   // Network errors or other errors without response
-  if (error?.request) {
+  if (errorRecord?.request) {
     return {
       message: getMessageFromCode(
         "ERROR_INTERNAL_SERVER",
@@ -202,12 +254,12 @@ export function handleApiError(
   }
 
   // Fallback for other errors
+  const fallbackMessage =
+    typeof errorRecord?.message === "string"
+      ? errorRecord.message
+      : "An unexpected error occurred";
   return {
-    message: getMessageFromCode(
-      "ERROR_INTERNAL_SERVER",
-      t,
-      error?.message || "An unexpected error occurred"
-    ),
+    message: getMessageFromCode("ERROR_INTERNAL_SERVER", t, fallbackMessage),
     code: "ERROR_INTERNAL_SERVER",
   };
 }

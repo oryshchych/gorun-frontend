@@ -8,6 +8,7 @@ import {
   updateEvent,
   deleteEvent,
 } from "../events";
+import type { CreateEventRequest } from "@/types/event";
 
 describe("Events API Service", () => {
   let mock: MockAdapter;
@@ -58,7 +59,13 @@ describe("Events API Service", () => {
       };
       mock.onGet("/events").reply((config) => {
         expect(config.params).toMatchObject(params);
-        return [200, { data: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0 } }];
+        return [
+          200,
+          {
+            data: [],
+            pagination: { page: 1, limit: 10, total: 0, totalPages: 0 },
+          },
+        ];
       });
 
       await getEvents(params);
@@ -114,7 +121,7 @@ describe("Events API Service", () => {
     });
 
     it("should handle validation error", async () => {
-      const invalidData = { title: "AB" } as any;
+      const invalidData = { title: "AB" } as unknown as CreateEventRequest;
       mock.onPost("/events").reply(400, { message: "Validation failed" });
 
       await expect(createEvent(invalidData)).rejects.toMatchObject({

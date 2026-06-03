@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
+import type { ComponentProps } from "react";
 import { render, screen } from "@testing-library/react";
 import { EventList } from "../EventList";
 import { Event } from "@/types/event";
@@ -18,7 +19,7 @@ vi.mock("next-intl", () => ({
 }));
 
 vi.mock("next/link", () => ({
-  default: ({ children, href, ...props }: any) => (
+  default: ({ children, href, ...props }: ComponentProps<"a">) => (
     <a href={href} {...props}>
       {children}
     </a>
@@ -26,7 +27,7 @@ vi.mock("next/link", () => ({
 }));
 
 vi.mock("next/image", () => ({
-  default: ({ src, alt, ...props }: any) => {
+  default: ({ src, alt, ...props }: ComponentProps<"img">) => {
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={src} alt={alt} {...props} />;
   },
@@ -34,7 +35,9 @@ vi.mock("next/image", () => ({
 
 vi.mock("framer-motion", () => ({
   motion: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    div: ({ children, ...props }: ComponentProps<"div">) => (
+      <div {...props}>{children}</div>
+    ),
   },
 }));
 
@@ -109,7 +112,7 @@ describe("EventList", () => {
   });
 
   it('should display "no events" message when events is undefined', () => {
-    render(<EventList events={undefined as any} />);
+    render(<EventList events={undefined as unknown as Event[]} />);
 
     expect(screen.getByText("No events found")).toBeInTheDocument();
   });

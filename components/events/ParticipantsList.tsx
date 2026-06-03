@@ -6,6 +6,18 @@ import { Participant } from "@/types/registration";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslations } from "next-intl";
 
+/**
+ * Optional fields the backend may include on a participant but that are not
+ * part of the core {@link Participant} contract.
+ */
+interface ParticipantExtras {
+  distance?: string;
+  email?: string;
+  bib?: number | string;
+}
+
+type ParticipantWithExtras = Participant & ParticipantExtras;
+
 interface ParticipantsListProps {
   participants: Participant[];
   isLoading?: boolean;
@@ -29,7 +41,8 @@ export function ParticipantsList({
     if (distances) return distances;
     const seen = new Set<string>();
     participants.forEach((p) => {
-      if ((p as any).distance) seen.add((p as any).distance);
+      const { distance } = p as ParticipantWithExtras;
+      if (distance) seen.add(distance);
     });
     return Array.from(seen);
   }, [participants, distances]);
@@ -37,20 +50,20 @@ export function ParticipantsList({
   const filtered = useMemo(() => {
     const q = query.toLowerCase();
     return participants.filter((p) => {
-      const dist = (p as any).distance as string | undefined;
+      const dist = (p as ParticipantWithExtras).distance;
       const matchDist = distFilter === "all" || dist === distFilter;
       const fullName = `${p.name} ${p.surname}`.toLowerCase();
       const matchQ =
-        !q ||
-        fullName.includes(q) ||
-        (p.city || "").toLowerCase().includes(q);
+        !q || fullName.includes(q) || (p.city || "").toLowerCase().includes(q);
       return matchDist && matchQ;
     });
   }, [participants, query, distFilter]);
 
   if (isLoading) {
     return (
-      <div style={{ padding: "24px 0", color: "var(--gr-ink-3)", fontSize: 14 }}>
+      <div
+        style={{ padding: "24px 0", color: "var(--gr-ink-3)", fontSize: 14 }}
+      >
         Loading runners…
       </div>
     );
@@ -108,7 +121,8 @@ export function ParticipantsList({
                 borderRadius: 999,
                 fontSize: 13,
                 fontWeight: 700,
-                background: distFilter === d ? "var(--gr-ink)" : "var(--gr-surface)",
+                background:
+                  distFilter === d ? "var(--gr-ink)" : "var(--gr-surface)",
                 color: distFilter === d ? "var(--gr-bg)" : "var(--gr-ink-2)",
                 border: "1px solid var(--gr-line)",
                 whiteSpace: "nowrap",
@@ -149,13 +163,14 @@ export function ParticipantsList({
                 new Date(b.registeredAt).getTime()
             )
             .map((p, i) => {
+              const extras = p as ParticipantWithExtras;
               const fullName = `${p.name} ${p.surname}`;
               const isMe =
                 user &&
                 (user.name?.toLowerCase() === fullName.toLowerCase() ||
-                  user.email === (p as any).email);
-              const dist = (p as any).distance as string | undefined;
-              const bib = (p as any).bib as number | string | undefined;
+                  user.email === extras.email);
+              const dist = extras.distance;
+              const bib = extras.bib;
 
               return (
                 <div
@@ -169,15 +184,18 @@ export function ParticipantsList({
                       i < filtered.length - 1
                         ? "1px solid var(--gr-line)"
                         : "none",
-                    background: isMe
-                      ? "var(--gr-brand-50)"
-                      : "transparent",
+                    background: isMe ? "var(--gr-brand-50)" : "transparent",
                   }}
                 >
                   {/* Bib */}
                   <div
                     className="gr-mono"
-                    style={{ fontSize: 11, fontWeight: 700, minWidth: 40, color: "var(--gr-ink-3)" }}
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      minWidth: 40,
+                      color: "var(--gr-ink-3)",
+                    }}
                   >
                     {bib ? `#${String(bib).padStart(3, "0")}` : "—"}
                   </div>

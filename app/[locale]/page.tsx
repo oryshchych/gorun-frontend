@@ -5,13 +5,13 @@ import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import { EventsHub } from "@/components/events/EventsHub";
 import { Event, PastEvent } from "@/types/event";
+import { getLocalizedString } from "@/lib/utils";
 import { generateMetadata as generateSEOMetadata, siteConfig } from "@/lib/seo";
 import type { Metadata } from "next";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001").replace(
-  /\/api$/,
-  ""
-);
+const API_BASE = (
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+).replace(/\/api$/, "");
 
 async function fetchUpcomingEvents(locale: string): Promise<Event[]> {
   try {
@@ -39,13 +39,11 @@ async function fetchPastEvents(locale: string): Promise<PastEvent[]> {
     const json = await res.json();
     const raw = json?.data;
     if (!Array.isArray(raw)) return [];
-    return raw.map((e: any) => ({
+    return raw.map((e: Event) => ({
       id: e.id,
       name:
         e.resolvedTitle ||
-        e.translations?.title?.[locale] ||
-        e.title ||
-        "",
+        getLocalizedString(e.translations?.title, locale, "en", e.title || ""),
       dateLabel: e.dateLabel || "",
       city: e.city || e.location || "",
       cover: e.cover || e.imageUrl?.landscape || e.imageUrl?.portrait || "",

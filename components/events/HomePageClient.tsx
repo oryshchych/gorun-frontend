@@ -78,7 +78,7 @@ export default function HomePageClient({
 
       setPromoCodeDiscount(result);
       toast.success(t("event.promoCodeApplied"));
-    } catch (error: any) {
+    } catch (error) {
       setPromoCodeDiscount(null);
 
       // Handle API error with code-based translation
@@ -96,7 +96,7 @@ export default function HomePageClient({
       await createRegistration.mutateAsync(data);
       // Don't show toast here - it's handled in useCreateRegistration hook
       // The hook will redirect to payment if paymentLink exists
-    } catch (error: any) {
+    } catch (error) {
       console.error("Registration error:", error);
       // Error is already handled by the mutation
     }

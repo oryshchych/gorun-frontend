@@ -1,5 +1,9 @@
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
+import {
+  getMessages,
+  getTranslations,
+  setRequestLocale,
+} from "next-intl/server";
 import { notFound } from "next/navigation";
 import { locales } from "@/i18n";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
@@ -72,7 +76,7 @@ export default async function LocaleLayout({
   const { locale } = await params;
 
   // Validate that the incoming `locale` parameter is valid
-  if (!locales.includes(locale as any)) {
+  if (!(locales as readonly string[]).includes(locale)) {
     notFound();
   }
 
@@ -92,7 +96,10 @@ export default async function LocaleLayout({
       suppressHydrationWarning
       className={`${bricolage.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
-      <body suppressHydrationWarning style={{ fontFamily: "var(--font-body, Inter, system-ui, sans-serif)" }}>
+      <body
+        suppressHydrationWarning
+        style={{ fontFamily: "var(--font-body, Inter, system-ui, sans-serif)" }}
+      >
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

@@ -19,7 +19,8 @@ export function ProfileClient() {
 
   const registrations: Registration[] = registrationsData?.data || [];
   const upcoming = registrations.filter(
-    (r) => r.status !== "cancelled" && r.event && new Date(r.event.date) > new Date()
+    (r) =>
+      r.status !== "cancelled" && r.event && new Date(r.event.date) > new Date()
   );
   const past = registrations.filter(
     (r) => r.event && new Date(r.event.date) <= new Date()
@@ -63,12 +64,12 @@ export function ProfileClient() {
             alignItems: "center",
           }}
         >
-        <h1
-          className="gr-display"
-          style={{ fontSize: 22, fontWeight: 800, margin: 0 }}
-        >
-          {t("title")}
-        </h1>
+          <h1
+            className="gr-display"
+            style={{ fontSize: 22, fontWeight: 800, margin: 0 }}
+          >
+            {t("title")}
+          </h1>
           <Link
             href={`/${locale}/profile/settings`}
             style={{
@@ -104,7 +105,8 @@ export function ProfileClient() {
                   width: 64,
                   height: 64,
                   borderRadius: 999,
-                  background: "linear-gradient(135deg, var(--gr-brand), var(--gr-brand-700))",
+                  background:
+                    "linear-gradient(135deg, var(--gr-brand), var(--gr-brand-700))",
                   color: "#fff",
                   display: "grid",
                   placeItems: "center",
@@ -122,11 +124,15 @@ export function ProfileClient() {
                 >
                   {user.name}
                 </div>
-                <div style={{ fontSize: 12, color: "var(--gr-ink-3)", marginTop: 2 }}>
-                  {(user as any).runningClub
-                    ? `${(user as any).runningClub} · `
-                    : ""}
-                  {(user as any).city || user.email}
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "var(--gr-ink-3)",
+                    marginTop: 2,
+                  }}
+                >
+                  {user.runningClub ? `${user.runningClub} · ` : ""}
+                  {user.city || user.email}
                 </div>
               </div>
               <Link
@@ -154,19 +160,27 @@ export function ProfileClient() {
               }}
             >
               {[
-                [String((user as any).totalKm ?? "—"), t("stats.km")],
+                [String(user.totalKm ?? "—"), t("stats.km")],
                 [String(registrations.length), t("stats.races")],
-                [`${(user as any).totalDonated ?? 0}₴`, t("stats.afu")],
+                [`${user.totalDonated ?? 0}₴`, t("stats.afu")],
               ].map(([n, l]) => (
                 <div key={l}>
                   <div
                     className="gr-display"
-                    style={{ fontSize: 20, fontWeight: 800, color: "var(--gr-ink)" }}
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 800,
+                      color: "var(--gr-ink)",
+                    }}
                   >
                     {n}
                   </div>
                   <div
-                    style={{ fontSize: 11, color: "var(--gr-ink-3)", fontWeight: 600 }}
+                    style={{
+                      fontSize: 11,
+                      color: "var(--gr-ink-3)",
+                      fontWeight: 600,
+                    }}
                   >
                     {l}
                   </div>
@@ -224,9 +238,7 @@ export function ProfileClient() {
                   {t("noUpcoming")}
                 </div>
               ) : (
-                upcoming.map((reg) => (
-                  <RacePassCard key={reg.id} reg={reg} />
-                ))
+                upcoming.map((reg) => <RacePassCard key={reg.id} reg={reg} />)
               )}
 
               {/* CTA to browse events */}
@@ -284,16 +296,14 @@ export function ProfileClient() {
                   {t("noPast")}
                 </div>
               ) : (
-                past.map((reg) => (
-                  <PastRaceCard key={reg.id} reg={reg} />
-                ))
+                past.map((reg) => <PastRaceCard key={reg.id} reg={reg} />)
               )}
             </div>
           )}
 
           {tab === "kids" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {((user as any).kids as any[] | undefined)?.map((k: any) => (
+              {user.kids?.map((k) => (
                 <div
                   key={k.id}
                   style={{
@@ -319,7 +329,9 @@ export function ProfileClient() {
                     <Baby size={22} color="var(--gr-brand-700)" />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700 }}>{k.name}</div>
+                    <div style={{ fontSize: 15, fontWeight: 700 }}>
+                      {k.name}
+                    </div>
                     <div style={{ fontSize: 12, color: "var(--gr-ink-3)" }}>
                       Age {k.age}
                       {k.shirt ? ` · Shirt ${k.shirt}` : ""}
@@ -400,7 +412,7 @@ function RacePassCard({ reg }: { reg: Registration }) {
               letterSpacing: "0.08em",
             }}
           >
-                      UPCOMING
+            UPCOMING
           </div>
           <div
             className="gr-display"
@@ -433,14 +445,25 @@ function RacePassCard({ reg }: { reg: Registration }) {
         }}
       >
         {[
-          ["BIB", (reg as any).bib ? String((reg as any).bib).padStart(4, "0") : "—"],
-          ["DIST", (reg as any).distance || "—"],
-          ["STATUS", reg.status === "confirmed" ? "CONF" : reg.status.toUpperCase()],
-          ["PAY", reg.paymentStatus === "completed" ? "PAID" : reg.paymentStatus?.toUpperCase() ?? "—"],
+          ["BIB", reg.bib ? String(reg.bib).padStart(4, "0") : "—"],
+          ["DIST", reg.distance || "—"],
+          [
+            "STATUS",
+            reg.status === "confirmed" ? "CONF" : reg.status.toUpperCase(),
+          ],
+          [
+            "PAY",
+            reg.paymentStatus === "completed"
+              ? "PAID"
+              : (reg.paymentStatus?.toUpperCase() ?? "—"),
+          ],
         ].map(([k, v]) => (
           <div
             key={k}
-            style={{ padding: 12, borderRight: "1px dashed rgba(255,255,255,0.2)" }}
+            style={{
+              padding: 12,
+              borderRight: "1px dashed rgba(255,255,255,0.2)",
+            }}
           >
             <div
               style={{
@@ -452,10 +475,7 @@ function RacePassCard({ reg }: { reg: Registration }) {
             >
               {k}
             </div>
-            <div
-              className="gr-mono"
-              style={{ fontSize: 14, fontWeight: 800 }}
-            >
+            <div className="gr-mono" style={{ fontSize: 14, fontWeight: 800 }}>
               {v}
             </div>
           </div>
@@ -499,7 +519,9 @@ function PastRaceCard({ reg }: { reg: Registration }) {
         />
       )}
       <div style={{ flex: 1, padding: 14 }}>
-        <div style={{ fontSize: 11, color: "var(--gr-ink-3)", fontWeight: 600 }}>
+        <div
+          style={{ fontSize: 11, color: "var(--gr-ink-3)", fontWeight: 600 }}
+        >
           {reg.event?.date
             ? new Date(reg.event.date).toLocaleDateString("en", {
                 month: "short",
@@ -512,9 +534,14 @@ function PastRaceCard({ reg }: { reg: Registration }) {
           {eventTitle}
         </div>
         <div
-          style={{ display: "flex", gap: 12, marginTop: 8, alignItems: "center" }}
+          style={{
+            display: "flex",
+            gap: 12,
+            marginTop: 8,
+            alignItems: "center",
+          }}
         >
-          {(reg as any).distance && (
+          {reg.distance && (
             <span
               style={{
                 background: "var(--gr-surface-2)",
@@ -525,13 +552,16 @@ function PastRaceCard({ reg }: { reg: Registration }) {
                 fontWeight: 600,
               }}
             >
-              {(reg as any).distance}
+              {reg.distance}
             </span>
           )}
           <span
             style={{
               fontSize: 12,
-              color: reg.status === "confirmed" ? "var(--gr-brand-700)" : "var(--gr-ink-3)",
+              color:
+                reg.status === "confirmed"
+                  ? "var(--gr-brand-700)"
+                  : "var(--gr-ink-3)",
               fontWeight: 600,
             }}
           >
@@ -605,7 +635,12 @@ function ProfilePrompt({ locale }: { locale: string }) {
       </div>
 
       <div
-        style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 10 }}
+        style={{
+          marginTop: 28,
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+        }}
       >
         {[
           "Race pass with QR for check-in",

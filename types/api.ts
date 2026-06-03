@@ -1,4 +1,4 @@
-export interface ApiSuccessResponse<T = any> {
+export interface ApiSuccessResponse<T = unknown> {
   success: true;
   code: string;
   data: T;
@@ -19,7 +19,7 @@ export interface ApiErrorResponse {
   errors?: Record<string, string[]>;
 }
 
-export type ApiResponse<T = any> = ApiSuccessResponse<T> | ApiErrorResponse;
+export type ApiResponse<T = unknown> = ApiSuccessResponse<T> | ApiErrorResponse;
 
 // Legacy support - keep for backward compatibility
 export interface ApiError {
@@ -32,7 +32,7 @@ export interface ApiError {
   code?: string; // Add code field for legacy support
 }
 
-export interface PaginatedResponse<T = any> {
+export interface PaginatedResponse<T = unknown> {
   data: T[];
   pagination: {
     page: number;

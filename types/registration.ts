@@ -20,6 +20,10 @@ export interface Registration {
   registeredAt: Date | string;
   paymentStatus?: "pending" | "completed" | "failed";
   paymentLink?: string;
+  /** Assigned bib number once the registration is confirmed. */
+  bib?: number | string;
+  /** Distance label the runner registered for, e.g. "21K". */
+  distance?: string;
 }
 
 export interface CreateRegistrationRequest {

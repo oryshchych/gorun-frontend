@@ -150,7 +150,7 @@ export const useCreateRegistration = () => {
 
       return { previousEvent };
     },
-    onError: (error: any, data, context) => {
+    onError: (error, data, context) => {
       // Rollback on error
       if (context?.previousEvent) {
         queryClient.setQueryData(

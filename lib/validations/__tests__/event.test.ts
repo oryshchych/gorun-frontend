@@ -11,7 +11,7 @@ const baseTranslations = {
   date: { en: "December 31, 2024 at 10:00 AM", uk: "31 грудня 2024 10:00" },
 };
 
-const buildEventData = (overrides: Record<string, any> = {}) => ({
+const buildEventData = (overrides: Record<string, unknown> = {}) => ({
   translations: JSON.parse(JSON.stringify(baseTranslations)),
   date: new Date("2024-12-31T10:00:00Z"),
   capacity: 100,

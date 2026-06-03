@@ -30,7 +30,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
   const createRegistration = useCreateRegistration();
 
   const [step, setStep] = useState(0);
-  const [pickedDistId, setPickedDistId] = useState(event.distances?.[0]?.id ?? "");
+  const [pickedDistId, setPickedDistId] = useState(
+    event.distances?.[0]?.id ?? ""
+  );
   const [pickedKids, setPickedKids] = useState<KidPick[]>([]);
   const [shirt, setShirt] = useState(user ? "M" : "M");
   const [pace, setPace] = useState("5:30");
@@ -44,12 +46,15 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
     const d = event.kidsDistances?.find((x) => x.id === k.distId);
     return sum + (d?.feeUah ?? d?.fee ?? 0);
   }, 0);
-  const total = (selectedDist?.feeUah ?? selectedDist?.fee ?? 0) + kidFee + donate;
+  const total =
+    (selectedDist?.feeUah ?? selectedDist?.fee ?? 0) + kidFee + donate;
 
   const handleNext = () => {
     // Before step 1 (distance → kids), require auth
     if (step === 0 && !user) {
-      router.push(`/${locale}/login?redirect=/${locale}/events/${event.id}/register`);
+      router.push(
+        `/${locale}/login?redirect=/${locale}/events/${event.id}/register`
+      );
       return;
     }
     if (step < STEP_LABELS.length - 1) {
@@ -71,14 +76,16 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
       const result = await createRegistration.mutateAsync({
         eventId: event.id,
         promoCode: undefined,
-      } as any);
+      });
 
-      if ((result as any)?.paymentLink) {
-        window.location.href = (result as any).paymentLink;
+      if (result.paymentLink) {
+        window.location.href = result.paymentLink;
         return;
       }
 
-      setRegBib((result as any)?.data?.bib ?? "—");
+      setRegBib(
+        result.registration.bib != null ? String(result.registration.bib) : "—"
+      );
       setDone(true);
     } catch {
       // Error toast handled by mutation
@@ -86,11 +93,22 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
   };
 
   if (done) {
-    return <RegSuccess event={event} bib={regBib} selectedDist={selectedDist} locale={locale} />;
+    return (
+      <RegSuccess
+        event={event}
+        bib={regBib}
+        selectedDist={selectedDist}
+        locale={locale}
+      />
+    );
   }
 
   const eventTitle =
-    event.title || event.name || event.translations?.title?.uk || event.translations?.title?.en || "";
+    event.title ||
+    event.name ||
+    event.translations?.title?.uk ||
+    event.translations?.title?.en ||
+    "";
 
   return (
     <div
@@ -147,7 +165,11 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
           </div>
           <button
             onClick={() => router.push(`/${locale}/events/${event.id}`)}
-            style={{ color: "var(--gr-ink-3)", display: "grid", placeItems: "center" }}
+            style={{
+              color: "var(--gr-ink-3)",
+              display: "grid",
+              placeItems: "center",
+            }}
             aria-label="Close"
           >
             <X size={22} />
@@ -163,7 +185,8 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                 flex: 1,
                 height: 4,
                 borderRadius: 2,
-                background: i <= step ? "var(--gr-brand)" : "var(--gr-line-strong)",
+                background:
+                  i <= step ? "var(--gr-brand)" : "var(--gr-line-strong)",
                 transition: "background 300ms",
               }}
             />
@@ -182,7 +205,13 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
         {/* Step 1: Distance */}
         {step === 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <div style={{ fontSize: 14, color: "var(--gr-ink-3)", marginBottom: 4 }}>
+            <div
+              style={{
+                fontSize: 14,
+                color: "var(--gr-ink-3)",
+                marginBottom: 4,
+              }}
+            >
               Pick your distance
             </div>
             {event.distances?.map((d) => {
@@ -194,7 +223,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                   style={{
                     padding: 16,
                     borderRadius: "var(--gr-r-lg)",
-                    background: sel ? "var(--gr-brand-50)" : "var(--gr-surface)",
+                    background: sel
+                      ? "var(--gr-brand-50)"
+                      : "var(--gr-surface)",
                     border: `2px solid ${sel ? "var(--gr-brand)" : "var(--gr-line)"}`,
                     display: "flex",
                     gap: 14,
@@ -215,17 +246,32 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     {d.label}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--gr-ink)" }}>
+                    <div
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 700,
+                        color: "var(--gr-ink)",
+                      }}
+                    >
                       {d.name}
                     </div>
-                    <div style={{ fontSize: 12, color: "var(--gr-ink-3)", marginTop: 2 }}>
+                    <div
+                      style={{
+                        fontSize: 12,
+                        color: "var(--gr-ink-3)",
+                        marginTop: 2,
+                      }}
+                    >
                       {d.elevation || d.laps}
                       {d.spots
                         ? ` · ${d.spots.total - d.spots.taken} spots left`
                         : ""}
                     </div>
                   </div>
-                  <div className="gr-display" style={{ fontWeight: 800, fontSize: 16 }}>
+                  <div
+                    className="gr-display"
+                    style={{ fontWeight: 800, fontSize: 16 }}
+                  >
                     {d.feeUah ?? d.fee} ₴
                   </div>
                 </button>
@@ -246,12 +292,14 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               <div style={{ fontSize: 14, color: "var(--gr-ink-3)" }}>
                 Bring your kids? (optional)
               </div>
-              <div style={{ fontSize: 12, color: "var(--gr-ink-4)", marginTop: 4 }}>
-                Pick a distance for each child you'd like to register.
+              <div
+                style={{ fontSize: 12, color: "var(--gr-ink-4)", marginTop: 4 }}
+              >
+                Pick a distance for each child you&apos;d like to register.
               </div>
             </div>
 
-            {(user as any)?.kids?.map((kid: any) => {
+            {user?.kids?.map((kid) => {
               const reg = pickedKids.find((p) => p.kidId === kid.id);
               return (
                 <div
@@ -284,7 +332,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                       <Baby size={20} color="var(--gr-brand-700)" />
                     </div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 15, fontWeight: 700 }}>{kid.name}</div>
+                      <div style={{ fontSize: 15, fontWeight: 700 }}>
+                        {kid.name}
+                      </div>
                       <div style={{ fontSize: 12, color: "var(--gr-ink-3)" }}>
                         Age {kid.age}
                         {kid.shirt ? ` · Shirt ${kid.shirt}` : ""}
@@ -293,7 +343,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     <button
                       onClick={() => {
                         if (reg) {
-                          setPickedKids(pickedKids.filter((p) => p.kidId !== kid.id));
+                          setPickedKids(
+                            pickedKids.filter((p) => p.kidId !== kid.id)
+                          );
                         } else {
                           setPickedKids([
                             ...pickedKids,
@@ -309,7 +361,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                         borderRadius: 999,
                         fontSize: 12,
                         fontWeight: 700,
-                        background: reg ? "var(--gr-ink)" : "var(--gr-brand-50)",
+                        background: reg
+                          ? "var(--gr-ink)"
+                          : "var(--gr-brand-50)",
                         color: reg ? "var(--gr-bg)" : "var(--gr-brand-700)",
                         cursor: "pointer",
                       }}
@@ -327,7 +381,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                             onClick={() =>
                               setPickedKids(
                                 pickedKids.map((p) =>
-                                  p.kidId === kid.id ? { ...p, distId: d.id } : p
+                                  p.kidId === kid.id
+                                    ? { ...p, distId: d.id }
+                                    : p
                                 )
                               )
                             }
@@ -335,7 +391,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                               flex: 1,
                               padding: "10px 8px",
                               borderRadius: "var(--gr-r-md)",
-                              background: sel ? "var(--gr-brand)" : "var(--gr-surface-2)",
+                              background: sel
+                                ? "var(--gr-brand)"
+                                : "var(--gr-surface-2)",
                               color: sel ? "#0B1A0F" : "var(--gr-ink-2)",
                               fontWeight: 700,
                               fontSize: 13,
@@ -343,7 +401,13 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                             }}
                           >
                             <div>{d.label}</div>
-                            <div style={{ fontSize: 10, fontWeight: 600, marginTop: 2 }}>
+                            <div
+                              style={{
+                                fontSize: 10,
+                                fontWeight: 600,
+                                marginTop: 2,
+                              }}
+                            >
                               {(d.feeUah ?? d.fee) === 0
                                 ? "Free"
                                 : `${d.feeUah ?? d.fee}₴`}
@@ -357,7 +421,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               );
             })}
 
-            {!((user as any)?.kids?.length) && (
+            {!user?.kids?.length && (
               <div
                 style={{
                   padding: 18,
@@ -412,7 +476,8 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                       width: 44,
                       height: 44,
                       borderRadius: 999,
-                      background: "linear-gradient(135deg, var(--gr-brand), var(--gr-brand-700))",
+                      background:
+                        "linear-gradient(135deg, var(--gr-brand), var(--gr-brand-700))",
                       color: "#fff",
                       display: "grid",
                       placeItems: "center",
@@ -428,7 +493,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                       .slice(0, 2)}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700 }}>{user.name}</div>
+                    <div style={{ fontSize: 15, fontWeight: 700 }}>
+                      {user.name}
+                    </div>
                     <div style={{ fontSize: 12, color: "var(--gr-ink-3)" }}>
                       {user.email}
                     </div>
@@ -461,7 +528,8 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                       borderRadius: "var(--gr-r-md)",
                       fontWeight: 700,
                       fontSize: 13,
-                      background: shirt === s ? "var(--gr-ink)" : "var(--gr-surface)",
+                      background:
+                        shirt === s ? "var(--gr-ink)" : "var(--gr-surface)",
                       color: shirt === s ? "var(--gr-bg)" : "var(--gr-ink-2)",
                       border: "1px solid var(--gr-line)",
                       cursor: "pointer",
@@ -502,7 +570,13 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     fontFamily: "inherit",
                   }}
                 />
-                <div style={{ fontSize: 12, color: "var(--gr-ink-4)", marginTop: 6 }}>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "var(--gr-ink-4)",
+                    marginTop: 6,
+                  }}
+                >
                   Used to seed your starting corral
                 </div>
               </label>
@@ -532,9 +606,12 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                       borderRadius: "var(--gr-r-md)",
                       fontWeight: 700,
                       fontSize: 12,
-                      background: donate === v ? "var(--gr-ink)" : "var(--gr-surface)",
+                      background:
+                        donate === v ? "var(--gr-ink)" : "var(--gr-surface)",
                       color:
-                        donate === v ? "var(--gr-afu-yellow)" : "var(--gr-ink-2)",
+                        donate === v
+                          ? "var(--gr-afu-yellow)"
+                          : "var(--gr-ink-2)",
                       border: "1px solid var(--gr-line)",
                       cursor: "pointer",
                     }}
@@ -543,7 +620,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                   </button>
                 ))}
               </div>
-              <div style={{ fontSize: 12, color: "var(--gr-ink-4)", marginTop: 6 }}>
+              <div
+                style={{ fontSize: 12, color: "var(--gr-ink-4)", marginTop: 6 }}
+              >
                 100% goes to the Armed Forces of Ukraine
               </div>
             </div>
@@ -601,10 +680,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               <SummaryRow
                 label={<strong>Total</strong>}
                 value={
-                  <strong
-                    className="gr-display"
-                    style={{ fontSize: 20 }}
-                  >
+                  <strong className="gr-display" style={{ fontSize: 20 }}>
                     {total} ₴
                   </strong>
                 }
@@ -664,7 +740,13 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                         fontWeight: 800,
                       }}
                     >
-                      {id === "apple" ? "🍎" : id === "google" ? "G" : id === "mono" ? "m" : "💳"}
+                      {id === "apple"
+                        ? "🍎"
+                        : id === "google"
+                          ? "G"
+                          : id === "mono"
+                            ? "m"
+                            : "💳"}
                     </div>
                     <div style={{ flex: 1 }}>{label}</div>
                     {payMethod === id && (
@@ -686,7 +768,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                 }}
               >
                 <div style={{ fontSize: 13, lineHeight: 1.5 }}>
-                  <strong style={{ color: "var(--gr-afu-yellow)" }}>{donate} ₴</strong>{" "}
+                  <strong style={{ color: "var(--gr-afu-yellow)" }}>
+                    {donate} ₴
+                  </strong>{" "}
                   from this purchase goes to the Armed Forces of Ukraine via the
                   registered foundation.
                 </div>
@@ -718,13 +802,12 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
             marginBottom: 10,
           }}
         >
-          <div style={{ fontSize: 12, color: "var(--gr-ink-3)", fontWeight: 600 }}>
+          <div
+            style={{ fontSize: 12, color: "var(--gr-ink-3)", fontWeight: 600 }}
+          >
             Total
           </div>
-          <div
-            className="gr-display"
-            style={{ fontSize: 22, fontWeight: 800 }}
-          >
+          <div className="gr-display" style={{ fontSize: 22, fontWeight: 800 }}>
             {total} ₴
           </div>
         </div>
@@ -817,7 +900,11 @@ function RegSuccess({
 }) {
   const router = useRouter();
   const eventTitle =
-    event.title || event.name || event.translations?.title?.uk || event.translations?.title?.en || "";
+    event.title ||
+    event.name ||
+    event.translations?.title?.uk ||
+    event.translations?.title?.en ||
+    "";
 
   return (
     <div
@@ -860,7 +947,12 @@ function RegSuccess({
 
         <h1
           className="gr-display"
-          style={{ fontSize: 30, fontWeight: 800, marginTop: 24, textWrap: "balance" }}
+          style={{
+            fontSize: 30,
+            fontWeight: 800,
+            marginTop: 24,
+            textWrap: "balance",
+          }}
         >
           You&apos;re in.
         </h1>

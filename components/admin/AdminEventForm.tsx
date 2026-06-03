@@ -77,10 +77,10 @@ export function AdminEventForm({
     [defaultValues]
   );
 
-  const form = useForm<AdminEventFormInput, any, AdminEventFormData>({
+  const form = useForm<AdminEventFormInput, unknown, AdminEventFormData>({
     resolver: zodResolver(
       adminEventFormResolverSchema as Parameters<typeof zodResolver>[0]
-    ) as unknown as Resolver<AdminEventFormInput, any, AdminEventFormData>,
+    ) as unknown as Resolver<AdminEventFormInput, unknown, AdminEventFormData>,
     defaultValues: mergedDefaults,
   });
 

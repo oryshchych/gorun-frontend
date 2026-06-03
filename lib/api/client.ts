@@ -147,16 +147,32 @@ interface FormattedError {
   code?: string; // Add code field for API code-based errors
 }
 
+interface ErrorResponseData {
+  message?: string;
+  code?: string;
+  errors?: Record<string, string[]>;
+  error?: {
+    message?: string;
+    errors?: Record<string, string[]>;
+  };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
 function formatErrorResponse(error: AxiosError): FormattedError {
   if (error.response) {
     // Server responded with error status
-    const data = error.response.data as any;
+    const data: ErrorResponseData = isRecord(error.response.data)
+      ? (error.response.data as ErrorResponseData)
+      : {};
 
     return {
-      message: data?.message || data?.error?.message || "An error occurred",
+      message: data.message || data.error?.message || "An error occurred",
       statusCode: error.response.status,
-      errors: data?.errors || data?.error?.errors,
-      code: data?.code, // Preserve API code if present
+      errors: data.errors || data.error?.errors,
+      code: data.code, // Preserve API code if present
     };
   } else if (error.request) {
     // Request made but no response received

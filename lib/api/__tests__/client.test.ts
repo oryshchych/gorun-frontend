@@ -54,9 +54,10 @@ describe("API Client", () => {
 
       try {
         await apiClient.get("/test");
-      } catch (error: any) {
-        expect(error.message).toBe("Server error");
-        expect(error.statusCode).toBe(500);
+      } catch (error) {
+        const formattedError = error as { message: string; statusCode: number };
+        expect(formattedError.message).toBe("Server error");
+        expect(formattedError.statusCode).toBe(500);
       }
     });
 
@@ -65,8 +66,9 @@ describe("API Client", () => {
 
       try {
         await apiClient.get("/test");
-      } catch (error: any) {
-        expect(error.message).toContain("Network Error");
+      } catch (error) {
+        const formattedError = error as { message: string };
+        expect(formattedError.message).toContain("Network Error");
       }
     });
 
@@ -139,10 +141,7 @@ describe("API Client", () => {
         .onGet("/auth/me")
         .reply(200, { data: { id: "1" } });
 
-      await Promise.all([
-        apiClient.get("/events"),
-        apiClient.get("/auth/me"),
-      ]);
+      await Promise.all([apiClient.get("/events"), apiClient.get("/auth/me")]);
 
       expect(refreshSpy).toHaveBeenCalledTimes(1);
       refreshSpy.mockRestore();

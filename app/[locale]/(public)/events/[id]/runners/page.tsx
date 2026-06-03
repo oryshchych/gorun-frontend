@@ -9,14 +9,15 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001").replace(
-  /\/api$/,
-  ""
-);
+const API_BASE = (
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+).replace(/\/api$/, "");
 
 async function fetchEvent(id: string, locale: string): Promise<Event | null> {
   try {
-    const res = await fetch(`${API_BASE}/api/events/${id}?lang=${locale}`, { cache: "no-store" });
+    const res = await fetch(`${API_BASE}/api/events/${id}?lang=${locale}`, {
+      cache: "no-store",
+    });
     if (!res.ok) return null;
     const json = await res.json();
     return json.data as Event;
@@ -27,7 +28,9 @@ async function fetchEvent(id: string, locale: string): Promise<Event | null> {
 
 async function fetchParticipants(id: string): Promise<Participant[]> {
   try {
-    const res = await fetch(`${API_BASE}/api/events/${id}/participants`, { cache: "no-store" });
+    const res = await fetch(`${API_BASE}/api/events/${id}/participants`, {
+      cache: "no-store",
+    });
     if (!res.ok) return [];
     const json = await res.json();
     return (json.data ?? []) as Participant[];
@@ -44,7 +47,12 @@ export async function generateMetadata({
   const { locale, id } = await params;
   const event = await fetchEvent(id, locale);
   const title = event
-    ? getLocalizedString(event.translations?.title, locale, "en", event.title || "")
+    ? getLocalizedString(
+        event.translations?.title,
+        locale,
+        "en",
+        event.title || ""
+      )
     : "Runners";
   return { title: `Runners — ${title}` };
 }
@@ -71,7 +79,11 @@ export default async function PublicRunnersPage({
 
   // Collect unique distances from participants
   const distanceOptions = Array.from(
-    new Set(participants.map((p) => (p as any).distance as string).filter(Boolean))
+    new Set(
+      participants
+        .map((p) => (p as Participant & { distance?: string }).distance)
+        .filter((distance): distance is string => Boolean(distance))
+    )
   );
 
   return (
