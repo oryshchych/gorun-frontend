@@ -1,13 +1,10 @@
 import { Metadata } from "next";
-import {
-  generateMetadata as generateSEOMetadata,
-} from "@/lib/seo";
+import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
 import { getLocalizedString } from "@/lib/utils";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001").replace(
-  /\/api$/,
-  ""
-);
+const API_BASE = (
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+).replace(/\/api$/, "");
 
 async function fetchEvent(id: string, locale: string) {
   try {

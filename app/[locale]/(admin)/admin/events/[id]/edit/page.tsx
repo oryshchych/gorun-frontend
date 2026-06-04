@@ -55,7 +55,9 @@ export default function AdminEditEventPage({ params }: Props) {
             {tCommon("back")}
           </Link>
         </Button>
-        <p className="text-destructive">{error?.message ?? "Event not found"}</p>
+        <p className="text-destructive">
+          {error?.message ?? "Event not found"}
+        </p>
       </>
     );
   }

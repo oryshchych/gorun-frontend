@@ -41,7 +41,10 @@ export default function AdminLayout({
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="size-8 animate-spin text-muted-foreground" aria-hidden />
+        <Loader2
+          className="size-8 animate-spin text-muted-foreground"
+          aria-hidden
+        />
       </div>
     );
   }

@@ -64,9 +64,11 @@ export function EventForm({
   const tCommon = useTranslations("common");
 
   const form = useForm<EventFormInput, unknown, EventFormData>({
-    resolver: zodResolver(
-      eventFormResolverSchema
-    ) as Resolver<EventFormInput, unknown, EventFormData>,
+    resolver: zodResolver(eventFormResolverSchema) as Resolver<
+      EventFormInput,
+      unknown,
+      EventFormData
+    >,
     defaultValues: {
       translations: {
         title: {

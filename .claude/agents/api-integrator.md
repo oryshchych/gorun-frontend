@@ -46,6 +46,7 @@ For each new endpoint, three layers cooperate:
 ## Output contract
 
 Present:
+
 1. **Files to add/modify** with full paths
 2. **Types** (the actual code)
 3. **Wrapper functions** (actual code)

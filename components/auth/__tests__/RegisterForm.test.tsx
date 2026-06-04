@@ -128,9 +128,7 @@ describe("RegisterForm", () => {
     const user = userEvent.setup();
     render(<RegisterForm />);
 
-    await user.click(
-      screen.getByRole("button", { name: /create account/i })
-    );
+    await user.click(screen.getByRole("button", { name: /create account/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/first name is required/i)).toBeInTheDocument();
@@ -146,14 +144,9 @@ describe("RegisterForm", () => {
     await user.type(screen.getByLabelText(/^phone$/i), "+380501112233");
     await user.type(screen.getByLabelText(/^email$/i), "john@example.com");
     await user.type(screen.getByLabelText(/^password$/i), "password123");
-    await user.type(
-      screen.getByLabelText(/confirm password/i),
-      "different123"
-    );
+    await user.type(screen.getByLabelText(/confirm password/i), "different123");
 
-    await user.click(
-      screen.getByRole("button", { name: /create account/i })
-    );
+    await user.click(screen.getByRole("button", { name: /create account/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/passwords don't match/i)).toBeInTheDocument();

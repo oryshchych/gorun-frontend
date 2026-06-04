@@ -8,7 +8,10 @@ export default function Footer() {
   const locale = useLocale();
   const t = useTranslations("footer");
 
-  const navColumns: { heading: string; links: { label: string; href: string; external: boolean }[] }[] = [
+  const navColumns: {
+    heading: string;
+    links: { label: string; href: string; external: boolean }[];
+  }[] = [
     {
       heading: t("eventsHeading"),
       links: [
@@ -19,16 +22,36 @@ export default function Footer() {
     {
       heading: t("aboutHeading"),
       links: [
-        { label: t("contact"), href: "mailto:gorunteam.ua@gmail.com", external: false },
-        { label: "Instagram", href: "https://instagram.com/gorun.lviv", external: true },
-        { label: "Facebook", href: "https://facebook.com/profile.php?id=61584661056098", external: true },
+        {
+          label: t("contact"),
+          href: "mailto:gorunteam.ua@gmail.com",
+          external: false,
+        },
+        {
+          label: "Instagram",
+          href: "https://instagram.com/gorun.lviv",
+          external: true,
+        },
+        {
+          label: "Facebook",
+          href: "https://facebook.com/profile.php?id=61584661056098",
+          external: true,
+        },
       ],
     },
     {
       heading: t("legalHeading"),
       links: [
-        { label: t("privacyPolicy"), href: `/${locale}/privacy-policy`, external: false },
-        { label: t("termsOfService"), href: `/${locale}/terms-of-service`, external: false },
+        {
+          label: t("privacyPolicy"),
+          href: `/${locale}/privacy-policy`,
+          external: false,
+        },
+        {
+          label: t("termsOfService"),
+          href: `/${locale}/terms-of-service`,
+          external: false,
+        },
       ],
     },
   ];
@@ -52,7 +75,12 @@ export default function Footer() {
           <div className="col-span-2 md:col-span-1">
             <Link
               href={`/${locale}`}
-              style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 14 }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 14,
+              }}
               aria-label="GoRun home"
             >
               <Image
@@ -63,7 +91,15 @@ export default function Footer() {
                 style={{ height: "auto" }}
               />
             </Link>
-            <p style={{ fontSize: 13, lineHeight: 1.6, opacity: 0.7, maxWidth: 300, margin: 0 }}>
+            <p
+              style={{
+                fontSize: 13,
+                lineHeight: 1.6,
+                opacity: 0.7,
+                maxWidth: 300,
+                margin: 0,
+              }}
+            >
               {t("tagline")}
             </p>
           </div>
@@ -83,7 +119,9 @@ export default function Footer() {
               >
                 {col.heading}
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 10 }}
+              >
                 {col.links.map((link) => (
                   <Link
                     key={link.label}

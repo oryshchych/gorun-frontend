@@ -11,6 +11,7 @@ Detect whether the current diff likely requires matching changes in a sibling re
 ## When to invoke
 
 After making changes that touch any of:
+
 - API client wrappers / route handlers
 - Request/response types or DTOs / shared schemas
 - Env vars consumed by either side
@@ -30,12 +31,15 @@ Not needed for: pure UI tweaks, copy edits, internal refactors with stable contr
 ## Procedure
 
 ### 1. Identify scope
+
 - If `--range` was supplied, `git diff <range>`. Otherwise compare working tree against `HEAD` (`git diff HEAD`) PLUS include unstaged via `git diff` and staged via `git diff --cached`. Dedupe by path.
 - Capture: list of changed files, last commit hash + subject (`git log -1 --pretty=format:"%h %s"`), current branch (`git rev-parse --abbrev-ref HEAD`).
 - If diff is empty, abort with: `No changes detected in range — nothing to sync.`
 
 ### 2. Identify this repo's role (informational)
+
 Inspect:
+
 - `package.json` → React/Next/Vue/Angular keys → frontend
 - `pyproject.toml` / `requirements.txt` → FastAPI/Django/Flask → backend
 - `go.mod` → Go service → backend
@@ -50,18 +54,21 @@ This is only used to label the source side of the prompt. The detection heuristi
 For every changed file, apply these heuristics. Bias toward false positives over false negatives — better to surface a non-issue than miss a contract drift.
 
 **A. HTTP route/path strings** — surface any modified line containing:
+
 - Method + path literals: `GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS` followed by a `/path/like/this` (URL-y)
 - Axios/fetch calls: `apiClient.<method>("...")`, `fetch("...", ...)`, `axios.<method>("...")`
 - Backend route definitions: `@(Get|Post|Put|Patch|Delete)("...")`, `router.<method>("...")`, `app.<method>("...")`, `path("...", ...)`, etc.
 - OpenAPI / route files: any file matching `**/routes/**`, `**/controllers/**`, `**/api/**`, `**/handlers/**`, `**/endpoints/**`
 
 **B. Shared types / DTOs / schemas** — flag changes in files matching:
+
 - `types/**`, `**/dto/**`, `**/dtos/**`, `**/schemas/**`, `**/models/**`, `**/entities/**`
 - Zod / Joi / Yup / Pydantic / marshmallow / Marshal schema files
 - OpenAPI / GraphQL SDL files (`.openapi.*`, `*.graphql`, `*.gql`)
 - Generated files (Prisma `schema.prisma`, TypeORM entities, SQLAlchemy models, GORM models)
 
 **C. Env vars** — grep diff for new/changed lines in:
+
 - `.env.example`, `.env.sample`, `.env.template`
 - `process.env.X`, `os.getenv("X")`, `Deno.env.get("X")`, `std::env::var("X")`
 - Config files (`config.*`, `settings.*`) referencing env
@@ -69,14 +76,17 @@ For every changed file, apply these heuristics. Bias toward false positives over
 Flag both newly referenced env vars AND removed ones.
 
 **D. Auth / session** — any modified line containing:
+
 - `Authorization`, `Bearer `, `X-API-Key`, `cookie`, `session`, `csrf`, `jwt`, `refresh_token`, `access_token`
 - Middleware files (`middleware.*`, `**/middleware/**`, `**/guards/**`, `**/interceptors/**`)
 
 **E. Error / status codes** — any modified line with:
+
 - `status: \d{3}`, `statusCode: \d{3}`, `res.status(\d{3})`, `HTTPException(status_code=`, `throw new HttpException`, `c.JSON(\d{3}`, `w.WriteHeader(\d{3}`
 - Custom error code enums or `apiCodes` namespace strings
 
 **F. Pagination / filter conventions** — any param literal containing:
+
 - `page`, `limit`, `offset`, `cursor`, `pageSize`, `perPage`, `sort`, `order`, `q`, `search`, `filter`
 - When the param NAME appears as a new key in a request object
 
@@ -94,6 +104,7 @@ Group findings into sections (omit empty sections):
 ```
 
 For each finding, capture:
+
 - One-line description
 - Source file path + line range (link as `path:start-end`)
 - A short relevant diff snippet (3-10 lines of context)
@@ -105,6 +116,7 @@ If 1+ findings: list them as a numbered preview and ask the user to confirm / dr
 If 0 findings: print `No cross-repo signals detected in this range.` and exit.
 
 ### 6. Resolve target name
+
 - If `--target` provided, use it verbatim.
 - Else inspect `~/Documents/Personal/`, `~/code/`, `~/src/`, `~/dev/` for sibling repos with similar root names (e.g., `gorun-client` → look for `gorun-server`, `gorun-api`, `gorun-backend`). If exactly one match, suggest it.
 - Else ask the user: "Target repo name or path?"
@@ -127,10 +139,12 @@ These changes appear to affect contracts shared with this repo. Use your project
 <one section per non-empty cluster — see step 4>
 
 ### API contracts
+
 - **`<METHOD> <path>`** — <one-line nature of change>
   Source: `<file>:<line-range>`
 
 ### Shared types / DTOs
+
 - **`<TypeName>`** — <added/removed/changed fields>
   Source: `<file>:<line-range>`
 

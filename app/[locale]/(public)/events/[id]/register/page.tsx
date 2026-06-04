@@ -7,10 +7,9 @@ import { isRegistrationClosed } from "@/lib/event-registration";
 import { RegistrationWizard } from "@/components/registration/RegistrationWizard";
 import type { Metadata } from "next";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001").replace(
-  /\/api$/,
-  ""
-);
+const API_BASE = (
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+).replace(/\/api$/, "");
 
 async function fetchEvent(id: string, locale: string): Promise<Event | null> {
   try {
@@ -33,7 +32,12 @@ export async function generateMetadata({
   const { locale, id } = await params;
   const event = await fetchEvent(id, locale);
   const title = event
-    ? getLocalizedString(event.translations?.title, locale, "en", event.title || "")
+    ? getLocalizedString(
+        event.translations?.title,
+        locale,
+        "en",
+        event.title || ""
+      )
     : "Register";
   return { title: `Register — ${title}` };
 }

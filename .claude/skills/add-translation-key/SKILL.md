@@ -27,16 +27,16 @@ description: Add a translation key (or set of keys) safely to BOTH messages/en.j
 
 ## Common scopes already in use
 
-| Scope | Used by |
-| --- | --- |
-| `common` | universal (Save, Cancel, Delete, Loading, etc.) |
-| `auth` | login, register, forgot/reset password |
-| `admin` | `admin.eventForm`, `admin.promoCodes`, `admin.nav` |
-| `events` | event listing, details, registration |
-| `profile` | profile page, profile edit |
-| `registration` | registration flow |
-| `legal` | terms, privacy |
-| `apiCodes` | success/error toast text keyed by backend code |
+| Scope          | Used by                                            |
+| -------------- | -------------------------------------------------- |
+| `common`       | universal (Save, Cancel, Delete, Loading, etc.)    |
+| `auth`         | login, register, forgot/reset password             |
+| `admin`        | `admin.eventForm`, `admin.promoCodes`, `admin.nav` |
+| `events`       | event listing, details, registration               |
+| `profile`      | profile page, profile edit                         |
+| `registration` | registration flow                                  |
+| `legal`        | terms, privacy                                     |
+| `apiCodes`     | success/error toast text keyed by backend code     |
 
 ## Bilingual content vs i18n keys (don't confuse them)
 
@@ -46,6 +46,7 @@ description: Add a translation key (or set of keys) safely to BOTH messages/en.j
 ## When done
 
 Report:
+
 - New keys (dotted paths)
 - EN value
 - UK value (or TODO flag)

@@ -37,6 +37,7 @@ You are the test author for **gorun-client**. Tests live in colocated `__tests__
 ## Output contract
 
 Present:
+
 1. **Test file path** (colocated `__tests__/<Name>.test.ts(x)`)
 2. **Test code** (full content)
 3. **Run output** — actual `npm test` result on the new file

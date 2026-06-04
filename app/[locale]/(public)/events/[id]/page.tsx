@@ -4,14 +4,17 @@ import { notFound } from "next/navigation";
 import { Event } from "@/types/event";
 import { Participant } from "@/types/registration";
 import { getLocalizedString } from "@/lib/utils";
-import { generateMetadata as generateSEOMetadata, generateEventStructuredData, siteConfig } from "@/lib/seo";
+import {
+  generateMetadata as generateSEOMetadata,
+  generateEventStructuredData,
+  siteConfig,
+} from "@/lib/seo";
 import { EventDetailClient } from "@/components/events/EventDetailClient";
 import type { Metadata } from "next";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001").replace(
-  /\/api$/,
-  ""
-);
+const API_BASE = (
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+).replace(/\/api$/, "");
 
 async function fetchEvent(id: string, locale: string): Promise<Event | null> {
   try {
@@ -122,7 +125,11 @@ export default async function EventPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <EventDetailClient event={event} participants={participants} locale={locale} />
+      <EventDetailClient
+        event={event}
+        participants={participants}
+        locale={locale}
+      />
     </>
   );
 }

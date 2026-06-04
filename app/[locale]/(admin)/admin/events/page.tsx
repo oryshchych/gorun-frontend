@@ -91,11 +91,16 @@ export default function AdminEventsListPage() {
               <tbody>
                 {rows.map((row) => {
                   const title = eventTitle(row, locale);
-                  const dateStr = format(new Date(row.date), "PP p", { locale: dateLocale });
+                  const dateStr = format(new Date(row.date), "PP p", {
+                    locale: dateLocale,
+                  });
                   const active = row.isActive !== false;
                   return (
                     <ShellTableBodyRow key={row.id}>
-                      <td className="max-w-[220px] truncate px-4 py-3 font-medium" title={title}>
+                      <td
+                        className="max-w-[220px] truncate px-4 py-3 font-medium"
+                        title={title}
+                      >
                         {title}
                       </td>
                       <td className="whitespace-nowrap px-4 py-3 shell-ink-muted">

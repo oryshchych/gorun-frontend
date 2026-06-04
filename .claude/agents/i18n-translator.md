@@ -25,6 +25,7 @@ You are the i18n gatekeeper for **gorun-client**. The #1 footgun in this codebas
 ## Output contract
 
 When proposing changes, present:
+
 1. **Key tree** added — full dotted paths
 2. **Locale values** — EN exact, UK exact (or flagged as TODO)
 3. **Files modified** — both message files + any TS/TSX consumers

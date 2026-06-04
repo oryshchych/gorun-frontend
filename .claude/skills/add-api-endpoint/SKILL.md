@@ -27,18 +27,26 @@ description: Wire a new backend endpoint end-to-end — types in types/<domain>.
    - For paginated lists, use `PaginatedResponse<Foo>` from `types/api.ts`
 
 3. **Add axios wrapper** in `lib/api/<domain>.ts`:
+
    ```ts
    import apiClient from "./client";
    import type { Foo, CreateFooRequest } from "@/types/foo";
    import type { PaginatedResponse } from "@/types/api";
 
-   export interface GetFoosParams { /* ... */ }
+   export interface GetFoosParams {
+     /* ... */
+   }
 
-   export const getFoos = async (params: GetFoosParams = {}): Promise<PaginatedResponse<Foo>> => {
-     const response = await apiClient.get<PaginatedResponse<Foo>>("/foos", { params });
+   export const getFoos = async (
+     params: GetFoosParams = {}
+   ): Promise<PaginatedResponse<Foo>> => {
+     const response = await apiClient.get<PaginatedResponse<Foo>>("/foos", {
+       params,
+     });
      return response.data;
    };
    ```
+
    - **Never** create a new `axios.create`.
    - **Never** import `axios` directly here — go through `apiClient`.
 

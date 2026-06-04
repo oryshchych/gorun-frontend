@@ -38,6 +38,7 @@ You are the forms specialist for **gorun-client**. Forms here follow a precise p
 ## Output contract
 
 When proposing a form, present:
+
 1. **Schema** (file path + the Zod source)
 2. **Form component** (file path + JSX)
 3. **i18n key tree** (with placeholder English; UK can use TODO if user can't supply yet)

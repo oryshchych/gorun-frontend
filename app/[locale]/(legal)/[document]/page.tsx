@@ -21,10 +21,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale, document } = await params;
 
-  if (
-    !locales.includes(locale as Locale) ||
-    !isLegalDocumentSlug(document)
-  ) {
+  if (!locales.includes(locale as Locale) || !isLegalDocumentSlug(document)) {
     return {};
   }
 
@@ -46,10 +43,7 @@ export default async function LegalPage({
 }) {
   const { locale, document } = await params;
 
-  if (
-    !locales.includes(locale as Locale) ||
-    !isLegalDocumentSlug(document)
-  ) {
+  if (!locales.includes(locale as Locale) || !isLegalDocumentSlug(document)) {
     notFound();
   }
 

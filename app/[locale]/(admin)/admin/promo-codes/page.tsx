@@ -54,13 +54,19 @@ export default function AdminPromoCodesListPage() {
 
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "active" | "inactive"
+  >("all");
   const [eventFilterId, setEventFilterId] = useState("all");
 
   const debouncedSearch = useDebounce(searchQuery, 300);
 
   const isActiveParam =
-    statusFilter === "active" ? true : statusFilter === "inactive" ? false : undefined;
+    statusFilter === "active"
+      ? true
+      : statusFilter === "inactive"
+        ? false
+        : undefined;
 
   const { data, isLoading, isError, error, refetch } = useAdminPromoCodes({
     page,

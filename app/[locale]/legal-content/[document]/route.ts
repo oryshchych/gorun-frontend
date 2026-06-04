@@ -11,10 +11,7 @@ export async function GET(
 ) {
   const { locale, document } = await params;
 
-  if (
-    !locales.includes(locale as Locale) ||
-    !isLegalDocumentSlug(document)
-  ) {
+  if (!locales.includes(locale as Locale) || !isLegalDocumentSlug(document)) {
     return new NextResponse(null, { status: 404 });
   }
 

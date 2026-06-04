@@ -36,11 +36,7 @@ export function EventTabs({ activeTab, onTabChange }: EventTabsProps) {
 
   return (
     <div className="border-b mb-6">
-      <nav
-        className="flex space-x-1"
-        role="tablist"
-        aria-label="Event tabs"
-      >
+      <nav className="flex space-x-1" role="tablist" aria-label="Event tabs">
         {tabs.map((tab) => (
           <Button
             key={tab.id}
@@ -73,4 +69,3 @@ export function EventTabs({ activeTab, onTabChange }: EventTabsProps) {
     </div>
   );
 }
-

@@ -34,6 +34,7 @@ You are the routing & layout specialist for **gorun-client**, a Next.js 16 App R
 ## Output contract
 
 When proposing a new route / restructure, present:
+
 1. **Route path(s)** with the chosen route group
 2. **File list** to create or modify (full paths)
 3. **Server vs client breakdown** with rationale per file
