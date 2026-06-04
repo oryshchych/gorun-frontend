@@ -3,7 +3,18 @@
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
-import { ArrowLeft, Heart, Share2, Calendar, Users, Ticket, MapPin, Baby, Check, Trophy } from "lucide-react";
+import {
+  ArrowLeft,
+  Heart,
+  Share2,
+  Calendar,
+  Users,
+  Ticket,
+  MapPin,
+  Baby,
+  Check,
+  Trophy,
+} from "lucide-react";
 import { Event } from "@/types/event";
 import { Participant } from "@/types/registration";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -11,7 +22,10 @@ import { Tag } from "@/components/ui/tag";
 import { ParticipantsList } from "@/components/events/ParticipantsList";
 import { PastEventRecap } from "@/components/events/PastEventRecap";
 import { getLocalizedString } from "@/lib/utils";
-import { isPastEventExperience, isRegistrationClosed } from "@/lib/event-registration";
+import {
+  isPastEventExperience,
+  isRegistrationClosed,
+} from "@/lib/event-registration";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale/en-US";
 import { uk } from "date-fns/locale/uk";
@@ -36,13 +50,28 @@ export function EventDetailClient({
 
   const title =
     event.resolvedTitle ||
-    getLocalizedString(event.translations?.title, locale, "en", event.title || "");
+    getLocalizedString(
+      event.translations?.title,
+      locale,
+      "en",
+      event.title || ""
+    );
   const description =
     event.resolvedDescription ||
-    getLocalizedString(event.translations?.description, locale, "en", event.description || "");
+    getLocalizedString(
+      event.translations?.description,
+      locale,
+      "en",
+      event.description || ""
+    );
   const location =
     event.resolvedLocation ||
-    getLocalizedString(event.translations?.location, locale, "en", event.location || "");
+    getLocalizedString(
+      event.translations?.location,
+      locale,
+      "en",
+      event.location || ""
+    );
 
   const coverImage =
     event.cover || event.imageUrl?.landscape || event.imageUrl?.portrait || "";
@@ -71,8 +100,8 @@ export function EventDetailClient({
   return (
     <div
       style={{
-        background: "var(--gr-bg)",
-        color: "var(--gr-ink)",
+        background: "var(--bg)",
+        color: "var(--ink)",
         minHeight: "100vh",
         paddingBottom: showMobileSticky ? 120 : 40,
       }}
@@ -85,10 +114,10 @@ export function EventDetailClient({
           backgroundImage: coverImage
             ? `linear-gradient(180deg, rgba(15,26,18,0.4), rgba(15,26,18,0.85)), url(${coverImage})`
             : undefined,
-          background: coverImage ? undefined : "var(--gr-ink)",
+          background: coverImage ? undefined : "var(--ink)",
           backgroundSize: "cover",
           backgroundPosition: "center",
-          color: "#fff",
+          color: "var(--surface)",
         }}
       >
         {/* Nav row */}
@@ -108,7 +137,7 @@ export function EventDetailClient({
               height: 40,
               borderRadius: 999,
               background: "rgba(255,255,255,0.95)",
-              color: "#0F1A12",
+              color: "var(--ink)",
               display: "grid",
               placeItems: "center",
             }}
@@ -123,7 +152,7 @@ export function EventDetailClient({
                 height: 40,
                 borderRadius: 999,
                 background: "rgba(255,255,255,0.95)",
-                color: "#0F1A12",
+                color: "var(--ink)",
                 display: "grid",
                 placeItems: "center",
                 border: 0,
@@ -139,7 +168,7 @@ export function EventDetailClient({
                 height: 40,
                 borderRadius: 999,
                 background: "rgba(255,255,255,0.95)",
-                color: "#0F1A12",
+                color: "var(--ink)",
                 display: "grid",
                 placeItems: "center",
                 border: 0,
@@ -172,7 +201,7 @@ export function EventDetailClient({
             <Tag
               style={{
                 background: "rgba(255,255,255,0.2)",
-                color: "#fff",
+                color: "var(--surface)",
                 backdropFilter: "blur(6px)",
                 textTransform: "none",
               }}
@@ -184,7 +213,7 @@ export function EventDetailClient({
                 tone="dark"
                 style={{
                   background: "rgba(0,0,0,0.35)",
-                  color: "#fff",
+                  color: "var(--surface)",
                   border: "1px solid rgba(255,255,255,0.35)",
                   textTransform: "none",
                 }}
@@ -237,46 +266,60 @@ export function EventDetailClient({
               <div
                 key="d"
                 style={{
-                  background: "var(--gr-surface)",
-                  border: "1px solid var(--gr-line)",
-                  borderRadius: "var(--gr-r-md)",
+                  background: "var(--surface)",
+                  border: "1px solid var(--line)",
+                  borderRadius: "var(--r-md)",
                   padding: 10,
                 }}
               >
-                <Calendar size={16} color="var(--gr-brand-700)" />
+                <Calendar size={16} color="var(--brand-active)" />
                 <div
                   className="gr-display"
-                  style={{ fontSize: 16, fontWeight: 800, color: "var(--gr-ink)", marginTop: 4 }}
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 800,
+                    color: "var(--ink)",
+                    marginTop: 4,
+                  }}
                 >
                   {dateLabel.split(",")[1]?.trim() ?? dateLabel}
                 </div>
-                <div style={{ fontSize: 11, color: "var(--gr-ink-3)" }}>{event.timeLabel ?? ""}</div>
+                <div style={{ fontSize: 11, color: "var(--ink-3)" }}>
+                  {event.timeLabel ?? ""}
+                </div>
               </div>,
               <div
                 key="r"
                 style={{
-                  background: "var(--gr-surface)",
-                  border: "1px solid var(--gr-line)",
-                  borderRadius: "var(--gr-r-md)",
+                  background: "var(--surface)",
+                  border: "1px solid var(--line)",
+                  borderRadius: "var(--r-md)",
                   padding: 10,
                 }}
               >
-                <Users size={16} color="var(--gr-brand-700)" />
+                <Users size={16} color="var(--brand-active)" />
                 <div
                   className="gr-display"
-                  style={{ fontSize: 16, fontWeight: 800, color: "var(--gr-ink)", marginTop: 4 }}
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 800,
+                    color: "var(--ink)",
+                    marginTop: 4,
+                  }}
                 >
                   {String(spotsTaken)}
                 </div>
-                <div style={{ fontSize: 11, color: "var(--gr-ink-3)" }}>{t("past.runnersOnRecord")}</div>
+                <div style={{ fontSize: 11, color: "var(--ink-3)" }}>
+                  {t("past.runnersOnRecord")}
+                </div>
               </div>,
               <Link
                 key="res"
                 href={`/${locale}/events/${event.id}/results`}
                 style={{
-                  background: "var(--gr-surface)",
-                  border: "1px solid var(--gr-line)",
-                  borderRadius: "var(--gr-r-md)",
+                  background: "var(--surface)",
+                  border: "1px solid var(--line)",
+                  borderRadius: "var(--r-md)",
                   padding: 10,
                   textDecoration: "none",
                   color: "inherit",
@@ -284,14 +327,25 @@ export function EventDetailClient({
                   transition: "border-color 150ms, background 150ms",
                 }}
               >
-                <Trophy size={16} color="var(--gr-brand-700)" />
+                <Trophy size={16} color="var(--brand-active)" />
                 <div
                   className="gr-display"
-                  style={{ fontSize: 16, fontWeight: 800, color: "var(--gr-ink)", marginTop: 4 }}
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 800,
+                    color: "var(--ink)",
+                    marginTop: 4,
+                  }}
                 >
                   {t("past.viewResults")}
                 </div>
-                <div style={{ fontSize: 11, color: "var(--gr-brand-700)", fontWeight: 600 }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "var(--brand-active)",
+                    fontWeight: 600,
+                  }}
+                >
                   →
                 </div>
               </Link>,
@@ -316,20 +370,25 @@ export function EventDetailClient({
               <div
                 key={i}
                 style={{
-                  background: "var(--gr-surface)",
-                  border: "1px solid var(--gr-line)",
-                  borderRadius: "var(--gr-r-md)",
+                  background: "var(--surface)",
+                  border: "1px solid var(--line)",
+                  borderRadius: "var(--r-md)",
                   padding: 10,
                 }}
               >
-                <Icon size={16} color="var(--gr-brand-700)" />
+                <Icon size={16} color="var(--brand-active)" />
                 <div
                   className="gr-display"
-                  style={{ fontSize: 16, fontWeight: 800, color: "var(--gr-ink)", marginTop: 4 }}
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 800,
+                    color: "var(--ink)",
+                    marginTop: 4,
+                  }}
                 >
                   {top}
                 </div>
-                <div style={{ fontSize: 11, color: "var(--gr-ink-3)" }}>{bot}</div>
+                <div style={{ fontSize: 11, color: "var(--ink-3)" }}>{bot}</div>
               </div>
             ))}
       </div>
@@ -339,9 +398,9 @@ export function EventDetailClient({
         style={{
           position: "sticky",
           top: 0,
-          background: "var(--gr-bg)",
+          background: "var(--bg)",
           zIndex: 10,
-          borderBottom: "1px solid var(--gr-line)",
+          borderBottom: "1px solid var(--line)",
         }}
       >
         <div
@@ -362,15 +421,15 @@ export function EventDetailClient({
                   padding: "14px 12px",
                   fontSize: 14,
                   fontWeight: 700,
-                  color: active ? "var(--gr-ink)" : "var(--gr-ink-3)",
-                  borderBottom: `2px solid ${active ? "var(--gr-brand)" : "transparent"}`,
+                  color: active ? "var(--ink)" : "var(--ink-3)",
+                  borderBottom: `2px solid ${active ? "var(--brand)" : "transparent"}`,
                   marginBottom: -1,
                   background: "transparent",
                   transition: "color 150ms",
                   border: "none",
                   borderBottomStyle: "solid",
                   borderBottomWidth: 2,
-                  borderBottomColor: active ? "var(--gr-brand)" : "transparent",
+                  borderBottomColor: active ? "var(--brand)" : "transparent",
                   cursor: "pointer",
                 }}
               >
@@ -394,8 +453,17 @@ export function EventDetailClient({
           {/* Main content column */}
           <div>
             {activeTab === "overview" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                <p style={{ fontSize: 15, lineHeight: 1.6, color: "var(--gr-ink-2)", margin: 0 }}>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 20 }}
+              >
+                <p
+                  style={{
+                    fontSize: 15,
+                    lineHeight: 1.6,
+                    color: "var(--ink-2)",
+                    margin: 0,
+                  }}
+                >
                   {description}
                 </p>
 
@@ -405,9 +473,9 @@ export function EventDetailClient({
                 {event.afu && (
                   <div
                     style={{
-                      background: "var(--gr-ink)",
-                      color: "var(--gr-bg)",
-                      borderRadius: "var(--gr-r-lg)",
+                      background: "var(--ink)",
+                      color: "var(--bg)",
+                      borderRadius: "var(--r-lg)",
                       padding: 18,
                     }}
                   >
@@ -424,7 +492,7 @@ export function EventDetailClient({
                           width: 8,
                           height: 8,
                           borderRadius: 999,
-                          background: "var(--gr-afu-yellow)",
+                          background: "var(--afu-yellow)",
                         }}
                       />
                       <div
@@ -432,13 +500,15 @@ export function EventDetailClient({
                           fontSize: 11,
                           fontWeight: 700,
                           letterSpacing: "0.08em",
-                          color: "var(--gr-afu-yellow)",
+                          color: "var(--afu-yellow)",
                         }}
                       >
                         {t("afuSupport")}
                       </div>
                     </div>
-                    <div style={{ fontSize: 14, lineHeight: 1.5 }}>{event.afu}</div>
+                    <div style={{ fontSize: 14, lineHeight: 1.5 }}>
+                      {event.afu}
+                    </div>
                   </div>
                 )}
 
@@ -447,14 +517,19 @@ export function EventDetailClient({
                   <div>
                     <div
                       className="gr-display"
-                      style={{ fontSize: 16, fontWeight: 700, marginBottom: 10 }}
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 700,
+                        marginBottom: 10,
+                      }}
                     >
                       {t("included")}
                     </div>
                     <div
                       style={{
                         display: "grid",
-                        gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+                        gridTemplateColumns:
+                          "repeat(auto-fill, minmax(180px, 1fr))",
                         gap: 8,
                       }}
                     >
@@ -466,13 +541,13 @@ export function EventDetailClient({
                             alignItems: "center",
                             gap: 8,
                             padding: "10px 12px",
-                            background: "var(--gr-surface)",
-                            borderRadius: "var(--gr-r-md)",
-                            border: "1px solid var(--gr-line)",
+                            background: "var(--surface)",
+                            borderRadius: "var(--r-md)",
+                            border: "1px solid var(--line)",
                             fontSize: 13,
                           }}
                         >
-                          <Check size={15} color="var(--gr-brand-700)" />
+                          <Check size={15} color="var(--brand-active)" />
                           {perk}
                         </div>
                       ))}
@@ -487,7 +562,9 @@ export function EventDetailClient({
                 {/* `event.program` is [[time, what], ...]; `event.schedule` is [{time, what}, ...] */}
                 {(
                   event.program ??
-                  event.schedule?.map((s) => [s.time, s.what] as [string, string]) ??
+                  event.schedule?.map(
+                    (s) => [s.time, s.what] as [string, string]
+                  ) ??
                   []
                 ).map(([time, what], i) => (
                   <div
@@ -496,9 +573,9 @@ export function EventDetailClient({
                       display: "flex",
                       gap: 14,
                       padding: "14px 16px",
-                      background: "var(--gr-surface)",
-                      borderRadius: "var(--gr-r-md)",
-                      border: "1px solid var(--gr-line)",
+                      background: "var(--surface)",
+                      borderRadius: "var(--r-md)",
+                      border: "1px solid var(--line)",
                       alignItems: "center",
                     }}
                   >
@@ -507,17 +584,19 @@ export function EventDetailClient({
                       style={{
                         fontSize: 14,
                         fontWeight: 700,
-                        color: "var(--gr-brand-700)",
+                        color: "var(--brand-active)",
                         minWidth: 50,
                       }}
                     >
                       {time}
                     </div>
-                    <div style={{ fontSize: 14, color: "var(--gr-ink)" }}>{what}</div>
+                    <div style={{ fontSize: 14, color: "var(--ink)" }}>
+                      {what}
+                    </div>
                   </div>
                 ))}
                 {!(event.program ?? event.schedule)?.length && (
-                  <p style={{ color: "var(--gr-ink-3)", fontSize: 14 }}>
+                  <p style={{ color: "var(--ink-3)", fontSize: 14 }}>
                     {t("scheduleEmpty")}
                   </p>
                 )}
@@ -525,15 +604,17 @@ export function EventDetailClient({
             )}
 
             {activeTab === "distances" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 12 }}
+              >
                 {/* Adult distances from API `event.distances[]` */}
                 {event.distances?.map((d) => (
                   <div
                     key={d.id}
                     style={{
-                      background: "var(--gr-surface)",
-                      borderRadius: "var(--gr-r-lg)",
-                      border: "1px solid var(--gr-line)",
+                      background: "var(--surface)",
+                      borderRadius: "var(--r-lg)",
+                      border: "1px solid var(--line)",
                       padding: 16,
                     }}
                   >
@@ -547,30 +628,48 @@ export function EventDetailClient({
                       <div>
                         <div
                           className="gr-display"
-                          style={{ fontSize: 28, fontWeight: 800, color: "var(--gr-ink)", lineHeight: 1 }}
+                          style={{
+                            fontSize: 28,
+                            fontWeight: 800,
+                            color: "var(--ink)",
+                            lineHeight: 1,
+                          }}
                         >
                           {d.label}
                         </div>
-                        <div style={{ fontSize: 13, color: "var(--gr-ink-3)", marginTop: 2 }}>
+                        <div
+                          style={{
+                            fontSize: 13,
+                            color: "var(--ink-3)",
+                            marginTop: 2,
+                          }}
+                        >
                           {d.name}
                         </div>
                       </div>
                       <div style={{ textAlign: "right" }}>
                         <div
                           className="gr-display"
-                          style={{ fontSize: 18, fontWeight: 800, color: "var(--gr-brand-700)" }}
+                          style={{
+                            fontSize: 18,
+                            fontWeight: 800,
+                            color: "var(--brand-active)",
+                          }}
                         >
                           {d.feeUah ?? d.fee} ₴
                         </div>
                         {(d.elevation || d.laps) && (
-                          <div style={{ fontSize: 11, color: "var(--gr-ink-3)" }}>
+                          <div style={{ fontSize: 11, color: "var(--ink-3)" }}>
                             {d.elevation || d.laps}
                           </div>
                         )}
                       </div>
                     </div>
                     <div style={{ marginTop: 12 }}>
-                      <ProgressBar taken={d.spots.taken} total={d.spots.total} />
+                      <ProgressBar
+                        taken={d.spots.taken}
+                        total={d.spots.total}
+                      />
                     </div>
                   </div>
                 ))}
@@ -597,8 +696,8 @@ export function EventDetailClient({
                         gap: 8,
                         flexWrap: "wrap",
                         padding: 16,
-                        background: "var(--gr-brand-50)",
-                        borderRadius: "var(--gr-r-lg)",
+                        background: "var(--brand-tint)",
+                        borderRadius: "var(--r-lg)",
                       }}
                     >
                       {event.kidsDistances.map((d) => (
@@ -607,21 +706,39 @@ export function EventDetailClient({
                           style={{
                             padding: "12px 14px",
                             background: "rgba(255,255,255,0.6)",
-                            borderRadius: "var(--gr-r-md)",
+                            borderRadius: "var(--r-md)",
                             flex: "1 1 100px",
                           }}
                         >
                           <div
                             className="gr-display"
-                            style={{ fontSize: 18, fontWeight: 800, color: "var(--gr-brand-700)" }}
+                            style={{
+                              fontSize: 18,
+                              fontWeight: 800,
+                              color: "var(--brand-active)",
+                            }}
                           >
                             {d.label}
                           </div>
-                          <div style={{ fontSize: 11, color: "var(--gr-ink-3)", fontWeight: 600 }}>
+                          <div
+                            style={{
+                              fontSize: 11,
+                              color: "var(--ink-3)",
+                              fontWeight: 600,
+                            }}
+                          >
                             {t("age", { range: d.age })}
                           </div>
-                          <div style={{ fontSize: 11, color: "var(--gr-ink-3)", marginTop: 2 }}>
-                            {(d.feeUah ?? d.fee) === 0 ? t("free") : `${d.feeUah ?? d.fee} ₴`}
+                          <div
+                            style={{
+                              fontSize: 11,
+                              color: "var(--ink-3)",
+                              marginTop: 2,
+                            }}
+                          >
+                            {(d.feeUah ?? d.fee) === 0
+                              ? t("free")
+                              : `${d.feeUah ?? d.fee} ₴`}
                           </div>
                         </div>
                       ))}
@@ -630,7 +747,7 @@ export function EventDetailClient({
                 )}
 
                 {!event.distances?.length && !event.kidsDistances?.length && (
-                  <p style={{ color: "var(--gr-ink-3)", fontSize: 14 }}>
+                  <p style={{ color: "var(--ink-3)", fontSize: 14 }}>
                     {t("distancesEmpty")}
                   </p>
                 )}
@@ -645,26 +762,44 @@ export function EventDetailClient({
           {/* Desktop sticky sidebar */}
           {activeTab === "overview" && (
             <div
-              style={{ position: "sticky", top: 90, display: "flex", flexDirection: "column", gap: 14 }}
+              style={{
+                position: "sticky",
+                top: 90,
+                display: "flex",
+                flexDirection: "column",
+                gap: 14,
+              }}
               className="hidden lg:flex"
             >
               {registrationClosed ? (
                 pastExperience ? (
                   <div
                     style={{
-                      background: "var(--gr-surface)",
-                      borderRadius: "var(--gr-r-lg)",
-                      border: "1px solid var(--gr-line)",
+                      background: "var(--surface)",
+                      borderRadius: "var(--r-lg)",
+                      border: "1px solid var(--line)",
                       padding: 24,
                     }}
                   >
                     <div
                       className="gr-display"
-                      style={{ fontSize: 22, fontWeight: 800, color: "var(--gr-ink)", lineHeight: 1.2 }}
+                      style={{
+                        fontSize: 22,
+                        fontWeight: 800,
+                        color: "var(--ink)",
+                        lineHeight: 1.2,
+                      }}
                     >
                       {t("past.sidebarTitle")}
                     </div>
-                    <p style={{ fontSize: 14, color: "var(--gr-ink-2)", marginTop: 10, lineHeight: 1.5 }}>
+                    <p
+                      style={{
+                        fontSize: 14,
+                        color: "var(--ink-2)",
+                        marginTop: 10,
+                        lineHeight: 1.5,
+                      }}
+                    >
                       {t("past.sidebarSub")}
                     </p>
                     <div style={{ marginTop: 16 }}>
@@ -681,12 +816,12 @@ export function EventDetailClient({
                         marginTop: 18,
                         padding: "16px 22px",
                         borderRadius: 999,
-                        background: "var(--gr-brand)",
-                        color: "#0b1a0f",
+                        background: "var(--brand)",
+                        color: "var(--on-brand)",
                         fontWeight: 700,
                         fontSize: 16,
                         textDecoration: "none",
-                        boxShadow: "0 8px 28px var(--gr-brand-glow)",
+                        boxShadow: "0 8px 28px var(--brand-glow)",
                       }}
                     >
                       {t("past.viewResults")}
@@ -701,12 +836,12 @@ export function EventDetailClient({
                         marginTop: 10,
                         padding: "14px 20px",
                         borderRadius: 999,
-                        border: "1px solid var(--gr-line-strong)",
-                        color: "var(--gr-ink)",
+                        border: "1px solid var(--line-strong)",
+                        color: "var(--ink)",
                         fontWeight: 600,
                         fontSize: 15,
                         textDecoration: "none",
-                        background: "var(--gr-bg)",
+                        background: "var(--bg)",
                       }}
                     >
                       {t("past.viewRunners")}
@@ -715,14 +850,23 @@ export function EventDetailClient({
                 ) : (
                   <div
                     style={{
-                      background: "var(--gr-surface)",
-                      borderRadius: "var(--gr-r-lg)",
-                      border: "1px solid var(--gr-line)",
+                      background: "var(--surface)",
+                      borderRadius: "var(--r-lg)",
+                      border: "1px solid var(--line)",
                       padding: 24,
                     }}
                   >
-                    <p style={{ fontSize: 15, color: "var(--gr-ink-2)", lineHeight: 1.55, margin: 0 }}>
-                      {event.status === "CANCELLED" ? t("past.cancelled") : t("past.registrationClosed")}
+                    <p
+                      style={{
+                        fontSize: 15,
+                        color: "var(--ink-2)",
+                        lineHeight: 1.55,
+                        margin: 0,
+                      }}
+                    >
+                      {event.status === "CANCELLED"
+                        ? t("past.cancelled")
+                        : t("past.registrationClosed")}
                     </p>
                     <Link
                       href={`/${locale}`}
@@ -731,7 +875,7 @@ export function EventDetailClient({
                         marginTop: 16,
                         fontWeight: 700,
                         fontSize: 14,
-                        color: "var(--gr-brand-700)",
+                        color: "var(--brand-active)",
                         textDecoration: "none",
                       }}
                     >
@@ -742,16 +886,16 @@ export function EventDetailClient({
               ) : (
                 <div
                   style={{
-                    background: "var(--gr-surface)",
-                    borderRadius: "var(--gr-r-lg)",
-                    border: "1px solid var(--gr-line)",
+                    background: "var(--surface)",
+                    borderRadius: "var(--r-lg)",
+                    border: "1px solid var(--line)",
                     padding: 24,
                   }}
                 >
                   <div
                     style={{
                       fontSize: 12,
-                      color: "var(--gr-ink-3)",
+                      color: "var(--ink-3)",
                       fontWeight: 600,
                       textTransform: "uppercase",
                       letterSpacing: "0.06em",
@@ -759,7 +903,10 @@ export function EventDetailClient({
                   >
                     {t("entryFrom")}
                   </div>
-                  <div className="gr-display" style={{ fontSize: 36, fontWeight: 800, marginTop: 4 }}>
+                  <div
+                    className="gr-display"
+                    style={{ fontSize: 36, fontWeight: 800, marginTop: 4 }}
+                  >
                     {feeLabel || "—"}
                   </div>
                   <div style={{ marginTop: 16 }}>
@@ -776,12 +923,12 @@ export function EventDetailClient({
                       marginTop: 18,
                       padding: "16px 22px",
                       borderRadius: 999,
-                      background: "var(--gr-brand)",
-                      color: "#0b1a0f",
+                      background: "var(--brand)",
+                      color: "var(--on-brand)",
                       fontWeight: 700,
                       fontSize: 16,
                       textDecoration: "none",
-                      boxShadow: "0 8px 28px var(--gr-brand-glow)",
+                      boxShadow: "0 8px 28px var(--brand-glow)",
                     }}
                   >
                     {t("register")}
@@ -792,19 +939,26 @@ export function EventDetailClient({
               {event.afu && (
                 <div
                   style={{
-                    background: "var(--gr-ink)",
-                    color: "var(--gr-bg)",
-                    borderRadius: "var(--gr-r-lg)",
+                    background: "var(--ink)",
+                    color: "var(--bg)",
+                    borderRadius: "var(--r-lg)",
                     padding: 22,
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      marginBottom: 10,
+                    }}
+                  >
                     <div
                       style={{
                         width: 8,
                         height: 8,
                         borderRadius: 999,
-                        background: "var(--gr-afu-yellow)",
+                        background: "var(--afu-yellow)",
                       }}
                     />
                     <div
@@ -812,13 +966,15 @@ export function EventDetailClient({
                         fontSize: 11,
                         fontWeight: 700,
                         letterSpacing: "0.08em",
-                        color: "var(--gr-afu-yellow)",
+                        color: "var(--afu-yellow)",
                       }}
                     >
                       {t("afuSupport")}
                     </div>
                   </div>
-                  <div style={{ fontSize: 13, lineHeight: 1.55 }}>{event.afu}</div>
+                  <div style={{ fontSize: 13, lineHeight: 1.55 }}>
+                    {event.afu}
+                  </div>
                 </div>
               )}
             </div>
@@ -835,7 +991,7 @@ export function EventDetailClient({
             right: 0,
             bottom: 0,
             padding: "12px 18px 24px",
-            background: "linear-gradient(180deg, transparent, var(--gr-bg) 30%)",
+            background: "linear-gradient(180deg, transparent, var(--bg) 30%)",
             zIndex: 20,
           }}
           className="lg:hidden"
@@ -850,12 +1006,12 @@ export function EventDetailClient({
               width: "100%",
               padding: "16px 22px",
               borderRadius: 999,
-              background: "var(--gr-brand)",
-              color: "#0b1a0f",
+              background: "var(--brand)",
+              color: "var(--on-brand)",
               fontWeight: 700,
               fontSize: 16,
               textDecoration: "none",
-              boxShadow: "0 8px 28px var(--gr-brand-glow)",
+              boxShadow: "0 8px 28px var(--brand-glow)",
             }}
           >
             {feeLabel ? `${t("register")} · ${feeLabel}` : t("register")}
@@ -870,7 +1026,7 @@ export function EventDetailClient({
             right: 0,
             bottom: 0,
             padding: "12px 18px 24px",
-            background: "linear-gradient(180deg, transparent, var(--gr-bg) 30%)",
+            background: "linear-gradient(180deg, transparent, var(--bg) 30%)",
             zIndex: 20,
           }}
           className="lg:hidden"
@@ -885,12 +1041,12 @@ export function EventDetailClient({
               width: "100%",
               padding: "16px 22px",
               borderRadius: 999,
-              background: "var(--gr-brand)",
-              color: "#0b1a0f",
+              background: "var(--brand)",
+              color: "var(--on-brand)",
               fontWeight: 700,
               fontSize: 16,
               textDecoration: "none",
-              boxShadow: "0 8px 28px var(--gr-brand-glow)",
+              boxShadow: "0 8px 28px var(--brand-glow)",
             }}
           >
             {t("past.viewResults")}

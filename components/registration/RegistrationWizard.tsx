@@ -113,8 +113,8 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
   return (
     <div
       style={{
-        background: "var(--gr-bg)",
-        color: "var(--gr-ink)",
+        background: "var(--bg)",
+        color: "var(--ink)",
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
@@ -131,8 +131,8 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               width: 40,
               height: 40,
               borderRadius: 999,
-              background: "var(--gr-surface)",
-              border: "1px solid var(--gr-line)",
+              background: "var(--surface)",
+              border: "1px solid var(--line)",
               display: "grid",
               placeItems: "center",
               cursor: "pointer",
@@ -145,7 +145,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
             <div
               style={{
                 fontSize: 11,
-                color: "var(--gr-ink-3)",
+                color: "var(--ink-3)",
                 fontWeight: 700,
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
@@ -166,7 +166,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
           <button
             onClick={() => router.push(`/${locale}/events/${event.id}`)}
             style={{
-              color: "var(--gr-ink-3)",
+              color: "var(--ink-3)",
               display: "grid",
               placeItems: "center",
             }}
@@ -185,8 +185,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                 flex: 1,
                 height: 4,
                 borderRadius: 2,
-                background:
-                  i <= step ? "var(--gr-brand)" : "var(--gr-line-strong)",
+                background: i <= step ? "var(--brand)" : "var(--line-strong)",
                 transition: "background 300ms",
               }}
             />
@@ -208,7 +207,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
             <div
               style={{
                 fontSize: 14,
-                color: "var(--gr-ink-3)",
+                color: "var(--ink-3)",
                 marginBottom: 4,
               }}
             >
@@ -222,11 +221,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                   onClick={() => setPickedDistId(d.id)}
                   style={{
                     padding: 16,
-                    borderRadius: "var(--gr-r-lg)",
-                    background: sel
-                      ? "var(--gr-brand-50)"
-                      : "var(--gr-surface)",
-                    border: `2px solid ${sel ? "var(--gr-brand)" : "var(--gr-line)"}`,
+                    borderRadius: "var(--r-lg)",
+                    background: sel ? "var(--brand-tint)" : "var(--surface)",
+                    border: `2px solid ${sel ? "var(--brand)" : "var(--line)"}`,
                     display: "flex",
                     gap: 14,
                     alignItems: "center",
@@ -239,7 +236,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     style={{
                       fontSize: 28,
                       fontWeight: 800,
-                      color: sel ? "var(--gr-brand-700)" : "var(--gr-ink)",
+                      color: sel ? "var(--brand-active)" : "var(--ink)",
                       minWidth: 70,
                     }}
                   >
@@ -250,7 +247,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                       style={{
                         fontSize: 14,
                         fontWeight: 700,
-                        color: "var(--gr-ink)",
+                        color: "var(--ink)",
                       }}
                     >
                       {d.name}
@@ -258,7 +255,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     <div
                       style={{
                         fontSize: 12,
-                        color: "var(--gr-ink-3)",
+                        color: "var(--ink-3)",
                         marginTop: 2,
                       }}
                     >
@@ -278,7 +275,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               );
             })}
             {!event.distances?.length && (
-              <p style={{ color: "var(--gr-ink-3)", fontSize: 14 }}>
+              <p style={{ color: "var(--ink-3)", fontSize: 14 }}>
                 Distance info coming soon.
               </p>
             )}
@@ -289,11 +286,11 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
         {step === 1 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div>
-              <div style={{ fontSize: 14, color: "var(--gr-ink-3)" }}>
+              <div style={{ fontSize: 14, color: "var(--ink-3)" }}>
                 Bring your kids? (optional)
               </div>
               <div
-                style={{ fontSize: 12, color: "var(--gr-ink-4)", marginTop: 4 }}
+                style={{ fontSize: 12, color: "var(--ink-4)", marginTop: 4 }}
               >
                 Pick a distance for each child you&apos;d like to register.
               </div>
@@ -305,9 +302,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                 <div
                   key={kid.id}
                   style={{
-                    background: "var(--gr-surface)",
-                    borderRadius: "var(--gr-r-lg)",
-                    border: "1px solid var(--gr-line)",
+                    background: "var(--surface)",
+                    borderRadius: "var(--r-lg)",
+                    border: "1px solid var(--line)",
                     padding: 16,
                   }}
                 >
@@ -324,18 +321,18 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                         width: 40,
                         height: 40,
                         borderRadius: 999,
-                        background: "var(--gr-brand-50)",
+                        background: "var(--brand-tint)",
                         display: "grid",
                         placeItems: "center",
                       }}
                     >
-                      <Baby size={20} color="var(--gr-brand-700)" />
+                      <Baby size={20} color="var(--brand-active)" />
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 15, fontWeight: 700 }}>
                         {kid.name}
                       </div>
-                      <div style={{ fontSize: 12, color: "var(--gr-ink-3)" }}>
+                      <div style={{ fontSize: 12, color: "var(--ink-3)" }}>
                         Age {kid.age}
                         {kid.shirt ? ` · Shirt ${kid.shirt}` : ""}
                       </div>
@@ -361,10 +358,8 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                         borderRadius: 999,
                         fontSize: 12,
                         fontWeight: 700,
-                        background: reg
-                          ? "var(--gr-ink)"
-                          : "var(--gr-brand-50)",
-                        color: reg ? "var(--gr-bg)" : "var(--gr-brand-700)",
+                        background: reg ? "var(--ink)" : "var(--brand-tint)",
+                        color: reg ? "var(--bg)" : "var(--brand-active)",
                         cursor: "pointer",
                       }}
                     >
@@ -390,11 +385,11 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                             style={{
                               flex: 1,
                               padding: "10px 8px",
-                              borderRadius: "var(--gr-r-md)",
+                              borderRadius: "var(--r-md)",
                               background: sel
-                                ? "var(--gr-brand)"
-                                : "var(--gr-surface-2)",
-                              color: sel ? "#0B1A0F" : "var(--gr-ink-2)",
+                                ? "var(--brand)"
+                                : "var(--surface-2)",
+                              color: sel ? "var(--on-brand)" : "var(--ink-2)",
                               fontWeight: 700,
                               fontSize: 13,
                               cursor: "pointer",
@@ -425,9 +420,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               <div
                 style={{
                   padding: 18,
-                  borderRadius: "var(--gr-r-md)",
-                  border: "1.5px dashed var(--gr-line-strong)",
-                  color: "var(--gr-ink-3)",
+                  borderRadius: "var(--r-md)",
+                  border: "1.5px dashed var(--line-strong)",
+                  color: "var(--ink-3)",
                   fontSize: 13,
                   textAlign: "center",
                 }}
@@ -439,9 +434,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
             <button
               style={{
                 padding: 14,
-                border: "1.5px dashed var(--gr-line-strong)",
-                borderRadius: "var(--gr-r-md)",
-                color: "var(--gr-ink-3)",
+                border: "1.5px dashed var(--line-strong)",
+                borderRadius: "var(--r-md)",
+                color: "var(--ink-3)",
                 fontWeight: 600,
                 fontSize: 13,
                 display: "inline-flex",
@@ -464,9 +459,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
             {user && (
               <div
                 style={{
-                  background: "var(--gr-surface)",
-                  borderRadius: "var(--gr-r-lg)",
-                  border: "1px solid var(--gr-line)",
+                  background: "var(--surface)",
+                  borderRadius: "var(--r-lg)",
+                  border: "1px solid var(--line)",
                   padding: 16,
                 }}
               >
@@ -477,8 +472,8 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                       height: 44,
                       borderRadius: 999,
                       background:
-                        "linear-gradient(135deg, var(--gr-brand), var(--gr-brand-700))",
-                      color: "#fff",
+                        "linear-gradient(135deg, var(--brand), var(--brand-active))",
+                      color: "var(--surface)",
                       display: "grid",
                       placeItems: "center",
                       fontWeight: 700,
@@ -496,7 +491,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     <div style={{ fontSize: 15, fontWeight: 700 }}>
                       {user.name}
                     </div>
-                    <div style={{ fontSize: 12, color: "var(--gr-ink-3)" }}>
+                    <div style={{ fontSize: 12, color: "var(--ink-3)" }}>
                       {user.email}
                     </div>
                   </div>
@@ -509,7 +504,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                 style={{
                   fontSize: 12,
                   fontWeight: 600,
-                  color: "var(--gr-ink-3)",
+                  color: "var(--ink-3)",
                   textTransform: "uppercase",
                   letterSpacing: "0.06em",
                   marginBottom: 8,
@@ -525,13 +520,12 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     style={{
                       flex: 1,
                       padding: "12px 0",
-                      borderRadius: "var(--gr-r-md)",
+                      borderRadius: "var(--r-md)",
                       fontWeight: 700,
                       fontSize: 13,
-                      background:
-                        shirt === s ? "var(--gr-ink)" : "var(--gr-surface)",
-                      color: shirt === s ? "var(--gr-bg)" : "var(--gr-ink-2)",
-                      border: "1px solid var(--gr-line)",
+                      background: shirt === s ? "var(--ink)" : "var(--surface)",
+                      color: shirt === s ? "var(--bg)" : "var(--ink-2)",
+                      border: "1px solid var(--line)",
                       cursor: "pointer",
                     }}
                   >
@@ -547,7 +541,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                   style={{
                     fontSize: 12,
                     fontWeight: 600,
-                    color: "var(--gr-ink-3)",
+                    color: "var(--ink-3)",
                     textTransform: "uppercase",
                     letterSpacing: "0.06em",
                     marginBottom: 8,
@@ -562,18 +556,18 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                   style={{
                     width: "100%",
                     padding: "14px 16px",
-                    borderRadius: "var(--gr-r-md)",
-                    background: "var(--gr-surface)",
-                    border: "1.5px solid var(--gr-line-strong)",
+                    borderRadius: "var(--r-md)",
+                    background: "var(--surface)",
+                    border: "1.5px solid var(--line-strong)",
                     fontSize: 16,
-                    color: "var(--gr-ink)",
+                    color: "var(--ink)",
                     fontFamily: "inherit",
                   }}
                 />
                 <div
                   style={{
                     fontSize: 12,
-                    color: "var(--gr-ink-4)",
+                    color: "var(--ink-4)",
                     marginTop: 6,
                   }}
                 >
@@ -587,7 +581,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                 style={{
                   fontSize: 12,
                   fontWeight: 600,
-                  color: "var(--gr-ink-3)",
+                  color: "var(--ink-3)",
                   textTransform: "uppercase",
                   letterSpacing: "0.06em",
                   marginBottom: 8,
@@ -603,16 +597,14 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     style={{
                       flex: 1,
                       padding: "12px 0",
-                      borderRadius: "var(--gr-r-md)",
+                      borderRadius: "var(--r-md)",
                       fontWeight: 700,
                       fontSize: 12,
                       background:
-                        donate === v ? "var(--gr-ink)" : "var(--gr-surface)",
+                        donate === v ? "var(--ink)" : "var(--surface)",
                       color:
-                        donate === v
-                          ? "var(--gr-afu-yellow)"
-                          : "var(--gr-ink-2)",
-                      border: "1px solid var(--gr-line)",
+                        donate === v ? "var(--afu-yellow)" : "var(--ink-2)",
+                      border: "1px solid var(--line)",
                       cursor: "pointer",
                     }}
                   >
@@ -621,7 +613,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                 ))}
               </div>
               <div
-                style={{ fontSize: 12, color: "var(--gr-ink-4)", marginTop: 6 }}
+                style={{ fontSize: 12, color: "var(--ink-4)", marginTop: 6 }}
               >
                 100% goes to the Armed Forces of Ukraine
               </div>
@@ -635,9 +627,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
             {/* Summary */}
             <div
               style={{
-                background: "var(--gr-surface)",
-                borderRadius: "var(--gr-r-lg)",
-                border: "1px solid var(--gr-line)",
+                background: "var(--surface)",
+                borderRadius: "var(--r-lg)",
+                border: "1px solid var(--line)",
                 padding: 16,
               }}
             >
@@ -673,7 +665,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               <div
                 style={{
                   height: 1,
-                  background: "var(--gr-line)",
+                  background: "var(--line)",
                   margin: "12px 0",
                 }}
               />
@@ -693,7 +685,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                 style={{
                   fontSize: 12,
                   fontWeight: 600,
-                  color: "var(--gr-ink-3)",
+                  color: "var(--ink-3)",
                   textTransform: "uppercase",
                   letterSpacing: "0.06em",
                   marginBottom: 8,
@@ -718,12 +710,12 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                       alignItems: "center",
                       gap: 12,
                       padding: 14,
-                      borderRadius: "var(--gr-r-md)",
-                      background: "var(--gr-surface)",
-                      border: `2px solid ${payMethod === id ? "var(--gr-brand)" : "var(--gr-line)"}`,
+                      borderRadius: "var(--r-md)",
+                      background: "var(--surface)",
+                      border: `2px solid ${payMethod === id ? "var(--brand)" : "var(--line)"}`,
                       fontSize: 14,
                       fontWeight: 600,
-                      color: "var(--gr-ink)",
+                      color: "var(--ink)",
                       textAlign: "left",
                       cursor: "pointer",
                     }}
@@ -733,7 +725,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                         width: 32,
                         height: 32,
                         borderRadius: 999,
-                        background: "var(--gr-surface-2)",
+                        background: "var(--surface-2)",
                         display: "grid",
                         placeItems: "center",
                         fontSize: 11,
@@ -750,7 +742,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     </div>
                     <div style={{ flex: 1 }}>{label}</div>
                     {payMethod === id && (
-                      <Check size={18} color="var(--gr-brand-700)" />
+                      <Check size={18} color="var(--brand-active)" />
                     )}
                   </button>
                 ))}
@@ -761,14 +753,14 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
             {donate > 0 && (
               <div
                 style={{
-                  background: "var(--gr-ink)",
-                  color: "var(--gr-bg)",
-                  borderRadius: "var(--gr-r-lg)",
+                  background: "var(--ink)",
+                  color: "var(--bg)",
+                  borderRadius: "var(--r-lg)",
                   padding: 16,
                 }}
               >
                 <div style={{ fontSize: 13, lineHeight: 1.5 }}>
-                  <strong style={{ color: "var(--gr-afu-yellow)" }}>
+                  <strong style={{ color: "var(--afu-yellow)" }}>
                     {donate} ₴
                   </strong>{" "}
                   from this purchase goes to the Armed Forces of Ukraine via the
@@ -788,7 +780,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
           right: 0,
           bottom: 0,
           padding: "14px 18px 32px",
-          background: "linear-gradient(180deg, transparent, var(--gr-bg) 25%)",
+          background: "linear-gradient(180deg, transparent, var(--bg) 25%)",
           zIndex: 20,
           maxWidth: 640,
           margin: "0 auto",
@@ -802,9 +794,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
             marginBottom: 10,
           }}
         >
-          <div
-            style={{ fontSize: 12, color: "var(--gr-ink-3)", fontWeight: 600 }}
-          >
+          <div style={{ fontSize: 12, color: "var(--ink-3)", fontWeight: 600 }}>
             Total
           </div>
           <div className="gr-display" style={{ fontSize: 22, fontWeight: 800 }}>
@@ -819,8 +809,8 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               width: "100%",
               height: 56,
               borderRadius: 999,
-              background: "var(--gr-brand)",
-              color: "#0b1a0f",
+              background: "var(--brand)",
+              color: "var(--on-brand)",
               fontWeight: 700,
               fontSize: 16,
               display: "flex",
@@ -841,8 +831,8 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               width: "100%",
               height: 56,
               borderRadius: 999,
-              background: "var(--gr-brand)",
-              color: "#0b1a0f",
+              background: "var(--brand)",
+              color: "var(--on-brand)",
               fontWeight: 700,
               fontSize: 16,
               display: "flex",
@@ -851,7 +841,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               gap: 8,
               cursor: "pointer",
               border: 0,
-              boxShadow: "0 8px 28px var(--gr-brand-glow)",
+              boxShadow: "0 8px 28px var(--brand-glow)",
               opacity: createRegistration.isPending ? 0.7 : 1,
             }}
           >
@@ -878,7 +868,7 @@ function SummaryRow({
         justifyContent: "space-between",
         padding: "6px 0",
         fontSize: 13,
-        color: "var(--gr-ink-2)",
+        color: "var(--ink-2)",
       }}
     >
       <div>{label}</div>
@@ -910,8 +900,8 @@ function RegSuccess({
     <div
       className="gr-screen-enter"
       style={{
-        background: "var(--gr-bg)",
-        color: "var(--gr-ink)",
+        background: "var(--bg)",
+        color: "var(--ink)",
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
@@ -936,13 +926,13 @@ function RegSuccess({
             width: 96,
             height: 96,
             borderRadius: 999,
-            background: "var(--gr-brand)",
+            background: "var(--brand)",
             display: "grid",
             placeItems: "center",
-            boxShadow: "0 12px 48px var(--gr-brand-glow)",
+            boxShadow: "0 12px 48px var(--brand-glow)",
           }}
         >
-          <Check size={48} color="#0b1a0f" strokeWidth={3} />
+          <Check size={48} color="var(--on-brand)" strokeWidth={3} />
         </div>
 
         <h1
@@ -959,7 +949,7 @@ function RegSuccess({
         <p
           style={{
             fontSize: 14,
-            color: "var(--gr-ink-3)",
+            color: "var(--ink-3)",
             marginTop: 8,
             lineHeight: 1.5,
             maxWidth: 280,
@@ -968,7 +958,7 @@ function RegSuccess({
           {bib && (
             <>
               Bib{" "}
-              <strong className="gr-mono" style={{ color: "var(--gr-ink)" }}>
+              <strong className="gr-mono" style={{ color: "var(--ink)" }}>
                 #{bib}
               </strong>{" "}
               ·{" "}
@@ -985,9 +975,9 @@ function RegSuccess({
             width: "100%",
             marginTop: 28,
             padding: 18,
-            background: "var(--gr-ink)",
-            color: "var(--gr-bg)",
-            borderRadius: "var(--gr-r-xl)",
+            background: "var(--ink)",
+            color: "var(--bg)",
+            borderRadius: "var(--r-xl)",
           }}
         >
           <div
@@ -1003,7 +993,7 @@ function RegSuccess({
                 style={{
                   fontSize: 11,
                   fontWeight: 700,
-                  color: "var(--gr-brand)",
+                  color: "var(--brand)",
                   letterSpacing: "0.08em",
                 }}
               >
@@ -1020,12 +1010,12 @@ function RegSuccess({
               style={{
                 width: 60,
                 height: 60,
-                background: "#fff",
+                background: "var(--surface)",
                 borderRadius: 8,
                 display: "grid",
                 placeItems: "center",
                 fontSize: 10,
-                color: "#000",
+                color: "var(--ink)",
                 fontWeight: 700,
               }}
             >
@@ -1067,8 +1057,8 @@ function RegSuccess({
           width: "100%",
           height: 56,
           borderRadius: 999,
-          background: "var(--gr-brand)",
-          color: "#0b1a0f",
+          background: "var(--brand)",
+          color: "var(--on-brand)",
           fontWeight: 700,
           fontSize: 16,
           cursor: "pointer",

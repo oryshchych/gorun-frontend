@@ -1,0 +1,105 @@
+/* ============================================================
+   GoRun - unified design tokens - "Slate" direction
+   Light on :root, dark overrides on .dark (the next-themes class).
+   ============================================================ */
+:root {
+  /* Brand action - #2BC36B is fixed */
+  --brand: #2bc36b;
+  --brand-hover: #23ae60;
+  --brand-active: #1c9954;
+  --brand-strong: #15803d;
+  --brand-tint: #e7f7ef;
+  --brand-glow: rgba(43, 195, 107, 0.32);
+  --on-brand: #06140c;
+
+  /* Surfaces */
+  --bg: #f3f5f8;
+  --surface: #ffffff;
+  --surface-2: #e8ecf1;
+
+  /* Borders */
+  --line: rgba(16, 24, 38, 0.1);
+  --line-strong: rgba(16, 24, 38, 0.17);
+
+  /* Ink / text */
+  --ink: #101826;
+  --ink-2: #2c3a4d;
+  --ink-3: #586a7f;
+  --ink-4: #8c99a8;
+
+  /* Status */
+  --danger: #dc2626;
+  --danger-bg: #fcebea;
+  --warn: #b45309;
+  --warn-bg: #fbefdd;
+  --info: #2563eb;
+  --info-bg: #e7eefd;
+  --success: #15803d;
+  --success-bg: #e7f7ef;
+
+  /* Ukraine accent */
+  --afu-blue: #0057b7;
+  --afu-yellow: #ffd700;
+  --medal-silver: #c0c0c0;
+  --medal-bronze: #cd7f32;
+
+  /* Elevation */
+  --shadow-sm: 0 1px 2px rgba(16, 24, 38, 0.06);
+  --shadow-md:
+    0 4px 14px rgba(16, 24, 38, 0.09), 0 1px 2px rgba(16, 24, 38, 0.05);
+  --shadow-lg:
+    0 18px 44px rgba(16, 24, 38, 0.16), 0 2px 6px rgba(16, 24, 38, 0.07);
+
+  /* Radius */
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* Type */
+  --font-display:
+    "Bricolage Grotesque", "SF Pro Display", system-ui, sans-serif;
+  --font-body: "Inter", "SF Pro Text", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+.dark {
+  --brand: #34d679;
+  --brand-hover: #45de86;
+  --brand-active: #2bc36b;
+  --brand-strong: #2bc36b;
+  --brand-tint: #14271c;
+  --brand-glow: rgba(52, 214, 121, 0.35);
+  --on-brand: #06140c;
+
+  --bg: #14181e;
+  --surface: #1b212a;
+  --surface-2: #232b35;
+
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.18);
+
+  --ink: #eaeef4;
+  --ink-2: #c2ccd8;
+  --ink-3: #8a97a6;
+  --ink-4: #5e6b79;
+
+  --danger: #f87171;
+  --danger-bg: #2a1413;
+  --warn: #fbbf24;
+  --warn-bg: #2a2010;
+  --info: #60a5fa;
+  --info-bg: #0f1f33;
+  --success: #34d679;
+  --success-bg: #14271c;
+
+  --afu-blue: #4f8ae8;
+  --afu-yellow: #ffd700;
+  --medal-silver: #c0c0c0;
+  --medal-bronze: #cd7f32;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 18px 44px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.35);
+}

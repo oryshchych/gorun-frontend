@@ -14,22 +14,21 @@ export function ProgressBar({ taken, total, className }: ProgressBarProps) {
   return (
     <div className={cn("w-full", className)}>
       <div className="flex justify-between mb-1.5 text-xs font-semibold">
-        <span style={{ color: "var(--gr-ink-2)" }}>
+        <span className="text-ink-2">
           {taken} / {total} runners
         </span>
-        <span style={{ color: isOver ? "var(--gr-warn)" : "var(--gr-ink-3)" }}>
+        <span className={isOver ? "text-warn" : "text-ink-3"}>
           {isOver ? "Waitlist" : `${total - taken} spots left`}
         </span>
       </div>
-      <div
-        className="h-1.5 rounded-full overflow-hidden"
-        style={{ background: "var(--gr-surface-2)" }}
-      >
+      <div className="h-1.5 rounded-full overflow-hidden bg-surface-2">
         <div
-          className="h-full rounded-full transition-[width] duration-300"
+          className={cn(
+            "h-full rounded-full transition-[width] duration-300",
+            isOver ? "bg-warn" : "bg-brand"
+          )}
           style={{
             width: `${pct}%`,
-            background: isOver ? "var(--gr-warn)" : "var(--gr-brand)",
           }}
         />
       </div>

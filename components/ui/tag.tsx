@@ -8,13 +8,18 @@ interface TagProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const toneClasses: Record<TagTone, string> = {
-  neutral: "bg-[var(--gr-surface-2)] text-[var(--gr-ink-2)]",
-  brand: "bg-[var(--gr-brand-50)] text-[var(--gr-brand-700)]",
-  warn: "bg-[var(--gr-warn-bg)] text-[var(--gr-warn)]",
-  dark: "bg-[var(--gr-ink)] text-[var(--gr-bg)]",
+  neutral: "bg-surface-2 text-ink-3",
+  brand: "bg-brand-tint text-brand-active",
+  warn: "bg-warn-bg text-warn",
+  dark: "bg-ink text-bg",
 };
 
-export function Tag({ tone = "neutral", className, children, ...props }: TagProps) {
+export function Tag({
+  tone = "neutral",
+  className,
+  children,
+  ...props
+}: TagProps) {
   return (
     <span
       className={cn(

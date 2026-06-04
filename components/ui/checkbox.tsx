@@ -42,11 +42,9 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
           onClick={handleClick}
           className={cn(
             "h-4 w-4 rounded border-2 flex items-center justify-center transition-all",
-            checked
-              ? "bg-[#48C773] border-[#48C773]"
-              : "bg-background border-input",
+            checked ? "bg-brand border-brand" : "bg-background border-input",
             disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
-            "focus-within:ring-[#48C773] focus-within:ring-2 focus-within:ring-offset-2",
+            "focus-within:ring-brand focus-within:ring-2 focus-within:ring-offset-2",
             className
           )}
         >

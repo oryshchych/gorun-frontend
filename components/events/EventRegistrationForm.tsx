@@ -381,7 +381,7 @@ export function EventRegistrationForm({
                               type="button"
                               size="sm"
                               variant="default"
-                              className="absolute right-2 top-1/2 -translate-y-1/2 h-7 px-2 cursor-pointer bg-[#48C773] text-white hover:bg-[#3fa962] shadow-sm"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 h-7 px-2 cursor-pointer bg-brand text-on-brand hover:bg-brand-hover shadow-sm"
                               onClick={validatePromoCodeInput}
                               disabled={isCheckingPromoCode || isLoading}
                               aria-label={tCommon("apply")}
@@ -469,7 +469,7 @@ export function EventRegistrationForm({
                   <button
                     type="button"
                     onClick={handlePrivacyClick}
-                    className="text-[#48C773] hover:underline underline-offset-2 cursor-pointer"
+                    className="text-brand-active hover:underline underline-offset-2 cursor-pointer"
                   >
                     {tFooter("privacyPolicy")}
                   </button>
@@ -491,7 +491,7 @@ export function EventRegistrationForm({
                   <button
                     type="button"
                     onClick={handleTermsClick}
-                    className="text-[#48C773] hover:underline underline-offset-2 cursor-pointer"
+                    className="text-brand-active hover:underline underline-offset-2 cursor-pointer"
                   >
                     {tFooter("termsOfService")}
                   </button>
@@ -508,7 +508,7 @@ export function EventRegistrationForm({
                 !acceptedPrivacy ||
                 !acceptedTerms
               }
-              className="w-full cursor-pointer bg-[#48C773] text-white hover:bg-[#48C773]/90 shadow-lg hover:shadow-xl transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full cursor-pointer bg-brand text-on-brand hover:bg-brand-hover shadow-lg hover:shadow-xl transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               size="lg"
               aria-label={t("proceedToPayment")}
             >

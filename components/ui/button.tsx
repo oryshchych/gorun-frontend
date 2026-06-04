@@ -5,24 +5,23 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-semibold transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-brand-glow)] aria-invalid:border-destructive",
+  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap font-semibold transition-all disabled:pointer-events-none disabled:bg-surface-2 disabled:text-ink-4 disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-brand aria-invalid:border-danger",
   {
     variants: {
       variant: {
-        /* ── GoRun design-system variants (pill shape, use these for new UI) ── */
+        /* GoRun design-system variants (pill shape, use these for new UI) */
         brand:
-          "rounded-full bg-[var(--gr-brand)] text-[#0b1a0f] hover:bg-[var(--gr-brand-600)] active:scale-[0.97] shadow-none",
+          "rounded-[var(--r-pill)] bg-brand text-on-brand hover:bg-brand-hover active:scale-[0.97] active:bg-brand-active shadow-none",
         primary:
-          "rounded-full bg-[var(--gr-ink)] text-[var(--gr-bg)] hover:opacity-90 active:scale-[0.97]",
-        soft:
-          "rounded-full bg-[var(--gr-surface-2)] text-[var(--gr-ink)] border border-[var(--gr-line)] hover:bg-[var(--gr-line)]",
+          "rounded-[var(--r-pill)] bg-ink text-bg hover:opacity-90 active:scale-[0.97]",
+        soft: "rounded-[var(--r-pill)] bg-surface-2 text-ink border border-line hover:bg-line",
         "ghost-gr":
-          "rounded-full bg-transparent text-[var(--gr-ink)] border border-[var(--gr-line-strong)] hover:bg-[var(--gr-surface-2)]",
-        /* ── Legacy shadcn variants (keep for existing components) ── */
+          "rounded-[var(--r-pill)] bg-transparent text-ink border border-line-strong hover:bg-surface-2",
+        /* Legacy shadcn variants (keep for existing components) */
         default:
-          "rounded-md bg-[var(--gr-brand)] text-white hover:bg-[var(--gr-brand-600)] active:scale-[0.98] shadow-sm",
+          "rounded-md bg-brand text-on-brand hover:bg-brand-hover active:scale-[0.98] shadow-sm",
         destructive:
-          "rounded-md bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60",
+          "rounded-md bg-danger text-white hover:bg-danger/90 focus-visible:ring-danger",
         outline:
           "rounded-md border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
         secondary:

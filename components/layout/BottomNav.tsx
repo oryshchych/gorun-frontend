@@ -59,10 +59,10 @@ export function BottomNav() {
         left: 12,
         right: 12,
         bottom: 16,
-        background: "var(--gr-surface)",
+        background: "var(--surface)",
         borderRadius: 999,
-        boxShadow: "var(--gr-shadow-lg)",
-        border: "1px solid var(--gr-line)",
+        boxShadow: "var(--shadow-lg)",
+        border: "1px solid var(--line)",
         display: "grid",
         gridTemplateColumns: "repeat(4, 1fr)",
         padding: 6,
@@ -86,8 +86,8 @@ export function BottomNav() {
               gap: 2,
               padding: "8px 0",
               borderRadius: 999,
-              background: active ? "var(--gr-ink)" : "transparent",
-              color: active ? "var(--gr-bg)" : "var(--gr-ink-3)",
+              background: active ? "var(--ink)" : "transparent",
+              color: active ? "var(--bg)" : "var(--ink-3)",
               transition: "all 200ms",
               textDecoration: "none",
               minHeight: 44,
@@ -97,7 +97,9 @@ export function BottomNav() {
             aria-label={label}
           >
             <Icon size={20} />
-            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.04em" }}>
+            <span
+              style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.04em" }}
+            >
               {label}
             </span>
           </Link>

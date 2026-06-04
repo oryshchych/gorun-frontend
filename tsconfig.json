@@ -39,7 +39,6 @@
     "assets/**/*.tsx",
     "middleware.ts",
     "i18n.ts",
-    "tailwind.config.ts",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],

@@ -1,30 +1,43 @@
 ---
-description: Tailwind v4 + design tokens + CVA variants for gorun-client.
-globs: **/*.tsx,app/globals.css,tailwind.config.ts,components/ui/**
-alwaysApply: false
+description: Unified GoRun design system tokens, Tailwind v4 utilities, and component styling rules.
+globs: **/*.tsx,app/globals.css,app/tokens.css,components/ui/**
+alwaysApply: true
 ---
 
-# Styling
+# GoRun Design System
 
-## Stack
+## System
 
-- **Tailwind CSS v4** — utility-first
-- **Design tokens** as CSS vars in `app/globals.css` (`--gr-brand`, `--gr-ink`, `--gr-bg`, `--gr-surface-*`, `--gr-line`, `--gr-line-strong`, `--gr-brand-glow`, plus shadow/radius vars)
-- **CVA** (`class-variance-authority`) for component variants
-- **`cn()`** from `@/lib/utils` for merging classes
-- **`next-themes`** for light/dark mode (class strategy)
+GoRun uses one set of CSS-variable design tokens in `app/tokens.css`: light values on `:root`, dark overrides on the `.dark` class set by `next-themes`. Tailwind v4 exposes those tokens via `@theme inline` in `app/globals.css`. The brand action color `#2BC36B` is the only fixed value.
 
-## Tokens, not hex
+Do not reintroduce the old `--gr-*` system, `hsl(var(--...))` shadcn tuples, `.gr-dark`, `.gr-light`, or `tailwind.config.ts` color definitions.
 
-Use design tokens for any color/surface/border. Examples:
+## Hard Rules
 
-```tsx
-className="bg-[var(--gr-brand)] text-[var(--gr-bg)]"
-className="border border-[var(--gr-line)]"
-className="text-[var(--gr-ink)]"
-```
+- Never hardcode color in components, inline styles, or Tailwind arbitrary values. No hex, `rgb()`, `hsl()`, named colors, `bg-[#...]`, `text-[#...]`, or `border-[#...]`.
+- Use token utilities (`bg-brand`, `text-ink`, `border-line`) or `var(--token)`.
+- Never invent a token or color inline. If a new role is truly needed, add it to `app/tokens.css` for both `:root` and `.dark`, then expose it in `app/globals.css`.
+- Dark mode is `.dark` only. Components should not need color-specific `dark:` logic.
+- Green is for action/accent only: CTAs, logo mark, focus rings, progress fills, selected states, and positive-status pills. Never use brand green for body text, link text, or large neutral surfaces.
+- Never put white text on bright brand green. Use `text-on-brand` on `bg-brand`; use `bg-brand-strong text-white` only when white text is truly required.
+- Stop at four ink levels: `ink`, `ink-2`, `ink-3`, `ink-4`.
+- Use only `rounded-sm`, `rounded-md`, `rounded-lg`, `rounded-xl`, and `rounded-[var(--r-pill)]` for pill buttons.
+- Color is never the only signal. Status UI must include a label and/or icon.
+- Inputs must be at least 16px (`text-base`). Every interactive element must show the `box-shadow: 0 0 0 4px var(--brand-glow)` focus ring.
 
-Don't hardcode hex colors. If a token doesn't exist for what you need, add it to `app/globals.css` (light + dark variants) FIRST.
+## Token Reference
+
+- Brand/action: `brand`, `brand-hover`, `brand-active`, `brand-strong`, `brand-tint`, `on-brand`, `brand-glow`
+- Surfaces: `bg`, `surface`, `surface-2`
+- Borders: `line`, `line-strong`
+- Text: `ink`, `ink-2`, `ink-3`, `ink-4`
+- Status: `danger`, `danger-bg`, `warn`, `warn-bg`, `info`, `info-bg`, `success`, `success-bg`
+- Ukraine accent: `afu-blue`, `afu-yellow`
+- Elevation: `shadow-[var(--shadow-sm)]`, `shadow-[var(--shadow-md)]`, `shadow-[var(--shadow-lg)]`
+- Radius: `r-sm`, `r-md`, `r-lg`, `r-xl`, `r-pill`
+- Type: `font-display`, `font-sans`, `font-mono`
+
+Legacy shadcn utilities (`bg-background`, `text-foreground`, `border-input`, etc.) still work through aliases. Prefer new GoRun utilities in any new or edited code.
 
 ## Variant primitive pattern
 
@@ -34,7 +47,11 @@ See `components/ui/button.tsx`. New primitives:
 const fooVariants = cva("base classes", {
   variants: {
     variant: { brand: "…", primary: "…", soft: "…" },
-    size: { sm: "h-9 px-3.5 text-sm", md: "h-12 px-[18px] text-[15px]", lg: "h-14 px-[22px] text-base" },
+    size: {
+      sm: "h-9 px-3.5 text-sm",
+      md: "h-12 px-[18px] text-[15px]",
+      lg: "h-14 px-[22px] text-base",
+    },
   },
   defaultVariants: { variant: "brand", size: "md" },
 });
@@ -44,14 +61,26 @@ const fooVariants = cva("base classes", {
 - **Legacy shadcn variants** (`default`, `secondary`, `destructive`, `outline`, `ghost`, `link`) — kept for back-compat only
 - **Sizes** are `sm | md | lg` (heights 9 / 12 / 14)
 
-## Dark mode
+## Component Patterns
 
-- Use `next-themes` with class strategy. All `--gr-*` tokens have light + dark variants defined in `app/globals.css`.
-- Don't use `dark:` utilities for color — let the token swap handle it.
+```tsx
+<button className="min-h-11 rounded-[var(--r-pill)] bg-brand px-5 py-3 font-semibold text-on-brand shadow-[var(--shadow-sm)] hover:bg-brand-hover active:bg-brand-active focus-visible:shadow-[0_0_0_4px_var(--brand-glow)] focus-visible:outline-none">
+  Register now
+</button>
+
+<input className="w-full rounded-md border border-line-strong bg-surface px-3.5 py-3 text-base text-ink placeholder:text-ink-4 focus:border-brand focus:shadow-[0_0_0_4px_var(--brand-glow)] focus:outline-none" />
+
+<span className="rounded-[var(--r-pill)] bg-warn-bg px-2.5 py-1 text-sm font-semibold text-warn">
+  Waitlist
+</span>
+```
 
 ## Anti-patterns
 
-- Inline `style={{ … }}` for anything that could be a utility or token
-- New CSS files outside `app/globals.css`
-- Hardcoded colors / spacings
+- Inline `style={{ ... }}` for anything that could be a utility or token
+- Hardcoded colors or arbitrary color values
+- `hsl(var(--...))`
+- `.gr-dark`, `.gr-light`, or `--gr-*`
+- White text on `bg-brand`
+- Green text/links on light surfaces
 - Skipping `cn()` and string-concatenating classNames

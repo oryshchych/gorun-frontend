@@ -23,10 +23,7 @@ export function EventCard({ event }: EventCardProps) {
 
   // Resolve cover image
   const coverImage =
-    event.cover ||
-    event.imageUrl?.landscape ||
-    event.imageUrl?.portrait ||
-    "";
+    event.cover || event.imageUrl?.landscape || event.imageUrl?.portrait || "";
 
   // Resolve display title
   const title = getLocalizedString(
@@ -46,7 +43,12 @@ export function EventCard({ event }: EventCardProps) {
   // Resolve city
   const city =
     event.city ||
-    getLocalizedString(event.translations?.location, locale, "en", event.location || "");
+    getLocalizedString(
+      event.translations?.location,
+      locale,
+      "en",
+      event.location || ""
+    );
 
   // Spots
   const spotsTotal = event.spots?.total ?? event.capacity;
@@ -63,7 +65,7 @@ export function EventCard({ event }: EventCardProps) {
   return (
     <Link
       href={`/${locale}/events/${event.id}`}
-      className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-brand)] rounded-[var(--gr-r-xl)]"
+      className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] rounded-[var(--r-xl)]"
       aria-label={`View details for ${title}`}
     >
       <motion.div
@@ -72,11 +74,11 @@ export function EventCard({ event }: EventCardProps) {
       >
         <article
           style={{
-            borderRadius: "var(--gr-r-xl)",
+            borderRadius: "var(--r-xl)",
             overflow: "hidden",
-            background: "var(--gr-surface)",
-            border: "1px solid var(--gr-line)",
-            boxShadow: "var(--gr-shadow-md)",
+            background: "var(--surface)",
+            border: "1px solid var(--line)",
+            boxShadow: "var(--shadow-md)",
           }}
         >
           {/* Cover */}
@@ -87,7 +89,7 @@ export function EventCard({ event }: EventCardProps) {
               backgroundImage: coverImage
                 ? `linear-gradient(180deg, rgba(15,26,18,0) 30%, rgba(15,26,18,0.85)), url(${coverImage})`
                 : undefined,
-              background: coverImage ? undefined : "var(--gr-surface-2)",
+              background: coverImage ? undefined : "var(--surface-2)",
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
@@ -97,7 +99,7 @@ export function EventCard({ event }: EventCardProps) {
               <span
                 style={{
                   background: "rgba(255,255,255,0.95)",
-                  color: "#0F1A12",
+                  color: "var(--ink)",
                   borderRadius: 999,
                   padding: "4px 10px",
                   fontSize: 11,
@@ -114,7 +116,7 @@ export function EventCard({ event }: EventCardProps) {
                 <span
                   style={{
                     background: "rgba(255,255,255,0.95)",
-                    color: "#0F1A12",
+                    color: "var(--ink)",
                     borderRadius: 12,
                     padding: "4px 10px",
                     fontSize: 11,
@@ -133,7 +135,7 @@ export function EventCard({ event }: EventCardProps) {
                   left: 16,
                   right: 16,
                   bottom: 14,
-                  color: "#fff",
+                  color: "var(--surface)",
                 }}
               >
                 <div
@@ -152,33 +154,64 @@ export function EventCard({ event }: EventCardProps) {
           </div>
 
           {/* Body */}
-          <div style={{ padding: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+          <div
+            style={{
+              padding: 14,
+              display: "flex",
+              flexDirection: "column",
+              gap: 10,
+            }}
+          >
             {/* Title (when no cover image) */}
             {!coverImage && (
               <h3
                 className="gr-display"
-                style={{ fontSize: 18, fontWeight: 700, color: "var(--gr-ink)", margin: 0 }}
+                style={{
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: "var(--ink)",
+                  margin: 0,
+                }}
               >
                 {title}
               </h3>
             )}
 
             {/* Meta row */}
-            <div style={{ display: "flex", gap: 12, fontSize: 12, color: "var(--gr-ink-3)" }}>
+            <div
+              style={{
+                display: "flex",
+                gap: 12,
+                fontSize: 12,
+                color: "var(--ink-3)",
+              }}
+            >
               {city && (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                  }}
+                >
                   <MapPin size={13} /> {city}
                 </span>
               )}
               {event.timeLabel && (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                  }}
+                >
                   <Clock size={13} /> {event.timeLabel}
                 </span>
               )}
             </div>
 
             {/* Distance pills */}
-            {(event.distances?.length || event.kidsDistances?.length) ? (
+            {event.distances?.length || event.kidsDistances?.length ? (
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                 {event.distances?.map((d) => (
                   <span
@@ -188,8 +221,8 @@ export function EventCard({ event }: EventCardProps) {
                       borderRadius: 999,
                       fontSize: 12,
                       fontWeight: 700,
-                      background: "var(--gr-surface-2)",
-                      color: "var(--gr-ink-2)",
+                      background: "var(--surface-2)",
+                      color: "var(--ink-2)",
                     }}
                   >
                     {d.label}
@@ -202,8 +235,8 @@ export function EventCard({ event }: EventCardProps) {
                       borderRadius: 999,
                       fontSize: 12,
                       fontWeight: 700,
-                      background: "var(--gr-brand-50)",
-                      color: "var(--gr-brand-700)",
+                      background: "var(--brand-tint)",
+                      color: "var(--brand-active)",
                       display: "inline-flex",
                       alignItems: "center",
                       gap: 4,
@@ -226,8 +259,9 @@ export function EventCard({ event }: EventCardProps) {
                 justifyContent: "space-between",
               }}
             >
-              <div style={{ fontSize: 12, color: "var(--gr-ink-3)" }}>
-                {Math.round((spotsTaken / spotsTotal) * 100)}% full              </div>
+              <div style={{ fontSize: 12, color: "var(--ink-3)" }}>
+                {Math.round((spotsTaken / spotsTotal) * 100)}% full{" "}
+              </div>
               <div
                 style={{
                   display: "inline-flex",
@@ -235,7 +269,7 @@ export function EventCard({ event }: EventCardProps) {
                   gap: 4,
                   fontSize: 13,
                   fontWeight: 700,
-                  color: "var(--gr-ink)",
+                  color: "var(--ink)",
                 }}
               >
                 {t("viewEvent")}

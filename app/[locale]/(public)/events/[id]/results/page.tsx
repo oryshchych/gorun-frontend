@@ -7,10 +7,9 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001").replace(
-  /\/api$/,
-  ""
-);
+const API_BASE = (
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+).replace(/\/api$/, "");
 
 interface ResultRow {
   id: string;
@@ -27,7 +26,9 @@ interface ResultRow {
 
 async function fetchEvent(id: string, locale: string): Promise<Event | null> {
   try {
-    const res = await fetch(`${API_BASE}/api/events/${id}?lang=${locale}`, { cache: "no-store" });
+    const res = await fetch(`${API_BASE}/api/events/${id}?lang=${locale}`, {
+      cache: "no-store",
+    });
     if (!res.ok) return null;
     const json = await res.json();
     return json.data as Event;
@@ -38,7 +39,9 @@ async function fetchEvent(id: string, locale: string): Promise<Event | null> {
 
 async function fetchResults(id: string): Promise<ResultRow[]> {
   try {
-    const res = await fetch(`${API_BASE}/api/events/${id}/results`, { cache: "no-store" });
+    const res = await fetch(`${API_BASE}/api/events/${id}/results`, {
+      cache: "no-store",
+    });
     if (!res.ok) return [];
     const json = await res.json();
     return (json.data ?? []) as ResultRow[];
@@ -55,7 +58,12 @@ export async function generateMetadata({
   const { locale, id } = await params;
   const event = await fetchEvent(id, locale);
   const title = event
-    ? getLocalizedString(event.translations?.title, locale, "en", event.title || "")
+    ? getLocalizedString(
+        event.translations?.title,
+        locale,
+        "en",
+        event.title || ""
+      )
     : "Results";
   return { title: `Results — ${title}` };
 }
@@ -75,8 +83,8 @@ export default async function PublicResultsPage({
     return (
       <div
         style={{
-          background: "var(--gr-bg)",
-          color: "var(--gr-ink)",
+          background: "var(--bg)",
+          color: "var(--ink)",
           minHeight: "100vh",
           display: "flex",
           flexDirection: "column",
@@ -92,7 +100,7 @@ export default async function PublicResultsPage({
         >
           Results not yet available
         </div>
-        <p style={{ fontSize: 14, color: "var(--gr-ink-3)", maxWidth: 320 }}>
+        <p style={{ fontSize: 14, color: "var(--ink-3)", maxWidth: 320 }}>
           Results will be published after the race finishes.
         </p>
         <Link
@@ -101,8 +109,8 @@ export default async function PublicResultsPage({
             marginTop: 24,
             padding: "12px 24px",
             borderRadius: 999,
-            background: "var(--gr-brand)",
-            color: "#0b1a0f",
+            background: "var(--brand)",
+            color: "var(--on-brand)",
             fontWeight: 700,
             fontSize: 14,
             textDecoration: "none",
@@ -126,13 +134,17 @@ export default async function PublicResultsPage({
   const podium = results.slice(0, 3);
   const rest = results.slice(3);
 
-  const medalColors = ["#FFD700", "#C0C0C0", "#CD7F32"];
+  const medalColors = [
+    "var(--afu-yellow)",
+    "var(--medal-silver)",
+    "var(--medal-bronze)",
+  ];
 
   return (
     <div
       style={{
-        background: "var(--gr-bg)",
-        color: "var(--gr-ink)",
+        background: "var(--bg)",
+        color: "var(--ink)",
         minHeight: "100vh",
         paddingBottom: 100,
       }}
@@ -147,7 +159,7 @@ export default async function PublicResultsPage({
               alignItems: "center",
               gap: 6,
               fontSize: 13,
-              color: "var(--gr-ink-3)",
+              color: "var(--ink-3)",
               fontWeight: 600,
               textDecoration: "none",
               marginBottom: 12,
@@ -162,7 +174,7 @@ export default async function PublicResultsPage({
           >
             Results
           </h1>
-          <p style={{ fontSize: 14, color: "var(--gr-ink-3)", marginTop: 4 }}>
+          <p style={{ fontSize: 14, color: "var(--ink-3)", marginTop: 4 }}>
             {title}
           </p>
         </div>
@@ -172,7 +184,7 @@ export default async function PublicResultsPage({
             style={{
               padding: "48px 0",
               textAlign: "center",
-              color: "var(--gr-ink-3)",
+              color: "var(--ink-3)",
               fontSize: 14,
             }}
           >
@@ -194,9 +206,9 @@ export default async function PublicResultsPage({
                   <div
                     key={r.id}
                     style={{
-                      background: "var(--gr-surface)",
-                      borderRadius: "var(--gr-r-lg)",
-                      border: "1px solid var(--gr-line)",
+                      background: "var(--surface)",
+                      borderRadius: "var(--r-lg)",
+                      border: "1px solid var(--line)",
                       padding: 24,
                       position: "relative",
                       overflow: "hidden",
@@ -225,7 +237,7 @@ export default async function PublicResultsPage({
                           height: 48,
                           borderRadius: "50%",
                           background: medalColors[i],
-                          color: "#0F1A12",
+                          color: "var(--ink)",
                           display: "grid",
                           placeItems: "center",
                           fontWeight: 800,
@@ -239,7 +251,7 @@ export default async function PublicResultsPage({
                           {r.name || "—"}
                         </div>
                         {r.city && (
-                          <div style={{ fontSize: 12, color: "var(--gr-ink-3)" }}>
+                          <div style={{ fontSize: 12, color: "var(--ink-3)" }}>
                             {r.city}
                           </div>
                         )}
@@ -252,14 +264,14 @@ export default async function PublicResultsPage({
                           justifyContent: "space-between",
                           marginTop: 16,
                           paddingTop: 14,
-                          borderTop: "1px solid var(--gr-line)",
+                          borderTop: "1px solid var(--line)",
                         }}
                       >
                         <div>
                           <div
                             style={{
                               fontSize: 10,
-                              color: "var(--gr-ink-3)",
+                              color: "var(--ink-3)",
                               fontWeight: 600,
                               textTransform: "uppercase",
                               letterSpacing: "0.06em",
@@ -269,7 +281,11 @@ export default async function PublicResultsPage({
                           </div>
                           <div
                             className="gr-mono"
-                            style={{ fontSize: 20, fontWeight: 800, marginTop: 2 }}
+                            style={{
+                              fontSize: 20,
+                              fontWeight: 800,
+                              marginTop: 2,
+                            }}
                           >
                             {r.finishTime}
                           </div>
@@ -279,7 +295,7 @@ export default async function PublicResultsPage({
                             <div
                               style={{
                                 fontSize: 10,
-                                color: "var(--gr-ink-3)",
+                                color: "var(--ink-3)",
                                 fontWeight: 600,
                                 textTransform: "uppercase",
                                 letterSpacing: "0.06em",
@@ -289,7 +305,11 @@ export default async function PublicResultsPage({
                             </div>
                             <div
                               className="gr-mono"
-                              style={{ fontSize: 14, fontWeight: 700, marginTop: 4 }}
+                              style={{
+                                fontSize: 14,
+                                fontWeight: 700,
+                                marginTop: 4,
+                              }}
                             >
                               {r.paceMinKm}/km
                             </div>
@@ -306,9 +326,9 @@ export default async function PublicResultsPage({
             {rest.length > 0 && (
               <div
                 style={{
-                  background: "var(--gr-surface)",
-                  borderRadius: "var(--gr-r-lg)",
-                  border: "1px solid var(--gr-line)",
+                  background: "var(--surface)",
+                  borderRadius: "var(--r-lg)",
+                  border: "1px solid var(--line)",
                   overflow: "hidden",
                 }}
               >
@@ -319,9 +339,9 @@ export default async function PublicResultsPage({
                     padding: "12px 18px",
                     fontSize: 11,
                     fontWeight: 700,
-                    color: "var(--gr-ink-3)",
+                    color: "var(--ink-3)",
                     letterSpacing: "0.06em",
-                    borderBottom: "1px solid var(--gr-line)",
+                    borderBottom: "1px solid var(--line)",
                     textTransform: "uppercase",
                   }}
                 >
@@ -341,21 +361,21 @@ export default async function PublicResultsPage({
                       padding: "14px 18px",
                       alignItems: "center",
                       borderBottom:
-                        i < rest.length - 1 ? "1px solid var(--gr-line)" : "none",
+                        i < rest.length - 1 ? "1px solid var(--line)" : "none",
                       fontSize: 14,
                     }}
                   >
                     <div style={{ fontWeight: 700 }}>{r.position ?? i + 4}</div>
                     <div style={{ fontWeight: 600 }}>{r.name || "—"}</div>
-                    <div style={{ color: "var(--gr-ink-3)", fontSize: 13 }}>
+                    <div style={{ color: "var(--ink-3)", fontSize: 13 }}>
                       {r.city || "—"}
                     </div>
                     <div>
                       {r.distance && (
                         <span
                           style={{
-                            background: "var(--gr-surface-2)",
-                            color: "var(--gr-ink-2)",
+                            background: "var(--surface-2)",
+                            color: "var(--ink-2)",
                             borderRadius: 999,
                             padding: "3px 8px",
                             fontSize: 11,
@@ -366,15 +386,12 @@ export default async function PublicResultsPage({
                         </span>
                       )}
                     </div>
-                    <div
-                      className="gr-mono"
-                      style={{ fontWeight: 700 }}
-                    >
+                    <div className="gr-mono" style={{ fontWeight: 700 }}>
                       {r.finishTime || "—"}
                     </div>
                     <div
                       className="gr-mono"
-                      style={{ color: "var(--gr-ink-3)", fontSize: 13 }}
+                      style={{ color: "var(--ink-3)", fontSize: 13 }}
                     >
                       {r.paceMinKm ? `${r.paceMinKm}/km` : "—"}
                     </div>

@@ -26,7 +26,7 @@ const markdownComponents = {
 
 export function LegalMarkdown({ content }: { content: string }) {
   return (
-    <div className="prose prose-neutral max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-[#48C773] prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted">
+    <div className="prose prose-neutral max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-brand-active prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted">
       <ReactMarkdown components={markdownComponents}>{content}</ReactMarkdown>
     </div>
   );

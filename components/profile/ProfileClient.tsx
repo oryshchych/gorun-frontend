@@ -48,8 +48,8 @@ export function ProfileClient() {
   return (
     <div
       style={{
-        background: "var(--gr-bg)",
-        color: "var(--gr-ink)",
+        background: "var(--bg)",
+        color: "var(--ink)",
         minHeight: "100vh",
         paddingBottom: 120,
       }}
@@ -76,11 +76,11 @@ export function ProfileClient() {
               width: 40,
               height: 40,
               borderRadius: 999,
-              background: "var(--gr-surface)",
-              border: "1px solid var(--gr-line)",
+              background: "var(--surface)",
+              border: "1px solid var(--line)",
               display: "grid",
               placeItems: "center",
-              color: "var(--gr-ink)",
+              color: "var(--ink)",
             }}
             aria-label="Settings"
           >
@@ -92,9 +92,9 @@ export function ProfileClient() {
         <div style={{ padding: "0 18px" }}>
           <div
             style={{
-              background: "var(--gr-surface)",
-              borderRadius: "var(--gr-r-lg)",
-              border: "1px solid var(--gr-line)",
+              background: "var(--surface)",
+              borderRadius: "var(--r-lg)",
+              border: "1px solid var(--line)",
               padding: 18,
             }}
           >
@@ -106,8 +106,8 @@ export function ProfileClient() {
                   height: 64,
                   borderRadius: 999,
                   background:
-                    "linear-gradient(135deg, var(--gr-brand), var(--gr-brand-700))",
-                  color: "#fff",
+                    "linear-gradient(135deg, var(--brand), var(--brand-active))",
+                  color: "var(--surface)",
                   display: "grid",
                   placeItems: "center",
                   fontSize: 22,
@@ -127,7 +127,7 @@ export function ProfileClient() {
                 <div
                   style={{
                     fontSize: 12,
-                    color: "var(--gr-ink-3)",
+                    color: "var(--ink-3)",
                     marginTop: 2,
                   }}
                 >
@@ -140,7 +140,7 @@ export function ProfileClient() {
                 style={{
                   fontSize: 13,
                   fontWeight: 700,
-                  color: "var(--gr-brand-700)",
+                  color: "var(--brand-active)",
                   textDecoration: "none",
                 }}
               >
@@ -156,7 +156,7 @@ export function ProfileClient() {
                 gap: 8,
                 marginTop: 16,
                 paddingTop: 16,
-                borderTop: "1px dashed var(--gr-line-strong)",
+                borderTop: "1px dashed var(--line-strong)",
               }}
             >
               {[
@@ -170,7 +170,7 @@ export function ProfileClient() {
                     style={{
                       fontSize: 20,
                       fontWeight: 800,
-                      color: "var(--gr-ink)",
+                      color: "var(--ink)",
                     }}
                   >
                     {n}
@@ -178,7 +178,7 @@ export function ProfileClient() {
                   <div
                     style={{
                       fontSize: 11,
-                      color: "var(--gr-ink-3)",
+                      color: "var(--ink-3)",
                       fontWeight: 600,
                     }}
                   >
@@ -209,9 +209,9 @@ export function ProfileClient() {
                   borderRadius: 999,
                   fontSize: 13,
                   fontWeight: 700,
-                  background: active ? "var(--gr-ink)" : "transparent",
-                  color: active ? "var(--gr-bg)" : "var(--gr-ink-3)",
-                  border: active ? "0" : "1px solid var(--gr-line)",
+                  background: active ? "var(--ink)" : "transparent",
+                  color: active ? "var(--bg)" : "var(--ink-3)",
+                  border: active ? "0" : "1px solid var(--line)",
                   cursor: "pointer",
                   minHeight: 44,
                 }}
@@ -231,7 +231,7 @@ export function ProfileClient() {
                   style={{
                     padding: "24px 0",
                     textAlign: "center",
-                    color: "var(--gr-ink-3)",
+                    color: "var(--ink-3)",
                     fontSize: 14,
                   }}
                 >
@@ -246,38 +246,38 @@ export function ProfileClient() {
                 href={`/${locale}`}
                 style={{
                   padding: 16,
-                  borderRadius: "var(--gr-r-lg)",
+                  borderRadius: "var(--r-lg)",
                   textAlign: "left",
-                  background: "var(--gr-surface)",
-                  border: "1.5px dashed var(--gr-line-strong)",
+                  background: "var(--surface)",
+                  border: "1.5px dashed var(--line-strong)",
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
                   textDecoration: "none",
-                  color: "var(--gr-ink)",
+                  color: "var(--ink)",
                 }}
               >
                 <div
                   style={{
                     width: 44,
                     height: 44,
-                    borderRadius: "var(--gr-r-md)",
-                    background: "var(--gr-brand-50)",
+                    borderRadius: "var(--r-md)",
+                    background: "var(--brand-tint)",
                     display: "grid",
                     placeItems: "center",
                   }}
                 >
-                  <Plus size={22} color="var(--gr-brand-700)" />
+                  <Plus size={22} color="var(--brand-active)" />
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>
                     {t("browseEvents")}
                   </div>
-                  <div style={{ fontSize: 12, color: "var(--gr-ink-3)" }}>
+                  <div style={{ fontSize: 12, color: "var(--ink-3)" }}>
                     {t("browseEventsSub")}
                   </div>
                 </div>
-                <ArrowRight size={18} color="var(--gr-ink-3)" />
+                <ArrowRight size={18} color="var(--ink-3)" />
               </Link>
             </div>
           )}
@@ -289,7 +289,7 @@ export function ProfileClient() {
                   style={{
                     padding: "24px 0",
                     textAlign: "center",
-                    color: "var(--gr-ink-3)",
+                    color: "var(--ink-3)",
                     fontSize: 14,
                   }}
                 >
@@ -307,9 +307,9 @@ export function ProfileClient() {
                 <div
                   key={k.id}
                   style={{
-                    background: "var(--gr-surface)",
-                    borderRadius: "var(--gr-r-lg)",
-                    border: "1px solid var(--gr-line)",
+                    background: "var(--surface)",
+                    borderRadius: "var(--r-lg)",
+                    border: "1px solid var(--line)",
                     padding: 16,
                     display: "flex",
                     alignItems: "center",
@@ -321,18 +321,18 @@ export function ProfileClient() {
                       width: 44,
                       height: 44,
                       borderRadius: 999,
-                      background: "var(--gr-brand-50)",
+                      background: "var(--brand-tint)",
                       display: "grid",
                       placeItems: "center",
                     }}
                   >
-                    <Baby size={22} color="var(--gr-brand-700)" />
+                    <Baby size={22} color="var(--brand-active)" />
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 15, fontWeight: 700 }}>
                       {k.name}
                     </div>
-                    <div style={{ fontSize: 12, color: "var(--gr-ink-3)" }}>
+                    <div style={{ fontSize: 12, color: "var(--ink-3)" }}>
                       Age {k.age}
                       {k.shirt ? ` · Shirt ${k.shirt}` : ""}
                     </div>
@@ -341,7 +341,7 @@ export function ProfileClient() {
                     style={{
                       fontSize: 13,
                       fontWeight: 700,
-                      color: "var(--gr-brand-700)",
+                      color: "var(--brand-active)",
                       background: "transparent",
                       border: 0,
                       cursor: "pointer",
@@ -355,9 +355,9 @@ export function ProfileClient() {
               <button
                 style={{
                   padding: 14,
-                  border: "1.5px dashed var(--gr-line-strong)",
-                  borderRadius: "var(--gr-r-md)",
-                  color: "var(--gr-ink-3)",
+                  border: "1.5px dashed var(--line-strong)",
+                  borderRadius: "var(--r-md)",
+                  color: "var(--ink-3)",
                   fontWeight: 600,
                   fontSize: 13,
                   display: "inline-flex",
@@ -389,10 +389,10 @@ function RacePassCard({ reg }: { reg: Registration }) {
   return (
     <div
       style={{
-        borderRadius: "var(--gr-r-xl)",
+        borderRadius: "var(--r-xl)",
         overflow: "hidden",
-        background: "var(--gr-ink)",
-        color: "var(--gr-bg)",
+        background: "var(--ink)",
+        color: "var(--bg)",
       }}
     >
       <div
@@ -408,7 +408,7 @@ function RacePassCard({ reg }: { reg: Registration }) {
             style={{
               fontSize: 11,
               fontWeight: 700,
-              color: "var(--gr-brand)",
+              color: "var(--brand)",
               letterSpacing: "0.08em",
             }}
           >
@@ -425,12 +425,12 @@ function RacePassCard({ reg }: { reg: Registration }) {
           style={{
             width: 56,
             height: 56,
-            background: "#fff",
+            background: "var(--surface)",
             borderRadius: 8,
             display: "grid",
             placeItems: "center",
             fontSize: 10,
-            color: "#000",
+            color: "var(--ink)",
             fontWeight: 700,
           }}
         >
@@ -499,9 +499,9 @@ function PastRaceCard({ reg }: { reg: Registration }) {
   return (
     <div
       style={{
-        background: "var(--gr-surface)",
-        borderRadius: "var(--gr-r-lg)",
-        border: "1px solid var(--gr-line)",
+        background: "var(--surface)",
+        borderRadius: "var(--r-lg)",
+        border: "1px solid var(--line)",
         overflow: "hidden",
         display: "flex",
         alignItems: "stretch",
@@ -519,9 +519,7 @@ function PastRaceCard({ reg }: { reg: Registration }) {
         />
       )}
       <div style={{ flex: 1, padding: 14 }}>
-        <div
-          style={{ fontSize: 11, color: "var(--gr-ink-3)", fontWeight: 600 }}
-        >
+        <div style={{ fontSize: 11, color: "var(--ink-3)", fontWeight: 600 }}>
           {reg.event?.date
             ? new Date(reg.event.date).toLocaleDateString("en", {
                 month: "short",
@@ -544,8 +542,8 @@ function PastRaceCard({ reg }: { reg: Registration }) {
           {reg.distance && (
             <span
               style={{
-                background: "var(--gr-surface-2)",
-                color: "var(--gr-ink-2)",
+                background: "var(--surface-2)",
+                color: "var(--ink-2)",
                 borderRadius: 999,
                 padding: "4px 10px",
                 fontSize: 11,
@@ -560,8 +558,8 @@ function PastRaceCard({ reg }: { reg: Registration }) {
               fontSize: 12,
               color:
                 reg.status === "confirmed"
-                  ? "var(--gr-brand-700)"
-                  : "var(--gr-ink-3)",
+                  ? "var(--brand-active)"
+                  : "var(--ink-3)",
               fontWeight: 600,
             }}
           >
@@ -578,8 +576,8 @@ function ProfilePrompt({ locale }: { locale: string }) {
     <div
       className="gr-screen-enter"
       style={{
-        background: "var(--gr-bg)",
-        color: "var(--gr-ink)",
+        background: "var(--bg)",
+        color: "var(--ink)",
         minHeight: "100vh",
         padding: "24px 22px 130px",
       }}
@@ -590,7 +588,7 @@ function ProfilePrompt({ locale }: { locale: string }) {
             width: 64,
             height: 64,
             borderRadius: 999,
-            background: "var(--gr-brand-50)",
+            background: "var(--brand-tint)",
             display: "grid",
             placeItems: "center",
           }}
@@ -600,7 +598,7 @@ function ProfilePrompt({ locale }: { locale: string }) {
             height="28"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="var(--gr-brand-700)"
+            stroke="var(--brand-active)"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -624,7 +622,7 @@ function ProfilePrompt({ locale }: { locale: string }) {
         <p
           style={{
             fontSize: 14,
-            color: "var(--gr-ink-3)",
+            color: "var(--ink-3)",
             marginTop: 10,
             lineHeight: 1.55,
           }}
@@ -655,9 +653,9 @@ function ProfilePrompt({ locale }: { locale: string }) {
               alignItems: "center",
               gap: 12,
               padding: "12px 14px",
-              background: "var(--gr-surface)",
-              border: "1px solid var(--gr-line)",
-              borderRadius: "var(--gr-r-md)",
+              background: "var(--surface)",
+              border: "1px solid var(--line)",
+              borderRadius: "var(--r-md)",
             }}
           >
             <div
@@ -665,8 +663,8 @@ function ProfilePrompt({ locale }: { locale: string }) {
                 width: 36,
                 height: 36,
                 borderRadius: 999,
-                background: "var(--gr-brand-50)",
-                color: "var(--gr-brand-700)",
+                background: "var(--brand-tint)",
+                color: "var(--brand-active)",
                 display: "grid",
                 placeItems: "center",
                 flexShrink: 0,
@@ -674,7 +672,7 @@ function ProfilePrompt({ locale }: { locale: string }) {
             >
               ✓
             </div>
-            <div style={{ fontSize: 13, color: "var(--gr-ink-2)" }}>{text}</div>
+            <div style={{ fontSize: 13, color: "var(--ink-2)" }}>{text}</div>
           </div>
         ))}
       </div>
@@ -689,8 +687,8 @@ function ProfilePrompt({ locale }: { locale: string }) {
             width: "100%",
             height: 56,
             borderRadius: 999,
-            background: "var(--gr-brand)",
-            color: "#0b1a0f",
+            background: "var(--brand)",
+            color: "var(--on-brand)",
             fontWeight: 700,
             fontSize: 16,
             textDecoration: "none",
@@ -703,7 +701,7 @@ function ProfilePrompt({ locale }: { locale: string }) {
             textAlign: "center",
             marginTop: 10,
             fontSize: 12,
-            color: "var(--gr-ink-4)",
+            color: "var(--ink-4)",
           }}
         >
           You can browse events, runners, and results without an account.

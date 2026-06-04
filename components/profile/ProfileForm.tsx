@@ -268,8 +268,8 @@ export function ProfileForm() {
                     </FormControl>
                     <SelectContent
                       style={{
-                        backgroundColor: "#489994",
-                        color: "hsl(var(--foreground))",
+                        backgroundColor: "var(--surface)",
+                        color: "var(--ink)",
                       }}
                     >
                       <SelectItem value="unspecified">

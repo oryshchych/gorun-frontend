@@ -311,7 +311,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
                     href={getMapLink()}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#48C773] hover:underline"
+                    className="text-brand-active hover:underline"
                   >
                     Open in Maps
                   </a>
@@ -324,13 +324,13 @@ export function EventDescription({ event }: EventDescriptionProps) {
 
       {/* Event Price Card */}
       {event.basePrice !== undefined && (
-        <Card className="bg-linear-to-r from-[#48C773]/10 to-[#48C773]/5 border-[#48C773]/30">
+        <Card className="bg-linear-to-r from-brand-tint to-surface border-brand/30">
           <CardContent className="py-6">
             <div className="flex flex-col items-center justify-center gap-2">
               <span className="text-sm text-muted-foreground uppercase tracking-wide">
                 {t("registrationFee")}
               </span>
-              <span className="text-4xl font-bold text-[#48C773]">
+              <span className="text-4xl font-bold text-brand-active">
                 {event.basePrice} {t("currency")}
               </span>
             </div>
@@ -355,7 +355,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
             <Button
               onClick={handleRegisterClick}
               size="lg"
-              className="w-full cursor-pointer bg-[#48C773] hover:bg-[#3fa962] text-white font-bold text-lg py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full cursor-pointer bg-brand hover:bg-brand-hover text-on-brand font-bold text-lg py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
             >
               {t("register")}
             </Button>
@@ -372,7 +372,7 @@ export function EventDescription({ event }: EventDescriptionProps) {
             <CardTitle>{t("description")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-neutral max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-[#48C773] prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted prose-ul:text-muted-foreground prose-li:text-muted-foreground">
+            <div className="prose prose-neutral max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-brand-active prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted prose-ul:text-muted-foreground prose-li:text-muted-foreground">
               <ReactMarkdown
                 components={
                   {

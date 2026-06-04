@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 /** Profile / header menu surface — matches app teal chrome */
 const dropdownMenuSurfaceClass =
-  "border border-white/20 bg-[#2A747B] text-white shadow-lg";
+  "border border-line bg-afu-blue text-white shadow-lg";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 

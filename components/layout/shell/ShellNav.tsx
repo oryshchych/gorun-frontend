@@ -11,8 +11,8 @@ function navLinkClass(active: boolean, collapsed: boolean) {
     "shell-nav-link flex items-center rounded-md text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
     collapsed ? "justify-center px-2 py-2.5" : "gap-2 px-3 py-2",
     active
-      ? "shell-nav-link--active border-l-[3px] border-l-[var(--gr-brand)] bg-white font-semibold text-[var(--gr-ink)] shadow-sm dark:bg-[var(--gr-surface-2)]"
-      : "border-l-[3px] border-l-transparent text-muted-foreground hover:bg-white/80 hover:text-[var(--gr-ink)] dark:hover:bg-[var(--gr-surface-2)]/80"
+      ? "shell-nav-link--active border-l-[3px] border-l-[var(--brand)] bg-white font-semibold text-[var(--ink)] shadow-sm dark:bg-[var(--surface-2)]"
+      : "border-l-[3px] border-l-transparent text-muted-foreground hover:bg-white/80 hover:text-[var(--ink)] dark:hover:bg-[var(--surface-2)]/80"
   );
 }
 
@@ -41,7 +41,12 @@ export function ShellNav({
       >
         {items.map(({ segment, label, icon: Icon, exactOnly }) => {
           const href = segment ? `${basePath}/${segment}` : basePath;
-          const active = isShellNavActive(pathname, basePath, segment, exactOnly);
+          const active = isShellNavActive(
+            pathname,
+            basePath,
+            segment,
+            exactOnly
+          );
           return (
             <Link
               key={segment || "root"}
@@ -52,7 +57,10 @@ export function ShellNav({
               title={collapsed ? label : undefined}
             >
               <Icon
-                className={cn("size-4 shrink-0", active && "text-[var(--gr-brand)]")}
+                className={cn(
+                  "size-4 shrink-0",
+                  active && "text-[var(--brand)]"
+                )}
                 aria-hidden
               />
               {!collapsed ? <span>{label}</span> : null}
@@ -72,7 +80,7 @@ export function ShellNav({
             href={footer.href}
             onClick={onNavigate}
             className={cn(
-              "flex items-center text-sm text-muted-foreground transition-colors hover:bg-white/80 hover:text-[var(--gr-ink)]",
+              "flex items-center text-sm text-muted-foreground transition-colors hover:bg-white/80 hover:text-[var(--ink)]",
               collapsed ? "justify-center p-2" : "gap-2 px-3 py-2"
             )}
             title={collapsed ? footer.label : undefined}

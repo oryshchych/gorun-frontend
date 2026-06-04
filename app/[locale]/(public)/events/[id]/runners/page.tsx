@@ -89,8 +89,8 @@ export default async function PublicRunnersPage({
   return (
     <div
       style={{
-        background: "var(--gr-bg)",
-        color: "var(--gr-ink)",
+        background: "var(--bg)",
+        color: "var(--ink)",
         minHeight: "100vh",
         paddingBottom: 100,
       }}
@@ -105,7 +105,7 @@ export default async function PublicRunnersPage({
               alignItems: "center",
               gap: 6,
               fontSize: 13,
-              color: "var(--gr-ink-3)",
+              color: "var(--ink-3)",
               fontWeight: 600,
               textDecoration: "none",
               marginBottom: 12,
@@ -120,7 +120,7 @@ export default async function PublicRunnersPage({
           >
             Runners
           </h1>
-          <p style={{ fontSize: 14, color: "var(--gr-ink-3)", marginTop: 4 }}>
+          <p style={{ fontSize: 14, color: "var(--ink-3)", marginTop: 4 }}>
             {title} · {participants.length} registered
           </p>
         </div>

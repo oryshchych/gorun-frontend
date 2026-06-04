@@ -17,9 +17,9 @@ export function EventsHub({ events, pastEvents = [] }: EventsHubProps) {
   return (
     <div
       style={{
-        background: "var(--gr-bg)",
+        background: "var(--bg)",
         minHeight: "100vh",
-        color: "var(--gr-ink)",
+        color: "var(--ink)",
         fontFamily: "var(--font-body, Inter, system-ui, sans-serif)",
       }}
     >
@@ -35,7 +35,7 @@ export function EventsHub({ events, pastEvents = [] }: EventsHubProps) {
           style={{
             fontSize: 12,
             fontWeight: 700,
-            color: "var(--gr-brand-700)",
+            color: "var(--brand-active)",
             letterSpacing: "0.08em",
             textTransform: "uppercase",
           }}
@@ -48,7 +48,7 @@ export function EventsHub({ events, pastEvents = [] }: EventsHubProps) {
             fontSize: "clamp(28px, 6vw, 56px)",
             fontWeight: 800,
             lineHeight: 1.05,
-            color: "var(--gr-ink)",
+            color: "var(--ink)",
             marginTop: 4,
             textWrap: "balance",
             whiteSpace: "pre-line",
@@ -59,7 +59,7 @@ export function EventsHub({ events, pastEvents = [] }: EventsHubProps) {
         <p
           style={{
             fontSize: 14,
-            color: "var(--gr-ink-3)",
+            color: "var(--ink-3)",
             marginTop: 8,
             lineHeight: 1.5,
             maxWidth: 560,
@@ -81,11 +81,11 @@ export function EventsHub({ events, pastEvents = [] }: EventsHubProps) {
         >
           <div
             className="gr-display"
-            style={{ fontSize: 18, fontWeight: 700, color: "var(--gr-ink)" }}
+            style={{ fontSize: 18, fontWeight: 700, color: "var(--ink)" }}
           >
             {t("upcoming")}
           </div>
-          <div style={{ fontSize: 12, color: "var(--gr-ink-3)", fontWeight: 600 }}>
+          <div style={{ fontSize: 12, color: "var(--ink-3)", fontWeight: 600 }}>
             {t("racesCount", { count: events.length })}
           </div>
         </div>
@@ -93,7 +93,8 @@ export function EventsHub({ events, pastEvents = [] }: EventsHubProps) {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 420px), 1fr))",
+            gridTemplateColumns:
+              "repeat(auto-fill, minmax(min(100%, 420px), 1fr))",
             gap: 16,
           }}
         >
@@ -107,7 +108,7 @@ export function EventsHub({ events, pastEvents = [] }: EventsHubProps) {
             style={{
               padding: "48px 0",
               textAlign: "center",
-              color: "var(--gr-ink-3)",
+              color: "var(--ink-3)",
               fontSize: 14,
             }}
           >
@@ -122,7 +123,7 @@ export function EventsHub({ events, pastEvents = [] }: EventsHubProps) {
           <div style={{ padding: "28px 18px 10px" }}>
             <div
               className="gr-display"
-              style={{ fontSize: 18, fontWeight: 700, color: "var(--gr-ink)" }}
+              style={{ fontSize: 18, fontWeight: 700, color: "var(--ink)" }}
             >
               {t("past")}
             </div>
@@ -143,10 +144,10 @@ export function EventsHub({ events, pastEvents = [] }: EventsHubProps) {
                 style={{
                   minWidth: 200,
                   scrollSnapAlign: "start",
-                  background: "var(--gr-surface)",
-                  borderRadius: "var(--gr-r-lg)",
+                  background: "var(--surface)",
+                  borderRadius: "var(--r-lg)",
                   overflow: "hidden",
-                  border: "1px solid var(--gr-line)",
+                  border: "1px solid var(--line)",
                   flexShrink: 0,
                   textDecoration: "none",
                   color: "inherit",
@@ -164,14 +165,33 @@ export function EventsHub({ events, pastEvents = [] }: EventsHubProps) {
                   />
                 )}
                 <div style={{ padding: 12 }}>
-                  <div style={{ fontSize: 11, color: "var(--gr-ink-3)", fontWeight: 600 }}>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "var(--ink-3)",
+                      fontWeight: 600,
+                    }}
+                  >
                     {p.dateLabel}
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "var(--gr-ink)", marginTop: 2 }}>
+                  <div
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: "var(--ink)",
+                      marginTop: 2,
+                    }}
+                  >
                     {p.name}
                   </div>
                   {(p.distance || p.result) && (
-                    <div style={{ fontSize: 12, color: "var(--gr-ink-3)", marginTop: 4 }}>
+                    <div
+                      style={{
+                        fontSize: 12,
+                        color: "var(--ink-3)",
+                        marginTop: 4,
+                      }}
+                    >
                       {[p.distance, p.result].filter(Boolean).join(" · ")}
                     </div>
                   )}

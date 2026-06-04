@@ -90,7 +90,7 @@ export function EventImageOverlay({
       >
         {/* Compact: Just title and key info */}
         <div className="space-y-1 md:space-y-2">
-          <h2 className="text-md md:text-lg font-bold text-[#48C773] line-clamp-2">
+          <h2 className="text-md md:text-lg font-bold text-brand line-clamp-2">
             {localizedTitle}
           </h2>
           <div className="flex items-center gap-2 text-xs md:text-sm text-white/90">
@@ -110,7 +110,7 @@ export function EventImageOverlay({
     >
       {/* Top Section - Header with logos and funds text */}
       <div className="flex flex-col items-center gap-2 md:gap-4 justify-center">
-        <h2 className="text-lg md:text-3xl lg:text-3xl font-bold text-[#48C773]">
+        <h2 className="text-lg md:text-3xl lg:text-3xl font-bold text-brand">
           GoRun
         </h2>
         <div className="h-px w-full bg-white/30" />
@@ -141,7 +141,7 @@ export function EventImageOverlay({
             {localizedTitle.toUpperCase()}
           </h1>
           {localizedDescription && (
-            <p className="text-base md:text-lg lg:text-xl text-[#48C773] text-center">
+            <p className="text-base md:text-lg lg:text-xl text-brand text-center">
               {t("warmIntimateMeeting")}
             </p>
           )}

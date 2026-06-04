@@ -42,7 +42,9 @@ alwaysApply: false
 
 ## Design tokens
 
-- Use CSS vars from `app/globals.css`: `var(--gr-brand)`, `var(--gr-ink)`, `var(--gr-surface-2)`, etc.
+- Use token utilities or CSS vars from the unified design system: `bg-brand`, `text-on-brand`, `text-ink`, `bg-surface`, `border-line`, `var(--brand)`, `var(--ink)`, etc.
+- Never hardcode colors, use `hsl(var(--...))`, revive `--gr-*`, or add `.gr-dark` / `.gr-light`.
+- Green is action/accent only. Do not use brand green for body text or links, and never put white text on bright `bg-brand`; use `text-on-brand`.
 - For new UI: prefer the GoRun variant set (`brand`, `primary`, `soft`, `ghost-gr`). Legacy shadcn variants (`default`, `secondary`, …) are kept for back-compat only.
 
 ## i18n

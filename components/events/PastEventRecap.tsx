@@ -30,9 +30,9 @@ export function PastEventRecap({ event }: PastEventRecapProps) {
   return (
     <section
       style={{
-        background: "var(--gr-surface)",
-        border: "1px solid var(--gr-line)",
-        borderRadius: "var(--gr-r-lg)",
+        background: "var(--surface)",
+        border: "1px solid var(--line)",
+        borderRadius: "var(--r-lg)",
         padding: 20,
         display: "flex",
         flexDirection: "column",
@@ -45,14 +45,21 @@ export function PastEventRecap({ event }: PastEventRecapProps) {
           style={{
             fontSize: 18,
             fontWeight: 800,
-            color: "var(--gr-ink)",
+            color: "var(--ink)",
             marginBottom: hasCopy ? 10 : 0,
           }}
         >
           {t("howItWas")}
         </div>
         {hasCopy && (
-          <p style={{ fontSize: 15, lineHeight: 1.65, color: "var(--gr-ink-2)", margin: 0 }}>
+          <p
+            style={{
+              fontSize: 15,
+              lineHeight: 1.65,
+              color: "var(--ink-2)",
+              margin: 0,
+            }}
+          >
             {pastText}
           </p>
         )}
@@ -65,7 +72,7 @@ export function PastEventRecap({ event }: PastEventRecapProps) {
             style={{
               fontSize: 13,
               fontWeight: 700,
-              color: "var(--gr-ink-3)",
+              color: "var(--ink-3)",
               textTransform: "uppercase",
               letterSpacing: "0.06em",
               marginBottom: 10,
@@ -85,10 +92,10 @@ export function PastEventRecap({ event }: PastEventRecapProps) {
                 key={`${src}-${i}`}
                 style={{
                   aspectRatio: "4/3",
-                  borderRadius: "var(--gr-r-md)",
+                  borderRadius: "var(--r-md)",
                   overflow: "hidden",
-                  border: "1px solid var(--gr-line)",
-                  background: "var(--gr-surface-2)",
+                  border: "1px solid var(--line)",
+                  background: "var(--surface-2)",
                 }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- gallery URLs from API (mixed http/https hosts) */}
@@ -96,7 +103,12 @@ export function PastEventRecap({ event }: PastEventRecapProps) {
                   src={src}
                   alt={t("photoAlt", { n: i + 1 })}
                   loading="lazy"
-                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                  }}
                 />
               </div>
             ))}

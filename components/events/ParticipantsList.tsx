@@ -61,9 +61,7 @@ export function ParticipantsList({
 
   if (isLoading) {
     return (
-      <div
-        style={{ padding: "24px 0", color: "var(--gr-ink-3)", fontSize: 14 }}
-      >
+      <div style={{ padding: "24px 0", color: "var(--ink-3)", fontSize: 14 }}>
         Loading runners…
       </div>
     );
@@ -80,7 +78,7 @@ export function ParticipantsList({
             left: 14,
             top: "50%",
             transform: "translateY(-50%)",
-            color: "var(--gr-ink-3)",
+            color: "var(--ink-3)",
           }}
         />
         <input
@@ -90,11 +88,11 @@ export function ParticipantsList({
           style={{
             width: "100%",
             padding: "12px 16px 12px 42px",
-            borderRadius: "var(--gr-r-md)",
-            background: "var(--gr-surface)",
-            border: "1.5px solid var(--gr-line-strong)",
+            borderRadius: "var(--r-md)",
+            background: "var(--surface)",
+            border: "1.5px solid var(--line-strong)",
             fontSize: 16,
-            color: "var(--gr-ink)",
+            color: "var(--ink)",
             fontFamily: "inherit",
           }}
           aria-label="Search runners"
@@ -121,10 +119,9 @@ export function ParticipantsList({
                 borderRadius: 999,
                 fontSize: 13,
                 fontWeight: 700,
-                background:
-                  distFilter === d ? "var(--gr-ink)" : "var(--gr-surface)",
-                color: distFilter === d ? "var(--gr-bg)" : "var(--gr-ink-2)",
-                border: "1px solid var(--gr-line)",
+                background: distFilter === d ? "var(--ink)" : "var(--surface)",
+                color: distFilter === d ? "var(--bg)" : "var(--ink-2)",
+                border: "1px solid var(--line)",
                 whiteSpace: "nowrap",
                 cursor: "pointer",
               }}
@@ -138,9 +135,9 @@ export function ParticipantsList({
       {/* Table */}
       <div
         style={{
-          background: "var(--gr-surface)",
-          borderRadius: "var(--gr-r-lg)",
-          border: "1px solid var(--gr-line)",
+          background: "var(--surface)",
+          borderRadius: "var(--r-lg)",
+          border: "1px solid var(--line)",
           overflow: "hidden",
         }}
       >
@@ -149,7 +146,7 @@ export function ParticipantsList({
             style={{
               padding: 32,
               textAlign: "center",
-              color: "var(--gr-ink-3)",
+              color: "var(--ink-3)",
               fontSize: 13,
             }}
           >
@@ -182,9 +179,9 @@ export function ParticipantsList({
                     padding: "12px 16px",
                     borderBottom:
                       i < filtered.length - 1
-                        ? "1px solid var(--gr-line)"
+                        ? "1px solid var(--line)"
                         : "none",
-                    background: isMe ? "var(--gr-brand-50)" : "transparent",
+                    background: isMe ? "var(--brand-tint)" : "transparent",
                   }}
                 >
                   {/* Bib */}
@@ -194,7 +191,7 @@ export function ParticipantsList({
                       fontSize: 11,
                       fontWeight: 700,
                       minWidth: 40,
-                      color: "var(--gr-ink-3)",
+                      color: "var(--ink-3)",
                     }}
                   >
                     {bib ? `#${String(bib).padStart(3, "0")}` : "—"}
@@ -206,7 +203,7 @@ export function ParticipantsList({
                       style={{
                         fontSize: 14,
                         fontWeight: 700,
-                        color: "var(--gr-ink)",
+                        color: "var(--ink)",
                         display: "flex",
                         alignItems: "center",
                         gap: 6,
@@ -216,8 +213,8 @@ export function ParticipantsList({
                       {isMe && (
                         <span
                           style={{
-                            background: "var(--gr-brand-50)",
-                            color: "var(--gr-brand-700)",
+                            background: "var(--brand-tint)",
+                            color: "var(--brand-active)",
                             borderRadius: 999,
                             padding: "2px 6px",
                             fontSize: 9,
@@ -231,7 +228,7 @@ export function ParticipantsList({
                       )}
                     </div>
                     {p.city && (
-                      <div style={{ fontSize: 12, color: "var(--gr-ink-3)" }}>
+                      <div style={{ fontSize: 12, color: "var(--ink-3)" }}>
                         {p.city}
                       </div>
                     )}
@@ -241,8 +238,8 @@ export function ParticipantsList({
                   {dist && (
                     <span
                       style={{
-                        background: "var(--gr-surface-2)",
-                        color: "var(--gr-ink-2)",
+                        background: "var(--surface-2)",
+                        color: "var(--ink-2)",
                         borderRadius: 999,
                         padding: "4px 10px",
                         fontSize: 11,
@@ -264,7 +261,7 @@ export function ParticipantsList({
         style={{
           marginTop: 8,
           fontSize: 12,
-          color: "var(--gr-ink-4)",
+          color: "var(--ink-4)",
           textAlign: "center",
         }}
       >
