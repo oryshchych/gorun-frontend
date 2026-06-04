@@ -405,7 +405,14 @@
     "by": "від",
     "privacyPolicy": "Політика конфіденційності",
     "termsOfService": "Умови використання",
-    "contactUs": "Зв'яжіться з нами"
+    "contactUs": "Зв'яжіться з нами",
+    "tagline": "Благодійні забіги по всій Україні. Кожна участь підтримує Збройні сили.",
+    "eventsHeading": "Події",
+    "upcomingRaces": "Майбутні забіги",
+    "pastEvents": "Минулі події",
+    "aboutHeading": "Про нас",
+    "contact": "Контакти",
+    "legalHeading": "Правова інформація"
   },
   "apiCodes": {
     "SUCCESS_AUTH_REGISTERED": "Користувача успішно зареєстровано",

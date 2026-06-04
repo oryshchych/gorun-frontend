@@ -160,6 +160,7 @@ If any check fails, fix it before considering the task complete. Do not suppress
 ### Internationalization (THE big footgun)
 
 - **Every key MUST exist in BOTH `messages/en.json` AND `messages/uk.json`.** A missing key in one locale silently breaks `next-intl` at runtime in that locale.
+- **Never hardcode user-visible strings in JSX.** Every label, heading, link text, placeholder, and descriptive string a user reads must come from `useTranslations()` / `getTranslations()`. Raw English strings in JSX (e.g. `<p>Charity running events…</p>`) are always a bug — add the key to both locales and use `t("key")` instead.
 - **Client components:** `const t = useTranslations("scope")` from `next-intl`.
 - **Server components / metadata:** `const t = await getTranslations({ locale, namespace: "scope" })` from `next-intl/server`.
 - The `[locale]` route segment is required for every user-facing page. Configured locales: `["uk", "en"]`; default: `uk`. See `i18n.ts` and `middleware.ts`.

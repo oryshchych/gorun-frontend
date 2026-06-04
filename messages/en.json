@@ -405,7 +405,14 @@
     "by": "by",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
-    "contactUs": "Contact Us"
+    "contactUs": "Contact Us",
+    "tagline": "Charity running events across Ukraine. Every entry supports the Armed Forces.",
+    "eventsHeading": "Events",
+    "upcomingRaces": "Upcoming races",
+    "pastEvents": "Past events",
+    "aboutHeading": "About",
+    "contact": "Contact",
+    "legalHeading": "Legal"
   },
   "apiCodes": {
     "SUCCESS_AUTH_REGISTERED": "User registered successfully",

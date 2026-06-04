@@ -1,46 +1,46 @@
 "use client";
 
 import Link from "next/link";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 
 export default function Footer() {
   const locale = useLocale();
+  const t = useTranslations("footer");
 
-  const navColumns = [
+  const navColumns: { heading: string; links: { label: string; href: string; external: boolean }[] }[] = [
     {
-      heading: "Events",
+      heading: t("eventsHeading"),
       links: [
-        { label: "Upcoming races", href: `/${locale}` },
-        { label: "Past events", href: `/${locale}` },
+        { label: t("upcomingRaces"), href: `/${locale}`, external: false },
+        { label: t("pastEvents"), href: `/${locale}`, external: false },
       ],
     },
     {
-      heading: "About",
+      heading: t("aboutHeading"),
       links: [
-        { label: "Contact", href: "mailto:gorunteam.ua@gmail.com" },
-        { label: "Instagram", href: "https://instagram.com/gorun.lviv" },
-        { label: "Facebook", href: "https://facebook.com/profile.php?id=61584661056098" },
+        { label: t("contact"), href: "mailto:gorunteam.ua@gmail.com", external: false },
+        { label: "Instagram", href: "https://instagram.com/gorun.lviv", external: true },
+        { label: "Facebook", href: "https://facebook.com/profile.php?id=61584661056098", external: true },
       ],
     },
     {
-      heading: "Legal",
+      heading: t("legalHeading"),
       links: [
-        { label: "Privacy Policy", href: `/${locale}/privacy-policy` },
-        { label: "Terms of Service", href: `/${locale}/terms-of-service` },
+        { label: t("privacyPolicy"), href: `/${locale}/privacy-policy`, external: false },
+        { label: t("termsOfService"), href: `/${locale}/terms-of-service`, external: false },
       ],
     },
   ];
 
   return (
-    // className="dark" forces dark-mode token values always, making the footer
-    // permanently dark regardless of the app-level theme toggle.
+    // className="dark" forces dark-mode token values always — footer is permanently dark
     <footer
       className="dark"
       role="contentinfo"
       style={{
-        background: "var(--bg)",   // in .dark context: #14181E
-        color: "var(--ink)",       // in .dark context: #EAEEF4
+        background: "var(--bg)",
+        color: "var(--ink)",
         padding: "48px 32px 0",
         marginTop: 64,
       }}
@@ -53,18 +53,18 @@ export default function Footer() {
             <Link
               href={`/${locale}`}
               style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 14 }}
+              aria-label="GoRun home"
             >
               <Image
                 src="/images/logos/logo.png"
                 alt="GoRun"
                 width={56}
                 height={18}
-                style={{ height: "auto", filter: "brightness(0) invert(1)" }}
+                style={{ height: "auto" }}
               />
             </Link>
             <p style={{ fontSize: 13, lineHeight: 1.6, opacity: 0.7, maxWidth: 300, margin: 0 }}>
-              Charity running events across Ukraine. Every entry supports the
-              Armed Forces.
+              {t("tagline")}
             </p>
           </div>
 
@@ -88,9 +88,12 @@ export default function Footer() {
                   <Link
                     key={link.label}
                     href={link.href}
+                    {...(link.external
+                      ? { target: "_blank", rel: "noopener noreferrer" }
+                      : {})}
                     style={{
                       fontSize: 13,
-                      color: "var(--ink)",  // light text in .dark context
+                      color: "var(--ink)",
                       opacity: 0.8,
                       textDecoration: "none",
                     }}
