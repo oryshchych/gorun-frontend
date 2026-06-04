@@ -637,7 +637,11 @@
       "changeFile": "Change file",
       "removeFile": "Remove",
       "sectionSocials": "Social media",
-      "sectionRegistrationDates": "Registration dates"
+      "sectionRegistrationDates": "Registration dates",
+      "sectionOrganizer": "Organizer",
+      "organizerInfo": "Organizer",
+      "organizerContactName": "Organizer's name",
+      "organizerContactInfo": "Organizer's contacts"
     },
     "promoCodes": {
       "title": "Promo codes",

@@ -159,6 +159,9 @@ export interface Event {
   socials?: { instagram?: string; facebook?: string; telegram?: string };
   regulationUrl?: string;
   scheduleText?: string;
+  organizerInfo?: string;
+  organizerContactName?: string;
+  organizerContactInfo?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -201,6 +204,9 @@ interface BaseEventPayload {
   socials?: { instagram?: string; facebook?: string; telegram?: string };
   regulationUrl?: string;
   scheduleText?: string;
+  organizerInfo?: string;
+  organizerContactName?: string;
+  organizerContactInfo?: string;
 }
 
 export interface CreateEventRequest extends BaseEventPayload {}

@@ -223,7 +223,6 @@ export function AdminEventForm({
                 <TabsTrigger value="description">
                   {t("tabDescription")}
                 </TabsTrigger>
-                <TabsTrigger value="organizer">{t("tabOrganizer")}</TabsTrigger>
                 <TabsTrigger value="distances">{t("tabDistances")}</TabsTrigger>
                 <TabsTrigger value="payments">{t("tabPayments")}</TabsTrigger>
                 <TabsTrigger value="promoCodes">
@@ -626,6 +625,66 @@ export function AdminEventForm({
                 </div>
               </ShellFormSection>
 
+              {/* Organizer */}
+              <ShellFormSection>
+                <h2 className="text-lg font-semibold">
+                  {t("sectionOrganizer")}
+                </h2>
+                <FormField
+                  control={form.control}
+                  name="organizerInfo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("organizerInfo")}</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          value={field.value ?? ""}
+                          disabled={isLoading}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="organizerContactName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("organizerContactName")}</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value ?? ""}
+                            disabled={isLoading}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="organizerContactInfo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("organizerContactInfo")}</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value ?? ""}
+                            disabled={isLoading}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </ShellFormSection>
+
               {/* Social links */}
               <ShellFormSection>
                 <h2 className="text-lg font-semibold">{t("sectionSocials")}</h2>
@@ -688,12 +747,7 @@ export function AdminEventForm({
               </ShellFormSection>
             </TabsContent>
 
-            {/* ── Tabs 2–5: empty placeholders ── */}
-            <TabsContent value="organizer" className="space-y-4">
-              <ShellFormSection>
-                <p className="text-sm text-ink-3">{t("tabOrganizer")}</p>
-              </ShellFormSection>
-            </TabsContent>
+            {/* ── Tabs 2–4: empty placeholders ── */}
             <TabsContent value="distances" className="space-y-4">
               <ShellFormSection>
                 <p className="text-sm text-ink-3">{t("tabDistances")}</p>

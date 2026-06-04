@@ -637,7 +637,11 @@
       "changeFile": "Змінити файл",
       "removeFile": "Видалити",
       "sectionSocials": "Соціальні мережі",
-      "sectionRegistrationDates": "Дати реєстрації"
+      "sectionRegistrationDates": "Дати реєстрації",
+      "sectionOrganizer": "Організатор",
+      "organizerInfo": "Організатор",
+      "organizerContactName": "Ім'я організатора",
+      "organizerContactInfo": "Контакти організатора"
     },
     "promoCodes": {
       "title": "Промокоди",

@@ -233,6 +233,9 @@ export const adminEventFormSchema = z.object({
     .optional(),
   regulationUrl: optionalUrl.optional(),
   scheduleText: z.string().max(5000).optional(),
+  organizerInfo: z.string().max(300).optional(),
+  organizerContactName: z.string().max(200).optional(),
+  organizerContactInfo: z.string().max(500).optional(),
 });
 
 export type AdminEventFormData = z.output<typeof adminEventFormSchema>;
@@ -295,6 +298,9 @@ export type AdminEventFormInput = {
   socials?: { instagram?: string; facebook?: string; telegram?: string };
   regulationUrl?: string;
   scheduleText?: string;
+  organizerInfo?: string;
+  organizerContactName?: string;
+  organizerContactInfo?: string;
 };
 
 /**
@@ -473,6 +479,9 @@ export function adminFormToCreatePayload(
     socials: data.socials,
     regulationUrl: data.regulationUrl?.trim() || undefined,
     scheduleText: data.scheduleText?.trim() || undefined,
+    organizerInfo: data.organizerInfo?.trim() || undefined,
+    organizerContactName: data.organizerContactName?.trim() || undefined,
+    organizerContactInfo: data.organizerContactInfo?.trim() || undefined,
   };
 }
 
@@ -532,6 +541,9 @@ export function eventToAdminFormDefaults(event: {
   socials?: { instagram?: string; facebook?: string; telegram?: string };
   regulationUrl?: string;
   scheduleText?: string;
+  organizerInfo?: string;
+  organizerContactName?: string;
+  organizerContactInfo?: string;
 }): AdminEventFormInput {
   const d = new Date(event.date);
   const tr = event.translations;
@@ -624,6 +636,9 @@ export function eventToAdminFormDefaults(event: {
     socials: event.socials ?? { instagram: "", facebook: "", telegram: "" },
     regulationUrl: event.regulationUrl ?? "",
     scheduleText: event.scheduleText ?? "",
+    organizerInfo: event.organizerInfo ?? "",
+    organizerContactName: event.organizerContactName ?? "",
+    organizerContactInfo: event.organizerContactInfo ?? "",
   };
 }
 
@@ -666,5 +681,8 @@ export function createEmptyAdminEventForm(): AdminEventFormInput {
     socials: { instagram: "", facebook: "", telegram: "" },
     regulationUrl: "",
     scheduleText: "",
+    organizerInfo: "",
+    organizerContactName: "",
+    organizerContactInfo: "",
   };
 }
