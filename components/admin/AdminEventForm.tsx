@@ -554,9 +554,6 @@ export function AdminEventForm({
 
               {/* Registration dates */}
               <ShellFormSection>
-                <h2 className="text-lg font-semibold">
-                  {t("sectionRegistrationDates")}
-                </h2>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <FormField
                     control={form.control}
@@ -627,9 +624,6 @@ export function AdminEventForm({
 
               {/* Organizer */}
               <ShellFormSection>
-                <h2 className="text-lg font-semibold">
-                  {t("sectionOrganizer")}
-                </h2>
                 <FormField
                   control={form.control}
                   name="organizerInfo"
