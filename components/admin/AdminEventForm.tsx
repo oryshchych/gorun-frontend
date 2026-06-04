@@ -3,11 +3,20 @@
 import { useFieldArray, useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { useMemo } from "react";
-import { Loader2, Plus, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { FileText, Image as ImageIcon, Loader2, Upload } from "lucide-react";
 import { useTranslations } from "next-intl";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -32,20 +41,30 @@ import type {
   AdminEventFormInput,
 } from "@/lib/validations/admin-event";
 import { adminEventFormResolverSchema } from "@/lib/validations/admin-event";
-import {
-  formatNumberFieldValue,
-  parseFloatFieldInput,
-  parseIntFieldInput,
-} from "@/lib/forms/number-field";
+import apiClient from "@/lib/api/client";
+import { EventPromoCodesTab } from "@/components/admin/EventPromoCodesTab";
 
 const EVENT_STATUS = ["UPCOMING", "LIVE", "FINISHED", "CANCELLED"] as const;
+
+interface CloudinarySignatureResponse {
+  timestamp: number;
+  signature: string;
+  cloudName: string;
+  apiKey: string;
+}
 
 interface AdminEventFormProps {
   defaultValues: AdminEventFormInput;
   onSubmit: (data: AdminEventFormData) => void | Promise<void>;
   isLoading?: boolean;
   submitLabel?: string;
+  eventId?: string;
 }
+
+type ConfirmDialogState =
+  | { type: "status"; pendingValue: string }
+  | { type: "isActive"; pendingValue: boolean }
+  | null;
 
 function formatDateForInput(date: Date) {
   const d = new Date(date);
@@ -57,14 +76,43 @@ function formatDateForInput(date: Date) {
   return `${y}-${m}-${day}T${h}:${min}`;
 }
 
+async function uploadToCloudinary(
+  file: File,
+  resourceType: "image" | "raw"
+): Promise<string> {
+  const { data } = await apiClient.get<CloudinarySignatureResponse>(
+    "/cloudinary/signature"
+  );
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("api_key", data.apiKey);
+  formData.append("timestamp", String(data.timestamp));
+  formData.append("signature", data.signature);
+  formData.append("folder", "events");
+
+  const uploadUrl = `https://api.cloudinary.com/v1_1/${data.cloudName}/${resourceType}/upload`;
+  const response = await axios.post<{ secure_url: string }>(
+    uploadUrl,
+    formData
+  );
+  return response.data.secure_url;
+}
+
 export function AdminEventForm({
   defaultValues,
   onSubmit,
   isLoading = false,
   submitLabel,
+  eventId,
 }: AdminEventFormProps) {
   const t = useTranslations("admin.eventForm");
   const tCommon = useTranslations("common");
+
+  const [activeTab, setActiveTab] = useState("description");
+  const [contentLang, setContentLang] = useState<"uk" | "en">("uk");
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>(null);
+  const [bannerUploading, setBannerUploading] = useState(false);
+  const [regulationUploading, setRegulationUploading] = useState(false);
 
   const mergedDefaults = useMemo(
     () => ({
@@ -106,81 +154,176 @@ export function AdminEventForm({
     });
   });
 
+  function handleStatusChange(value: string) {
+    setConfirmDialog({ type: "status", pendingValue: value });
+  }
+
+  function handleIsActiveChange(checked: boolean) {
+    setConfirmDialog({ type: "isActive", pendingValue: checked });
+  }
+
+  function handleConfirm() {
+    if (!confirmDialog) return;
+    if (confirmDialog.type === "status") {
+      form.setValue(
+        "status",
+        confirmDialog.pendingValue as AdminEventFormInput["status"]
+      );
+    } else {
+      form.setValue("isActive", confirmDialog.pendingValue);
+    }
+    setConfirmDialog(null);
+  }
+
+  async function handleBannerUpload(file: File) {
+    setBannerUploading(true);
+    try {
+      const url = await uploadToCloudinary(file, "image");
+      form.setValue("cover", url);
+    } finally {
+      setBannerUploading(false);
+    }
+  }
+
+  async function handleRegulationUpload(file: File) {
+    setRegulationUploading(true);
+    try {
+      const url = await uploadToCloudinary(file, "raw");
+      form.setValue("regulationUrl", url);
+    } finally {
+      setRegulationUploading(false);
+    }
+  }
+
+  const coverValue = form.watch("cover");
+  const regulationUrlValue = form.watch("regulationUrl");
+
+  const titleFieldName =
+    contentLang === "uk" ? "translations.title.uk" : "translations.title.en";
+  const locationFieldName =
+    contentLang === "uk"
+      ? "translations.location.uk"
+      : "translations.location.en";
+  const descriptionFieldName =
+    contentLang === "uk"
+      ? "translations.description.uk"
+      : "translations.description.en";
+
   return (
-    <Form {...form}>
-      <form onSubmit={handleSubmit} className="space-y-10">
-        <Tabs defaultValue="main" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="main">{t("tabMain")}</TabsTrigger>
-            <TabsTrigger value="english">{t("tabEnglish")}</TabsTrigger>
-          </TabsList>
+    <>
+      <Form {...form}>
+        <form onSubmit={handleSubmit} className="space-y-10">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="space-y-6"
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <TabsList>
+                <TabsTrigger value="description">
+                  {t("tabDescription")}
+                </TabsTrigger>
+                <TabsTrigger value="organizer">{t("tabOrganizer")}</TabsTrigger>
+                <TabsTrigger value="distances">{t("tabDistances")}</TabsTrigger>
+                <TabsTrigger value="payments">{t("tabPayments")}</TabsTrigger>
+                <TabsTrigger value="promoCodes">
+                  {t("tabPromoCodes")}
+                </TabsTrigger>
+              </TabsList>
 
-          <TabsContent value="main" className="space-y-10">
-            <ShellFormSection>
-              <h2 className="text-lg font-semibold">{t("sectionStatus")}</h2>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="isActive"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-md border p-3">
-                      <FormControl>
-                        <Checkbox
-                          checked={!!field.value}
-                          disabled={isLoading}
-                          onChange={() => field.onChange(!field.value)}
-                        />
-                      </FormControl>
-                      <div>
-                        <FormLabel className="mt-0 cursor-pointer font-normal">
-                          {t("isActiveLabel")}
-                        </FormLabel>
-                        <p className="text-xs text-muted-foreground">
-                          {t("isActiveHint")}
-                        </p>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("statusLabel")}</FormLabel>
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        disabled={isLoading}
-                      >
+              {activeTab === "description" && (
+                <div className="flex gap-1 rounded-md border border-line p-1">
+                  <button
+                    type="button"
+                    onClick={() => setContentLang("uk")}
+                    className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
+                      contentLang === "uk"
+                        ? "bg-brand text-on-brand"
+                        : "text-ink-2 hover:text-ink"
+                    }`}
+                  >
+                    {t("btnUkrainian")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setContentLang("en")}
+                    className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
+                      contentLang === "en"
+                        ? "bg-brand text-on-brand"
+                        : "text-ink-2 hover:text-ink"
+                    }`}
+                  >
+                    {t("btnEnglish")}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* ── Tab 1: Event description ── */}
+            <TabsContent value="description" className="space-y-10">
+              {/* Status & visibility */}
+              <ShellFormSection>
+                <h2 className="text-lg font-semibold">{t("sectionStatus")}</h2>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="isActive"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-md border border-line p-3">
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={t("statusLabel")} />
-                          </SelectTrigger>
+                          <Checkbox
+                            checked={!!field.value}
+                            disabled={isLoading}
+                            onChange={() => handleIsActiveChange(!field.value)}
+                          />
                         </FormControl>
-                        <SelectContent>
-                          {EVENT_STATUS.map((v) => (
-                            <SelectItem key={v} value={v}>
-                              {t(`status.${v}`)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </ShellFormSection>
+                        <div>
+                          <FormLabel className="mt-0 cursor-pointer font-normal">
+                            {t("isActiveLabel")}
+                          </FormLabel>
+                          <p className="text-xs text-ink-3">
+                            {t("isActiveHint")}
+                          </p>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("statusLabel")}</FormLabel>
+                        <Select
+                          value={field.value}
+                          onValueChange={handleStatusChange}
+                          disabled={isLoading}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder={t("statusLabel")} />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {EVENT_STATUS.map((v) => (
+                              <SelectItem key={v} value={v}>
+                                {t(`status.${v}`)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </ShellFormSection>
 
-            <ShellFormSection>
-              <h2 className="text-lg font-semibold">
-                {t("sectionUkrainianContent")}
-              </h2>
-              <div className="grid gap-4 md:grid-cols-2">
+              {/* Event name — full width */}
+              <ShellFormSection>
                 <FormField
                   control={form.control}
-                  name="translations.title.uk"
+                  name={titleFieldName}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("title")}</FormLabel>
@@ -191,461 +334,31 @@ export function AdminEventForm({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="translations.location.uk"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("location")}</FormLabel>
-                      <FormControl>
-                        <Input {...field} disabled={isLoading} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="translations.date.uk"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("dateDisplayLabel")}</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          disabled={isLoading}
-                          placeholder={t("dateDisplayPlaceholder")}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="translations.description.uk"
-                  render={({ field }) => (
-                    <FormItem className="md:col-span-2">
-                      <FormLabel>{t("description")}</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} disabled={isLoading} rows={5} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </ShellFormSection>
 
-            <ShellFormSection>
-              <h2 className="text-lg font-semibold">{t("sectionCore")}</h2>
-              <div className="grid gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="slug"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("slug")}</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          disabled={isLoading}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="shortDesc"
-                  render={({ field }) => (
-                    <FormItem className="md:col-span-2">
-                      <FormLabel>{t("shortDesc")}</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          disabled={isLoading}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="venue"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("venue")}</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          disabled={isLoading}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="city"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("city")}</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          disabled={isLoading}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <FormField
-                control={form.control}
-                name="date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("dateTime")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="datetime-local"
-                        disabled={isLoading}
-                        value={
-                          field.value instanceof Date
-                            ? formatDateForInput(field.value)
-                            : field.value
-                              ? formatDateForInput(new Date(field.value))
-                              : ""
-                        }
-                        onChange={(e) =>
-                          field.onChange(new Date(e.target.value))
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="grid gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="capacity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("capacity")}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={1}
-                          disabled={isLoading}
-                          value={formatNumberFieldValue(field.value)}
-                          onChange={(e) =>
-                            field.onChange(parseIntFieldInput(e.target.value))
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="basePrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("basePrice")}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={0}
-                          step="0.01"
-                          disabled={isLoading}
-                          value={formatNumberFieldValue(field.value)}
-                          onChange={(e) =>
-                            field.onChange(parseFloatFieldInput(e.target.value))
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="fee"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("fee")}</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ""}
-                          disabled={isLoading}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </ShellFormSection>
-
-            <ShellFormSection>
-              <h2 className="text-lg font-semibold">{t("sectionMedia")}</h2>
-              <FormField
-                control={form.control}
-                name="imageUrl.portrait"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("imagePortrait")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="url"
-                        {...field}
-                        value={field.value ?? ""}
-                        disabled={isLoading}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="imageUrl.landscape"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("imageLandscape")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="url"
-                        {...field}
-                        value={field.value ?? ""}
-                        disabled={isLoading}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="cover"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("cover")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="url"
-                        {...field}
-                        value={field.value ?? ""}
-                        disabled={isLoading}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </ShellFormSection>
-
-            <ShellFormSection>
-              <h2 className="text-lg font-semibold">{t("sectionSpots")}</h2>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="spots.taken"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("spotsTaken")}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={0}
-                          disabled={isLoading}
-                          value={formatNumberFieldValue(field.value)}
-                          onChange={(e) =>
-                            field.onChange(parseIntFieldInput(e.target.value))
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="spots.total"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("spotsTotal")}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={1}
-                          disabled={isLoading}
-                          value={formatNumberFieldValue(field.value)}
-                          onChange={(e) =>
-                            field.onChange(parseIntFieldInput(e.target.value))
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </ShellFormSection>
-
-            <ShellFormSection>
-              <div className="flex items-center justify-between gap-2">
-                <h2 className="text-lg font-semibold">{t("sectionGallery")}</h2>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => ga.append({ url: "" })}
-                  disabled={isLoading}
-                >
-                  <Plus className="mr-1 size-4" />
-                  {t("addRow")}
-                </Button>
-              </div>
-              <div className="space-y-2">
-                {ga.fields.map((f, i) => (
-                  <div key={f.id} className="flex gap-2">
-                    <FormField
-                      control={form.control}
-                      name={`gallery.${i}.url`}
-                      render={({ field }) => (
-                        <FormItem className="flex-1">
-                          <FormControl>
-                            <Input type="url" {...field} disabled={isLoading} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => ga.remove(i)}
-                      disabled={isLoading}
-                      aria-label={t("removeRow")}
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </ShellFormSection>
-
-            <ShellFormSection>
-              <div className="flex items-center justify-between gap-2">
-                <h2 className="text-lg font-semibold">{t("sectionPerks")}</h2>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => pa.append({ line: "" })}
-                  disabled={isLoading}
-                >
-                  <Plus className="mr-1 size-4" />
-                  {t("addRow")}
-                </Button>
-              </div>
-              {pa.fields.map((f, i) => (
-                <div key={f.id} className="flex gap-2">
+                {/* Date + Location side by side */}
+                <div className="grid gap-4 sm:grid-cols-2">
                   <FormField
                     control={form.control}
-                    name={`perks.${i}.line`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormControl>
-                          <Input {...field} disabled={isLoading} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => pa.remove(i)}
-                    disabled={isLoading}
-                    aria-label={t("removeRow")}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                </div>
-              ))}
-            </ShellFormSection>
-
-            <ShellFormSection>
-              <FormField
-                control={form.control}
-                name="afu"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("afu")}</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        value={field.value ?? ""}
-                        disabled={isLoading}
-                        rows={3}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </ShellFormSection>
-
-            <ShellFormSection>
-              <div className="flex items-center justify-between gap-2">
-                <h2 className="text-lg font-semibold">
-                  {t("sectionSchedule")}
-                </h2>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => sa.append({ time: "", what: "" })}
-                  disabled={isLoading}
-                >
-                  <Plus className="mr-1 size-4" />
-                  {t("addRow")}
-                </Button>
-              </div>
-              {sa.fields.map((f, i) => (
-                <div
-                  key={f.id}
-                  className="grid gap-2 sm:grid-cols-[1fr_2fr_auto] sm:items-end"
-                >
-                  <FormField
-                    control={form.control}
-                    name={`schedule.${i}.time`}
+                    name="date"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="sm:sr-only">
-                          {t("scheduleTime")}
-                        </FormLabel>
+                        <FormLabel>{t("startDate")}</FormLabel>
                         <FormControl>
                           <Input
-                            {...field}
-                            placeholder="07:00"
+                            type="datetime-local"
                             disabled={isLoading}
+                            value={
+                              field.value instanceof Date
+                                ? formatDateForInput(field.value)
+                                : field.value
+                                  ? formatDateForInput(
+                                      new Date(field.value as string)
+                                    )
+                                  : ""
+                            }
+                            onChange={(e) =>
+                              field.onChange(new Date(e.target.value))
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -654,12 +367,10 @@ export function AdminEventForm({
                   />
                   <FormField
                     control={form.control}
-                    name={`schedule.${i}.what`}
+                    name={locationFieldName}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="sm:sr-only">
-                          {t("scheduleWhat")}
-                        </FormLabel>
+                        <FormLabel>{t("startLocation")}</FormLabel>
                         <FormControl>
                           <Input {...field} disabled={isLoading} />
                         </FormControl>
@@ -667,507 +378,14 @@ export function AdminEventForm({
                       </FormItem>
                     )}
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="justify-self-end"
-                    onClick={() => sa.remove(i)}
-                    disabled={isLoading}
-                    aria-label={t("removeRow")}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
                 </div>
-              ))}
-            </ShellFormSection>
 
-            <ShellFormSection>
-              <div className="flex items-center justify-between gap-2">
-                <h2 className="text-lg font-semibold">
-                  {t("sectionDistances")}
-                </h2>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    da.append({
-                      id: crypto.randomUUID(),
-                      label: "",
-                      name: "",
-                      km: undefined as unknown as number,
-                      elevation: "",
-                      laps: "",
-                      spots: {
-                        taken: undefined as unknown as number,
-                        total: undefined as unknown as number,
-                      },
-                    })
-                  }
-                  disabled={isLoading}
-                >
-                  <Plus className="mr-1 size-4" />
-                  {t("addDistance")}
-                </Button>
-              </div>
-              {da.fields.map((f, i) => (
-                <div key={f.id} className="space-y-3 rounded-md border p-3">
-                  <input
-                    type="hidden"
-                    {...form.register(`distances.${i}.id`)}
-                  />
-                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    <FormField
-                      control={form.control}
-                      name={`distances.${i}.label`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("distanceLabel")}</FormLabel>
-                          <FormControl>
-                            <Input {...field} disabled={isLoading} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`distances.${i}.name`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("distanceName")}</FormLabel>
-                          <FormControl>
-                            <Input {...field} disabled={isLoading} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`distances.${i}.km`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("distanceKm")}</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min={0}
-                              step="0.1"
-                              disabled={isLoading}
-                              value={formatNumberFieldValue(field.value)}
-                              onChange={(e) =>
-                                field.onChange(
-                                  parseFloatFieldInput(e.target.value)
-                                )
-                              }
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`distances.${i}.feeUah`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("distanceFee")}</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min={0}
-                              disabled={isLoading}
-                              value={formatNumberFieldValue(field.value)}
-                              onChange={(e) =>
-                                field.onChange(
-                                  parseFloatFieldInput(e.target.value)
-                                )
-                              }
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <FormField
-                      control={form.control}
-                      name={`distances.${i}.elevation`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("distanceElevation")}</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              value={field.value ?? ""}
-                              disabled={isLoading}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`distances.${i}.laps`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("distanceLaps")}</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              value={field.value ?? ""}
-                              disabled={isLoading}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <FormField
-                      control={form.control}
-                      name={`distances.${i}.spots.taken`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("spotsTaken")}</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min={0}
-                              disabled={isLoading}
-                              value={formatNumberFieldValue(field.value)}
-                              onChange={(e) =>
-                                field.onChange(
-                                  parseIntFieldInput(e.target.value)
-                                )
-                              }
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`distances.${i}.spots.total`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("spotsTotal")}</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min={1}
-                              disabled={isLoading}
-                              value={formatNumberFieldValue(field.value)}
-                              onChange={(e) =>
-                                field.onChange(
-                                  parseIntFieldInput(e.target.value)
-                                )
-                              }
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => da.remove(i)}
-                    disabled={isLoading}
-                  >
-                    <Trash2 className="mr-1 size-4" />
-                    {t("removeDistance")}
-                  </Button>
-                </div>
-              ))}
-            </ShellFormSection>
-
-            <ShellFormSection>
-              <div className="flex items-center justify-between gap-2">
-                <h2 className="text-lg font-semibold">{t("sectionKids")}</h2>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    ka.append({
-                      id: crypto.randomUUID(),
-                      label: "",
-                      name: "",
-                      age: "",
-                    })
-                  }
-                  disabled={isLoading}
-                >
-                  <Plus className="mr-1 size-4" />
-                  {t("addKids")}
-                </Button>
-              </div>
-              {ka.fields.map((f, i) => (
-                <div key={f.id} className="space-y-3 rounded-md border p-3">
-                  <input
-                    type="hidden"
-                    {...form.register(`kidsDistances.${i}.id`)}
-                  />
-                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    <FormField
-                      control={form.control}
-                      name={`kidsDistances.${i}.label`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("kidsLabel")}</FormLabel>
-                          <FormControl>
-                            <Input {...field} disabled={isLoading} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`kidsDistances.${i}.name`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("kidsName")}</FormLabel>
-                          <FormControl>
-                            <Input {...field} disabled={isLoading} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`kidsDistances.${i}.age`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("kidsAge")}</FormLabel>
-                          <FormControl>
-                            <Input {...field} disabled={isLoading} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`kidsDistances.${i}.feeUah`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("kidsFee")}</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min={0}
-                              disabled={isLoading}
-                              value={formatNumberFieldValue(field.value)}
-                              onChange={(e) =>
-                                field.onChange(
-                                  parseFloatFieldInput(e.target.value)
-                                )
-                              }
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => ka.remove(i)}
-                    disabled={isLoading}
-                  >
-                    <Trash2 className="mr-1 size-4" />
-                    {t("removeKids")}
-                  </Button>
-                </div>
-              ))}
-            </ShellFormSection>
-
-            <ShellFormSection>
-              <div className="flex items-center justify-between gap-2">
-                <h2 className="text-lg font-semibold">
-                  {t("sectionSpeakers")}
-                </h2>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    spa.append({
-                      fullnameEn: "",
-                      fullnameUk: "",
-                      shortDescriptionEn: "",
-                      shortDescriptionUk: "",
-                      descriptionEn: "",
-                      descriptionUk: "",
-                      image: "",
-                      instagramLink: "",
-                    })
-                  }
-                  disabled={isLoading}
-                >
-                  <Plus className="mr-1 size-4" />
-                  {t("addSpeaker")}
-                </Button>
-              </div>
-              {spa.fields.map((f, i) => (
-                <div key={f.id} className="space-y-3 rounded-md border p-3">
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <FormField
-                      control={form.control}
-                      name={`speakers.${i}.fullnameUk`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("speakerNameUk")}</FormLabel>
-                          <FormControl>
-                            <Input {...field} disabled={isLoading} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`speakers.${i}.shortDescriptionUk`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("speakerShortUk")}</FormLabel>
-                          <FormControl>
-                            <Input {...field} disabled={isLoading} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid gap-3">
-                    <FormField
-                      control={form.control}
-                      name={`speakers.${i}.descriptionUk`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("speakerDescUk")}</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              {...field}
-                              disabled={isLoading}
-                              rows={3}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <FormField
-                      control={form.control}
-                      name={`speakers.${i}.image`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("speakerImage")}</FormLabel>
-                          <FormControl>
-                            <Input type="url" {...field} disabled={isLoading} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`speakers.${i}.instagramLink`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("speakerInstagram")}</FormLabel>
-                          <FormControl>
-                            <Input {...field} disabled={isLoading} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => spa.remove(i)}
-                    disabled={isLoading}
-                  >
-                    <Trash2 className="mr-1 size-4" />
-                    {t("removeSpeaker")}
-                  </Button>
-                </div>
-              ))}
-            </ShellFormSection>
-          </TabsContent>
-
-          <TabsContent value="english" className="space-y-4">
-            <ShellFormSection>
-              <h2 className="text-lg font-semibold">
-                {t("sectionEnglishTranslations")}
-              </h2>
-              <div className="grid gap-4 md:grid-cols-2">
+                {/* Description — full width */}
                 <FormField
                   control={form.control}
-                  name="translations.title.en"
+                  name={descriptionFieldName}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("title")}</FormLabel>
-                      <FormControl>
-                        <Input {...field} disabled={isLoading} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="translations.location.en"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("location")}</FormLabel>
-                      <FormControl>
-                        <Input {...field} disabled={isLoading} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="translations.date.en"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("dateDisplayLabel")}</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          disabled={isLoading}
-                          placeholder={t("dateDisplayPlaceholder")}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="translations.description.en"
-                  render={({ field }) => (
-                    <FormItem className="md:col-span-2">
                       <FormLabel>{t("description")}</FormLabel>
                       <FormControl>
                         <Textarea {...field} disabled={isLoading} rows={5} />
@@ -1176,69 +394,421 @@ export function AdminEventForm({
                     </FormItem>
                   )}
                 />
-              </div>
-            </ShellFormSection>
+              </ShellFormSection>
 
-            <ShellFormSection>
-              <h2 className="text-lg font-semibold">
-                {t("sectionEnglishSpeakers")}
-              </h2>
-              {spa.fields.map((f, i) => (
-                <div key={f.id} className="space-y-3 rounded-md border p-3">
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <FormField
-                      control={form.control}
-                      name={`speakers.${i}.fullnameEn`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("speakerNameEn")}</FormLabel>
-                          <FormControl>
-                            <Input {...field} disabled={isLoading} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`speakers.${i}.shortDescriptionEn`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t("speakerShortEn")}</FormLabel>
-                          <FormControl>
-                            <Input {...field} disabled={isLoading} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+              {/* Banner upload */}
+              <ShellFormSection>
+                <FormField
+                  control={form.control}
+                  name="cover"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("eventBanner")}</FormLabel>
+                      <FormControl>
+                        <div className="space-y-2">
+                          {coverValue ? (
+                            <div className="flex items-center gap-3 rounded-md border border-line bg-surface-2 p-3">
+                              <ImageIcon className="size-5 shrink-0 text-ink-3" />
+                              <span className="flex-1 truncate text-sm text-ink-2">
+                                {coverValue}
+                              </span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => field.onChange("")}
+                                disabled={isLoading}
+                              >
+                                {t("removeFile")}
+                              </Button>
+                            </div>
+                          ) : (
+                            <label
+                              className={`flex cursor-pointer flex-col items-center gap-2 rounded-md border border-dashed border-line bg-surface-2 p-6 transition-colors hover:bg-surface ${
+                                bannerUploading
+                                  ? "pointer-events-none opacity-60"
+                                  : ""
+                              }`}
+                            >
+                              {bannerUploading ? (
+                                <Loader2 className="size-6 animate-spin text-ink-3" />
+                              ) : (
+                                <Upload className="size-6 text-ink-3" />
+                              )}
+                              <span className="text-sm text-ink-2">
+                                {bannerUploading
+                                  ? t("uploadingFile")
+                                  : t("uploadBanner")}
+                              </span>
+                              <input
+                                type="file"
+                                accept="image/jpeg,image/png"
+                                className="sr-only"
+                                disabled={bannerUploading || isLoading}
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    void handleBannerUpload(file);
+                                  }
+                                }}
+                              />
+                            </label>
+                          )}
+                          <p className="text-xs text-ink-3">
+                            {t("bannerHint")}
+                          </p>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </ShellFormSection>
+
+              {/* Schedule textarea */}
+              <ShellFormSection>
+                <FormField
+                  control={form.control}
+                  name="scheduleText"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("scheduleText")}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          value={field.value ?? ""}
+                          disabled={isLoading}
+                          rows={5}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </ShellFormSection>
+
+              {/* Regulation PDF upload */}
+              <ShellFormSection>
+                <FormField
+                  control={form.control}
+                  name="regulationUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("regulation")}</FormLabel>
+                      <FormControl>
+                        <div className="space-y-2">
+                          {regulationUrlValue ? (
+                            <div className="flex items-center gap-3 rounded-md border border-line bg-surface-2 p-3">
+                              <FileText className="size-5 shrink-0 text-ink-3" />
+                              <span className="flex-1 truncate text-sm text-ink-2">
+                                {regulationUrlValue}
+                              </span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => field.onChange("")}
+                                disabled={isLoading}
+                              >
+                                {t("removeFile")}
+                              </Button>
+                            </div>
+                          ) : (
+                            <label
+                              className={`flex cursor-pointer flex-col items-center gap-2 rounded-md border border-dashed border-line bg-surface-2 p-6 transition-colors hover:bg-surface ${
+                                regulationUploading
+                                  ? "pointer-events-none opacity-60"
+                                  : ""
+                              }`}
+                            >
+                              {regulationUploading ? (
+                                <Loader2 className="size-6 animate-spin text-ink-3" />
+                              ) : (
+                                <Upload className="size-6 text-ink-3" />
+                              )}
+                              <span className="text-sm text-ink-2">
+                                {regulationUploading
+                                  ? t("uploadingFile")
+                                  : t("uploadRegulation")}
+                              </span>
+                              <input
+                                type="file"
+                                accept="application/pdf"
+                                className="sr-only"
+                                disabled={regulationUploading || isLoading}
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    void handleRegulationUpload(file);
+                                  }
+                                }}
+                              />
+                            </label>
+                          )}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </ShellFormSection>
+
+              {/* Registration dates */}
+              <ShellFormSection>
+                <h2 className="text-lg font-semibold">
+                  {t("sectionRegistrationDates")}
+                </h2>
+                <div className="grid gap-4 sm:grid-cols-2">
                   <FormField
                     control={form.control}
-                    name={`speakers.${i}.descriptionEn`}
+                    name="registrationStart"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t("speakerDescEn")}</FormLabel>
+                        <FormLabel>{t("registrationStart")}</FormLabel>
                         <FormControl>
-                          <Textarea {...field} disabled={isLoading} rows={3} />
+                          <Input
+                            type="datetime-local"
+                            disabled={isLoading}
+                            value={
+                              field.value instanceof Date
+                                ? formatDateForInput(field.value)
+                                : field.value
+                                  ? formatDateForInput(
+                                      new Date(field.value as string)
+                                    )
+                                  : ""
+                            }
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value
+                                  ? new Date(e.target.value)
+                                  : undefined
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="registrationEnd"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("registrationEnd")}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="datetime-local"
+                            disabled={isLoading}
+                            value={
+                              field.value instanceof Date
+                                ? formatDateForInput(field.value)
+                                : field.value
+                                  ? formatDateForInput(
+                                      new Date(field.value as string)
+                                    )
+                                  : ""
+                            }
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value
+                                  ? new Date(e.target.value)
+                                  : undefined
+                              )
+                            }
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-              ))}
-            </ShellFormSection>
-          </TabsContent>
-        </Tabs>
+              </ShellFormSection>
 
-        <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
-          {isLoading && (
-            <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
-          )}
-          {submitLabel ?? tCommon("submit")}
-        </Button>
-      </form>
-    </Form>
+              {/* Social links */}
+              <ShellFormSection>
+                <h2 className="text-lg font-semibold">{t("sectionSocials")}</h2>
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <FormField
+                    control={form.control}
+                    name="socials.instagram"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("instagram")}</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value ?? ""}
+                            disabled={isLoading}
+                            placeholder="https://instagram.com/…"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="socials.facebook"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("facebook")}</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value ?? ""}
+                            disabled={isLoading}
+                            placeholder="https://facebook.com/…"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="socials.telegram"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("telegram")}</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value ?? ""}
+                            disabled={isLoading}
+                            placeholder="https://t.me/…"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </ShellFormSection>
+            </TabsContent>
+
+            {/* ── Tabs 2–5: empty placeholders ── */}
+            <TabsContent value="organizer" className="space-y-4">
+              <ShellFormSection>
+                <p className="text-sm text-ink-3">{t("tabOrganizer")}</p>
+              </ShellFormSection>
+            </TabsContent>
+            <TabsContent value="distances" className="space-y-4">
+              <ShellFormSection>
+                <p className="text-sm text-ink-3">{t("tabDistances")}</p>
+              </ShellFormSection>
+            </TabsContent>
+            <TabsContent value="payments" className="space-y-4">
+              <ShellFormSection>
+                <p className="text-sm text-ink-3">{t("tabPayments")}</p>
+              </ShellFormSection>
+            </TabsContent>
+            <TabsContent value="promoCodes" className="space-y-4">
+              {eventId ? (
+                <EventPromoCodesTab eventId={eventId} />
+              ) : (
+                <ShellFormSection>
+                  <p className="text-sm text-ink-3">{t("promoCodesUnsaved")}</p>
+                </ShellFormSection>
+              )}
+            </TabsContent>
+          </Tabs>
+
+          {/* Hidden field arrays kept in form state for future tabs */}
+          <div className="hidden">
+            {ga.fields.map((f, i) => (
+              <input
+                key={f.id}
+                type="hidden"
+                {...form.register(`gallery.${i}.url`)}
+              />
+            ))}
+            {pa.fields.map((f, i) => (
+              <input
+                key={f.id}
+                type="hidden"
+                {...form.register(`perks.${i}.line`)}
+              />
+            ))}
+            {sa.fields.map((f, i) => (
+              <input
+                key={f.id}
+                type="hidden"
+                {...form.register(`schedule.${i}.time`)}
+              />
+            ))}
+            {da.fields.map((f, i) => (
+              <input
+                key={f.id}
+                type="hidden"
+                {...form.register(`distances.${i}.id`)}
+              />
+            ))}
+            {ka.fields.map((f, i) => (
+              <input
+                key={f.id}
+                type="hidden"
+                {...form.register(`kidsDistances.${i}.id`)}
+              />
+            ))}
+            {spa.fields.map((f, i) => (
+              <input
+                key={f.id}
+                type="hidden"
+                {...form.register(`speakers.${i}.fullnameUk`)}
+              />
+            ))}
+          </div>
+
+          <Button
+            type="submit"
+            variant="brand"
+            disabled={isLoading || bannerUploading || regulationUploading}
+            className="w-full sm:w-auto"
+          >
+            {isLoading && (
+              <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
+            )}
+            {submitLabel ?? tCommon("submit")}
+          </Button>
+        </form>
+      </Form>
+
+      {/* Confirmation dialog for status / isActive changes */}
+      <Dialog
+        open={confirmDialog !== null}
+        onOpenChange={(open) => {
+          if (!open) setConfirmDialog(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {confirmDialog?.type === "status"
+                ? t("confirmStatusTitle")
+                : t("confirmIsActiveTitle")}
+            </DialogTitle>
+            <DialogDescription>
+              {confirmDialog?.type === "status"
+                ? t("confirmStatusDesc")
+                : t("confirmIsActiveDesc")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setConfirmDialog(null)}
+            >
+              {t("confirmCancel")}
+            </Button>
+            <Button type="button" variant="brand" onClick={handleConfirm}>
+              {t("confirmProceed")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

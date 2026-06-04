@@ -210,6 +210,29 @@ export const adminEventFormSchema = z.object({
   speakers: z.array(speakerRowSchema).optional(),
   status: z.enum(statusValues),
   isActive: z.boolean(),
+  registrationStart: z
+    .union([z.string(), z.date()])
+    .transform((val) => (val ? new Date(val) : undefined))
+    .refine((d) => d === undefined || !Number.isNaN(d.getTime()), {
+      message: "Invalid date",
+    })
+    .optional(),
+  registrationEnd: z
+    .union([z.string(), z.date()])
+    .transform((val) => (val ? new Date(val) : undefined))
+    .refine((d) => d === undefined || !Number.isNaN(d.getTime()), {
+      message: "Invalid date",
+    })
+    .optional(),
+  socials: z
+    .object({
+      instagram: z.string().optional(),
+      facebook: z.string().optional(),
+      telegram: z.string().optional(),
+    })
+    .optional(),
+  regulationUrl: optionalUrl.optional(),
+  scheduleText: z.string().max(5000).optional(),
 });
 
 export type AdminEventFormData = z.output<typeof adminEventFormSchema>;
@@ -267,6 +290,11 @@ export type AdminEventFormInput = {
   }>;
   status: EventStatus;
   isActive: boolean;
+  registrationStart?: Date | string;
+  registrationEnd?: Date | string;
+  socials?: { instagram?: string; facebook?: string; telegram?: string };
+  regulationUrl?: string;
+  scheduleText?: string;
 };
 
 /**
@@ -277,9 +305,7 @@ export function sanitizeAdminFormBeforeParse(
 ): AdminEventFormInput {
   return {
     ...data,
-    distances: data.distances?.filter(
-      (d) => d.label?.trim() && d.name?.trim()
-    ),
+    distances: data.distances?.filter((d) => d.label?.trim() && d.name?.trim()),
     kidsDistances: data.kidsDistances?.filter(
       (k) => k.label?.trim() && k.name?.trim() && k.age?.trim()
     ),
@@ -442,6 +468,11 @@ export function adminFormToCreatePayload(
     status: data.status,
     isActive: data.isActive,
     lifecyclePhase: lifecyclePhaseFromStatus(data.status),
+    registrationStart: data.registrationStart,
+    registrationEnd: data.registrationEnd,
+    socials: data.socials,
+    regulationUrl: data.regulationUrl?.trim() || undefined,
+    scheduleText: data.scheduleText?.trim() || undefined,
   };
 }
 
@@ -496,6 +527,11 @@ export function eventToAdminFormDefaults(event: {
   status?: EventStatus;
   isActive?: boolean;
   lifecyclePhase?: EventLifecyclePhase;
+  registrationStart?: Date | string;
+  registrationEnd?: Date | string;
+  socials?: { instagram?: string; facebook?: string; telegram?: string };
+  regulationUrl?: string;
+  scheduleText?: string;
 }): AdminEventFormInput {
   const d = new Date(event.date);
   const tr = event.translations;
@@ -521,7 +557,9 @@ export function eventToAdminFormDefaults(event: {
     })) ?? [];
 
   const resolvedStatus =
-    event.status ?? statusFromLifecyclePhase(event.lifecyclePhase) ?? "UPCOMING";
+    event.status ??
+    statusFromLifecyclePhase(event.lifecyclePhase) ??
+    "UPCOMING";
 
   return {
     translations: {
@@ -557,7 +595,9 @@ export function eventToAdminFormDefaults(event: {
     cover: event.cover ?? "",
     spots: event.spots,
     gallery: event.gallery?.length
-      ? event.gallery.map((url) => ({ url: typeof url === "string" ? url : "" }))
+      ? event.gallery.map((url) => ({
+          url: typeof url === "string" ? url : "",
+        }))
       : [],
     perks: event.perks?.length
       ? event.perks.map((line) => ({
@@ -575,6 +615,15 @@ export function eventToAdminFormDefaults(event: {
     speakers,
     status: resolvedStatus,
     isActive: event.isActive ?? true,
+    registrationStart: event.registrationStart
+      ? new Date(event.registrationStart)
+      : undefined,
+    registrationEnd: event.registrationEnd
+      ? new Date(event.registrationEnd)
+      : undefined,
+    socials: event.socials ?? { instagram: "", facebook: "", telegram: "" },
+    regulationUrl: event.regulationUrl ?? "",
+    scheduleText: event.scheduleText ?? "",
   };
 }
 
@@ -612,5 +661,10 @@ export function createEmptyAdminEventForm(): AdminEventFormInput {
     speakers: [],
     status: "UPCOMING",
     isActive: true,
+    registrationStart: undefined,
+    registrationEnd: undefined,
+    socials: { instagram: "", facebook: "", telegram: "" },
+    regulationUrl: "",
+    scheduleText: "",
   };
 }

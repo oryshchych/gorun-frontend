@@ -105,11 +105,15 @@ export function PromoCodeForm({
   promoId,
   initial,
   isLoadingInitial,
+  fixedEventId,
+  onSuccess,
 }: {
   mode: "create" | "edit";
   promoId?: string;
   initial?: AdminPromoCode | null;
   isLoadingInitial?: boolean;
+  fixedEventId?: string;
+  onSuccess?: () => void;
 }) {
   const t = useTranslations("admin.promoCodes");
   const tCommon = useTranslations("common");
@@ -125,18 +129,24 @@ export function PromoCodeForm({
 
   const form = useForm<AdminPromoCodeFormValues>({
     resolver: zodResolver(schema),
-    defaultValues: DEFAULTS,
+    defaultValues: fixedEventId
+      ? { ...DEFAULTS, eventId: fixedEventId }
+      : DEFAULTS,
   });
 
   useEffect(() => {
     if (mode === "edit" && initial) {
-      form.reset(promoToFormDefaults(initial));
+      const defaults = promoToFormDefaults(initial);
+      form.reset(
+        fixedEventId ? { ...defaults, eventId: fixedEventId } : defaults
+      );
     }
-  }, [form, initial, mode]);
+  }, [form, initial, mode, fixedEventId]);
 
   const { data: eventsResult, isLoading: eventsLoading } = useQuery({
     queryKey: ["admin", "promo-form-events", locale],
     queryFn: () => getEvents({ limit: 100, lang: locale }),
+    enabled: !fixedEventId,
   });
 
   const events = eventsResult?.data ?? [];
@@ -161,7 +171,11 @@ export function PromoCodeForm({
         });
       }
       toast.success(t("saved"));
-      router.push(`/${locale}/admin/promo-codes`);
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push(`/${locale}/admin/promo-codes`);
+      }
     } catch {
       /* error handled by mutation's onError */
     }
@@ -251,34 +265,36 @@ export function PromoCodeForm({
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="eventId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("eventLabel")}</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  disabled={submitting || eventsLoading}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("selectEvent")} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {events.map((ev) => (
-                      <SelectItem key={ev.id} value={ev.id}>
-                        {eventDisplayName(ev, locale)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {!fixedEventId && (
+            <FormField
+              control={form.control}
+              name="eventId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("eventLabel")}</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={submitting || eventsLoading}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("selectEvent")} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {events.map((ev) => (
+                        <SelectItem key={ev.id} value={ev.id}>
+                          {eventDisplayName(ev, locale)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <FormField
             control={form.control}
@@ -358,7 +374,10 @@ export function PromoCodeForm({
           />
 
           <div className="flex gap-3">
-            <Button type="submit" disabled={submitting || eventsLoading}>
+            <Button
+              type="submit"
+              disabled={submitting || (!fixedEventId && eventsLoading)}
+            >
               {submitting && (
                 <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
               )}

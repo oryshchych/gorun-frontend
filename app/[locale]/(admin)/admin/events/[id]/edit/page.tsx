@@ -82,6 +82,7 @@ export default function AdminEditEventPage({ params }: Props) {
           onSubmit={handleSubmit}
           isLoading={updateEvent.isPending}
           submitLabel={tCommon("save")}
+          eventId={id}
         />
       </div>
     </>

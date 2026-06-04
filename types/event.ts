@@ -5,11 +5,7 @@ export type SupportedLocale = "en" | "uk";
 export type EventStatus = "UPCOMING" | "LIVE" | "FINISHED" | "CANCELLED";
 
 /** Admin API lifecycle bucket; the admin UI derives this from `status` on save. */
-export type EventLifecyclePhase =
-  | "PLANNED"
-  | "FUTURE"
-  | "CURRENT"
-  | "FINISHED";
+export type EventLifecyclePhase = "PLANNED" | "FUTURE" | "CURRENT" | "FINISHED";
 
 export interface TranslationField {
   en?: string;
@@ -73,13 +69,13 @@ export interface SpotsInfo {
 export interface Distance {
   id: string;
   label: string; // "21K"
-  name: string;  // "Half Marathon"
+  name: string; // "Half Marathon"
   km: number;
   feeUah?: number;
   /** @deprecated use feeUah */
   fee?: number;
   elevation?: string; // "+520m" — trail events
-  laps?: string;      // "7.5 laps" — track events
+  laps?: string; // "7.5 laps" — track events
   spots: SpotsInfo;
 }
 
@@ -87,8 +83,8 @@ export interface Distance {
 export interface KidsDistance {
   id: string;
   label: string; // "100m"
-  name: string;  // "Tiny Sprint"
-  age: string;   // "3–5"
+  name: string; // "Tiny Sprint"
+  age: string; // "3–5"
   feeUah?: number;
   /** @deprecated use feeUah */
   fee?: number;
@@ -158,6 +154,11 @@ export interface Event {
   /** When false, event should be hidden from public listings */
   isActive?: boolean;
   lifecyclePhase?: EventLifecyclePhase;
+  registrationStart?: Date;
+  registrationEnd?: Date;
+  socials?: { instagram?: string; facebook?: string; telegram?: string };
+  regulationUrl?: string;
+  scheduleText?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -195,6 +196,11 @@ interface BaseEventPayload {
   status?: EventStatus;
   isActive?: boolean;
   lifecyclePhase?: EventLifecyclePhase;
+  registrationStart?: Date;
+  registrationEnd?: Date;
+  socials?: { instagram?: string; facebook?: string; telegram?: string };
+  regulationUrl?: string;
+  scheduleText?: string;
 }
 
 export interface CreateEventRequest extends BaseEventPayload {}
@@ -216,4 +222,3 @@ export interface PastEvent {
   result?: string;
   position?: string;
 }
-
