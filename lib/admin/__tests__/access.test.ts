@@ -7,9 +7,9 @@ describe("admin access helpers", () => {
     expect(isAdminUser(null)).toBe(false);
     expect(isAdminUser(undefined)).toBe(false);
     expect(isAdminUser({ id: "1", email: "a@b.c" } as User)).toBe(false);
-    expect(isAdminUser({ id: "1", email: "a@b.c", isAdmin: false } as User)).toBe(
-      false
-    );
+    expect(
+      isAdminUser({ id: "1", email: "a@b.c", isAdmin: false } as User)
+    ).toBe(false);
     expect(
       isAdminUser({
         id: "1",

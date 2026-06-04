@@ -7,9 +7,7 @@ export function startOfTodayLocal(): Date {
   return d;
 }
 
-export function registrationEventDate(
-  registration: Registration
-): Date | null {
+export function registrationEventDate(registration: Registration): Date | null {
   if (!registration.event?.date) return null;
   return new Date(registration.event.date);
 }

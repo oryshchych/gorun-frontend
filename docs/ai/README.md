@@ -36,13 +36,13 @@ docs/ai/README.md                    this file
 
 ## Which tool reads which file
 
-| Tool | Files it reads |
-| --- | --- |
-| **Claude Code** | `CLAUDE.md` (→ `AGENTS.md`), all of `.claude/`, plus picks up Cursor rules informally via context |
-| **Cursor** | `AGENTS.md` (via project context), all of `.cursor/rules/` (auto-attaches by glob) |
-| **GitHub Copilot** | `.github/copilot-instructions.md` (→ `AGENTS.md`) |
-| **Codex CLI / Aider / generic** | `AGENTS.md` directly |
-| **Gemini CLI** | `GEMINI.md` (→ `AGENTS.md`) |
+| Tool                            | Files it reads                                                                                    |
+| ------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **Claude Code**                 | `CLAUDE.md` (→ `AGENTS.md`), all of `.claude/`, plus picks up Cursor rules informally via context |
+| **Cursor**                      | `AGENTS.md` (via project context), all of `.cursor/rules/` (auto-attaches by glob)                |
+| **GitHub Copilot**              | `.github/copilot-instructions.md` (→ `AGENTS.md`)                                                 |
+| **Codex CLI / Aider / generic** | `AGENTS.md` directly                                                                              |
+| **Gemini CLI**                  | `GEMINI.md` (→ `AGENTS.md`)                                                                       |
 
 ---
 
@@ -103,7 +103,7 @@ If a convention applies to a narrow file scope and isn't general enough for AGEN
    ---
    description: <when this rule applies>
    globs: <comma-separated globs>
-   alwaysApply: false  # or true for the project-overview rule
+   alwaysApply: false # or true for the project-overview rule
    ---
    ```
 3. Body: bullet-point rules. Keep it scannable.

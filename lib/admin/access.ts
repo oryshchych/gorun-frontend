@@ -8,7 +8,9 @@ export function isAdminUser(user: User | null | undefined): boolean {
  * Reserved for future permission checks. Today `admin` and `super_admin`
  * behave the same for all admin features.
  */
-export function canAccessPromoCodesAdmin(_user: User | null | undefined): boolean {
+export function canAccessPromoCodesAdmin(
+  _user: User | null | undefined
+): boolean {
   return isAdminUser(_user);
 }
 

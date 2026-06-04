@@ -1,12 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import {
-  CalendarClock,
-  CalendarX2,
-  Trophy,
-  User,
-} from "lucide-react";
+import { CalendarClock, CalendarX2, Trophy, User } from "lucide-react";
 import { AppShell } from "@/components/layout/shell";
 import type { ShellNavItem } from "@/components/layout/shell";
 

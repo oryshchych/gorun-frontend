@@ -38,9 +38,7 @@ export const legalDocuments: Record<
   },
 };
 
-export function isLegalDocumentSlug(
-  value: string
-): value is LegalDocumentSlug {
+export function isLegalDocumentSlug(value: string): value is LegalDocumentSlug {
   return legalDocumentSlugs.includes(value as LegalDocumentSlug);
 }
 

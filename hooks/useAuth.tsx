@@ -58,35 +58,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loadUser();
   }, [loadAuthenticatedUser]);
 
-  const login = useCallback(async (credentials: LoginRequest) => {
-    setIsLoading(true);
-    try {
-      await apiLogin(credentials);
-      await loadAuthenticatedUser();
-    } finally {
-      setIsLoading(false);
-    }
-  }, [loadAuthenticatedUser]);
+  const login = useCallback(
+    async (credentials: LoginRequest) => {
+      setIsLoading(true);
+      try {
+        await apiLogin(credentials);
+        await loadAuthenticatedUser();
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [loadAuthenticatedUser]
+  );
 
-  const register = useCallback(async (data: RegisterRequest) => {
-    setIsLoading(true);
-    try {
-      await apiRegister(data);
-      await loadAuthenticatedUser();
-    } finally {
-      setIsLoading(false);
-    }
-  }, [loadAuthenticatedUser]);
+  const register = useCallback(
+    async (data: RegisterRequest) => {
+      setIsLoading(true);
+      try {
+        await apiRegister(data);
+        await loadAuthenticatedUser();
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [loadAuthenticatedUser]
+  );
 
-  const exchangeOAuthCallback = useCallback(async (code: string) => {
-    setIsLoading(true);
-    try {
-      await exchangeOAuthCode(code);
-      await loadAuthenticatedUser();
-    } finally {
-      setIsLoading(false);
-    }
-  }, [loadAuthenticatedUser]);
+  const exchangeOAuthCallback = useCallback(
+    async (code: string) => {
+      setIsLoading(true);
+      try {
+        await exchangeOAuthCode(code);
+        await loadAuthenticatedUser();
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [loadAuthenticatedUser]
+  );
 
   const logout = useCallback(async () => {
     setIsLoading(true);

@@ -120,10 +120,19 @@ export function ProfileClient() {
                   {initials}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="gr-display" style={{ fontSize: 20, fontWeight: 800 }}>
+                  <div
+                    className="gr-display"
+                    style={{ fontSize: 20, fontWeight: 800 }}
+                  >
                     {user.name}
                   </div>
-                  <div style={{ fontSize: 12, color: "var(--ink-3)", marginTop: 2 }}>
+                  <div
+                    style={{
+                      fontSize: 12,
+                      color: "var(--ink-3)",
+                      marginTop: 2,
+                    }}
+                  >
                     {user.runningClub ? `${user.runningClub} · ` : ""}
                     {user.city || user.email}
                   </div>
@@ -140,11 +149,21 @@ export function ProfileClient() {
                   <div key={l}>
                     <div
                       className="gr-display"
-                      style={{ fontSize: 20, fontWeight: 800, color: "var(--ink)" }}
+                      style={{
+                        fontSize: 20,
+                        fontWeight: 800,
+                        color: "var(--ink)",
+                      }}
                     >
                       {n}
                     </div>
-                    <div style={{ fontSize: 11, color: "var(--ink-3)", fontWeight: 600 }}>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: "var(--ink-3)",
+                        fontWeight: 600,
+                      }}
+                    >
                       {l}
                     </div>
                   </div>
@@ -155,7 +174,13 @@ export function ProfileClient() {
               <Link
                 href={`/${locale}/profile/settings`}
                 className="hidden md:block"
-                style={{ fontSize: 13, fontWeight: 700, color: "var(--brand-active)", textDecoration: "none", flexShrink: 0 }}
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "var(--brand-active)",
+                  textDecoration: "none",
+                  flexShrink: 0,
+                }}
               >
                 Edit
               </Link>
@@ -165,7 +190,12 @@ export function ProfileClient() {
             <div className="flex justify-end mt-3 md:hidden">
               <Link
                 href={`/${locale}/profile/settings`}
-                style={{ fontSize: 13, fontWeight: 700, color: "var(--brand-active)", textDecoration: "none" }}
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "var(--brand-active)",
+                  textDecoration: "none",
+                }}
               >
                 Edit
               </Link>

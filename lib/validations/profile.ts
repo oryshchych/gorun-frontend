@@ -4,12 +4,7 @@ import type { UserGender } from "@/types/auth";
 
 type TranslationFunction = (key: string) => string;
 
-const GENDERS: UserGender[] = [
-  "female",
-  "male",
-  "other",
-  "prefer_not_to_say",
-];
+const GENDERS: UserGender[] = ["female", "male", "other", "prefer_not_to_say"];
 
 export const createProfileSchema = (t: TranslationFunction) =>
   z.object({
@@ -40,20 +35,20 @@ export const createProfileSchema = (t: TranslationFunction) =>
       },
       { message: t("dateOfBirthFuture") }
     ),
-    gender: z.string().refine(
-      (val) => val === "" || GENDERS.includes(val as UserGender),
-      { message: t("genderInvalid") }
-    ),
+    gender: z
+      .string()
+      .refine((val) => val === "" || GENDERS.includes(val as UserGender), {
+        message: t("genderInvalid"),
+      }),
     emergencyContactName: z.string().max(100, t("emergencyNameMax")),
-    emergencyContactPhone: z.string().refine(
-      (val) => val === "" || isValidPhoneNumber(val),
-      { message: t("phoneInvalid") }
-    ),
+    emergencyContactPhone: z
+      .string()
+      .refine((val) => val === "" || isValidPhoneNumber(val), {
+        message: t("phoneInvalid"),
+      }),
     runningClub: z.string().max(100, t("runningClubMax")),
     city: z.string().max(100, t("cityMax")),
     deliveryAddress: z.string().max(2000, t("deliveryAddressMax")),
   });
 
-export type ProfileFormData = z.infer<
-  ReturnType<typeof createProfileSchema>
->;
+export type ProfileFormData = z.infer<ReturnType<typeof createProfileSchema>>;

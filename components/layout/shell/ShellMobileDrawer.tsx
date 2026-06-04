@@ -31,10 +31,7 @@ export function ShellMobileDrawer({
     <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
       <SheetContent
         side="left"
-        className={cn(
-          "w-[min(100%,280px)] border-r p-0",
-          SHELL_CHROME_SURFACE
-        )}
+        className={cn("w-[min(100%,280px)] border-r p-0", SHELL_CHROME_SURFACE)}
       >
         <SheetHeader className="sr-only">
           <SheetTitle>{t("navigation")}</SheetTitle>

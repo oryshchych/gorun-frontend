@@ -49,9 +49,7 @@ describe("adminEventFormSchema", () => {
   });
 
   it("rejects invalid capacity", () => {
-    const result = adminEventFormSchema.safeParse(
-      buildForm({ capacity: 0 })
-    );
+    const result = adminEventFormSchema.safeParse(buildForm({ capacity: 0 }));
     expect(result.success).toBe(false);
   });
 
@@ -96,9 +94,7 @@ describe("adminFormToCreatePayload", () => {
   });
 
   it("derives lifecyclePhase from status", () => {
-    const parsed = adminEventFormSchema.parse(
-      buildForm({ status: "LIVE" })
-    );
+    const parsed = adminEventFormSchema.parse(buildForm({ status: "LIVE" }));
     const payload = adminFormToCreatePayload(parsed);
     expect(payload.lifecyclePhase).toBe("CURRENT");
     expect(lifecyclePhaseFromStatus("FINISHED")).toBe("FINISHED");

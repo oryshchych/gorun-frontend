@@ -9,7 +9,12 @@ export function ShellFormSection({
   className?: string;
 }) {
   return (
-    <section className={cn("shell-surface space-y-4 rounded-lg border p-4 md:p-6", className)}>
+    <section
+      className={cn(
+        "shell-surface space-y-4 rounded-lg border p-4 md:p-6",
+        className
+      )}
+    >
       {children}
     </section>
   );

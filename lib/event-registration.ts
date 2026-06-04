@@ -15,7 +15,8 @@ export function isRegistrationClosed(event: Event): boolean {
  */
 export function isPastEventExperience(event: Event): boolean {
   if (event.status === "CANCELLED") return false;
-  if (event.status === "FINISHED" || event.lifecyclePhase === "FINISHED") return true;
+  if (event.status === "FINISHED" || event.lifecyclePhase === "FINISHED")
+    return true;
   const t = new Date(event.date).getTime();
   if (!Number.isNaN(t) && t < Date.now()) return true;
   return false;

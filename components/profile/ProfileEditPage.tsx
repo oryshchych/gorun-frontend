@@ -7,7 +7,11 @@ export async function ProfileEditPage() {
 
   return (
     <>
-      <ShellPageHeader title={t("formTitle")} description={t("formSubtitle")} className="mb-6" />
+      <ShellPageHeader
+        title={t("formTitle")}
+        description={t("formSubtitle")}
+        className="mb-6"
+      />
       <ProfileForm />
     </>
   );

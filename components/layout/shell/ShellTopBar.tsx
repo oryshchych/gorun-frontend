@@ -29,7 +29,9 @@ export function ShellTopBar({ title }: { title?: string }) {
         <Menu className="size-5" aria-hidden />
       </Button>
       {title ? (
-        <h1 className="truncate text-base font-semibold text-card-foreground">{title}</h1>
+        <h1 className="truncate text-base font-semibold text-card-foreground">
+          {title}
+        </h1>
       ) : null}
     </div>
   );

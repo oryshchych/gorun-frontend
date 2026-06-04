@@ -35,7 +35,9 @@ export async function getAdminPromoCodes(params?: {
         limit,
         ...(params?.search ? { search: params.search } : {}),
         ...(params?.eventId ? { eventId: params.eventId } : {}),
-        ...(params?.isActive !== undefined ? { isActive: params.isActive } : {}),
+        ...(params?.isActive !== undefined
+          ? { isActive: params.isActive }
+          : {}),
       },
     }
   );
@@ -54,7 +56,9 @@ export async function getAdminPromoCodes(params?: {
   };
 }
 
-export async function getAdminPromoCodeById(id: string): Promise<AdminPromoCode> {
+export async function getAdminPromoCodeById(
+  id: string
+): Promise<AdminPromoCode> {
   const response = await apiClient.get<ApiSuccessResponse<AdminPromoCode>>(
     `${ADMIN_PROMO_CODES_PATH}/${id}`
   );

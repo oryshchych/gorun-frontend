@@ -61,7 +61,9 @@ export function ShellProvider({ children }: { children: ReactNode }) {
     [collapsed, hydrated, mobileOpen, toggleCollapsed]
   );
 
-  return <ShellContext.Provider value={value}>{children}</ShellContext.Provider>;
+  return (
+    <ShellContext.Provider value={value}>{children}</ShellContext.Provider>
+  );
 }
 
 export function useShell() {

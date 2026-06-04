@@ -5,10 +5,7 @@ type TranslationFunction = (key: string) => string;
 export const createAdminPromoCodeSchema = (tv: TranslationFunction) =>
   z
     .object({
-      code: z
-        .string()
-        .min(1, tv("codeRequired"))
-        .max(50, tv("codeMax")),
+      code: z.string().min(1, tv("codeRequired")).max(50, tv("codeMax")),
       discountType: z.enum(["percentage", "fixed"]),
       discountValue: z.number(),
       eventId: z.string().min(1, tv("eventRequired")),

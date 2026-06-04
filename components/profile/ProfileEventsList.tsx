@@ -45,7 +45,11 @@ export function ProfileEventsList({ variant }: { variant: Variant }) {
   if (isLoading) {
     return (
       <div>
-        <ShellPageHeader title={title} description={subtitle} className="mb-8" />
+        <ShellPageHeader
+          title={title}
+          description={subtitle}
+          className="mb-8"
+        />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[...Array(4)].map((_, i) => (
             <div
@@ -61,7 +65,11 @@ export function ProfileEventsList({ variant }: { variant: Variant }) {
   if (error) {
     return (
       <div>
-        <ShellPageHeader title={title} description={subtitle} className="mb-8" />
+        <ShellPageHeader
+          title={title}
+          description={subtitle}
+          className="mb-8"
+        />
         <div className="bg-destructive/10 text-destructive px-4 py-3 rounded-lg">
           {error.message || tErrors("unexpectedError")}
         </div>

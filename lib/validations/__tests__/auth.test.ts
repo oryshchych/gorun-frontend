@@ -74,9 +74,9 @@ describe("Auth Validation Schemas", () => {
 
   describe("forgotPasswordSchema", () => {
     it("should validate email", () => {
-      expect(
-        forgotPasswordSchema.safeParse({ email: "a@b.com" }).success
-      ).toBe(true);
+      expect(forgotPasswordSchema.safeParse({ email: "a@b.com" }).success).toBe(
+        true
+      );
     });
   });
 
