@@ -72,13 +72,14 @@ export function ParticipantsList({
       {/* Search */}
       <div style={{ position: "relative", marginBottom: 12 }}>
         <Search
-          size={18}
+          size={16}
           style={{
             position: "absolute",
             left: 14,
             top: "50%",
             transform: "translateY(-50%)",
             color: "var(--ink-3)",
+            pointerEvents: "none",
           }}
         />
         <input
@@ -88,7 +89,7 @@ export function ParticipantsList({
           style={{
             width: "100%",
             padding: "12px 16px 12px 42px",
-            borderRadius: "var(--r-md)",
+            borderRadius: 999,
             background: "var(--surface)",
             border: "1.5px solid var(--line-strong)",
             fontSize: 16,
@@ -99,15 +100,17 @@ export function ParticipantsList({
         />
       </div>
 
-      {/* Distance filter pills */}
+      {/* Distance filter — pill segment */}
       {distanceOptions.length > 0 && (
         <div
           style={{
             display: "flex",
-            gap: 6,
+            gap: 4,
+            padding: 4,
+            background: "var(--surface-2)",
+            borderRadius: 999,
             overflowX: "auto",
             marginBottom: 12,
-            paddingBottom: 4,
           }}
         >
           {["all", ...distanceOptions].map((d) => (
@@ -115,15 +118,16 @@ export function ParticipantsList({
               key={d}
               onClick={() => setDistFilter(d)}
               style={{
-                padding: "8px 14px",
+                padding: "8px 16px",
                 borderRadius: 999,
                 fontSize: 13,
-                fontWeight: 700,
-                background: distFilter === d ? "var(--ink)" : "var(--surface)",
+                fontWeight: 600,
+                background: distFilter === d ? "var(--ink)" : "transparent",
                 color: distFilter === d ? "var(--bg)" : "var(--ink-2)",
-                border: "1px solid var(--line)",
+                border: 0,
                 whiteSpace: "nowrap",
                 cursor: "pointer",
+                transition: "background 150ms, color 150ms",
               }}
             >
               {d === "all" ? t("allDistances") : d}

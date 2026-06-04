@@ -197,7 +197,7 @@ export default async function PublicResultsPage({
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+                  gridTemplateColumns: "repeat(3, 1fr)",
                   gap: 16,
                   marginBottom: 28,
                 }}
@@ -233,15 +233,15 @@ export default async function PublicResultsPage({
                     >
                       <div
                         style={{
-                          width: 48,
-                          height: 48,
+                          width: 56,
+                          height: 56,
                           borderRadius: "50%",
                           background: medalColors[i],
                           color: "var(--ink)",
                           display: "grid",
                           placeItems: "center",
                           fontWeight: 800,
-                          fontSize: 20,
+                          fontSize: 22,
                         }}
                       >
                         {i + 1}

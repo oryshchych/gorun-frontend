@@ -1,95 +1,127 @@
 "use client";
 
 import Link from "next/link";
-import { useLocale, useTranslations } from "next-intl";
-import { Mail, Instagram, Facebook } from "lucide-react";
+import { useLocale } from "next-intl";
+import Image from "next/image";
 
 export default function Footer() {
   const locale = useLocale();
-  const tFooter = useTranslations("footer");
-  const currentYear = new Date().getFullYear();
 
-  // Contact information - these should be moved to environment variables or config
-  const contactInfo = {
-    phone: "",
-    email: "gorunteam.ua@gmail.com",
-    instagram: "https://instagram.com/gorun.lviv",
-    facebook: "https://facebook.com/profile.php?id=61584661056098",
-  };
+  const navColumns = [
+    {
+      heading: "Events",
+      links: [
+        { label: "Upcoming races", href: `/${locale}` },
+        { label: "Past events", href: `/${locale}` },
+      ],
+    },
+    {
+      heading: "About",
+      links: [
+        { label: "Contact", href: "mailto:gorunteam.ua@gmail.com" },
+        { label: "Instagram", href: "https://instagram.com/gorun.lviv" },
+        { label: "Facebook", href: "https://facebook.com/profile.php?id=61584661056098" },
+      ],
+    },
+    {
+      heading: "Legal",
+      links: [
+        { label: "Privacy Policy", href: `/${locale}/privacy-policy` },
+        { label: "Terms of Service", href: `/${locale}/terms-of-service` },
+      ],
+    },
+  ];
 
   return (
-    <footer className="border-t bg-background" role="contentinfo">
-      <div className="container mx-auto py-8 md:py-12 px-4 sm:px-6 lg:px-8 flex flex-col gap-2">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-2">
-          {/* Contact Information */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-2">
-            {/* Phone */}
-            {/* <a
-              href={`tel:${contactInfo.phone}`}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
-              aria-label={`Call us at ${contactInfo.phone}`}
+    // className="dark" forces dark-mode token values always, making the footer
+    // permanently dark regardless of the app-level theme toggle.
+    <footer
+      className="dark"
+      role="contentinfo"
+      style={{
+        background: "var(--bg)",   // in .dark context: #14181E
+        color: "var(--ink)",       // in .dark context: #EAEEF4
+        padding: "48px 32px 0",
+        marginTop: 64,
+      }}
+    >
+      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+        {/* Main grid — 2-col on mobile, 4-col on md+ */}
+        <div className="grid grid-cols-2 gap-8 pb-10 md:grid-cols-[2fr_1fr_1fr_1fr] md:gap-10">
+          {/* Brand column — full width on mobile */}
+          <div className="col-span-2 md:col-span-1">
+            <Link
+              href={`/${locale}`}
+              style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 14 }}
             >
-              <Phone className="w-4 h-4" aria-hidden="true" />
-              <span>{contactInfo.phone}</span>
-            </a> */}
+              <Image
+                src="/images/logos/logo.png"
+                alt="GoRun"
+                width={56}
+                height={18}
+                style={{ height: "auto", filter: "brightness(0) invert(1)" }}
+              />
+            </Link>
+            <p style={{ fontSize: 13, lineHeight: 1.6, opacity: 0.7, maxWidth: 300, margin: 0 }}>
+              Charity running events across Ukraine. Every entry supports the
+              Armed Forces.
+            </p>
+          </div>
 
-            {/* Email */}
-            <a
-              href={`mailto:${contactInfo.email}`}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md"
-              aria-label={`Email us at ${contactInfo.email}`}
-            >
-              <Mail className="w-4 h-4" aria-hidden="true" />
-              <span>{contactInfo.email}</span>
-            </a>
-
-            {/* Social Media Icons */}
-            <div className="flex items-center gap-3">
-              {/* Instagram */}
-              <a
-                href={contactInfo.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md p-1"
-                aria-label="Follow us on Instagram"
+          {/* Nav columns */}
+          {navColumns.map((col) => (
+            <div key={col.heading}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  color: "var(--brand)",
+                  marginBottom: 14,
+                  textTransform: "uppercase",
+                }}
               >
-                <Instagram className="w-5 h-5" aria-hidden="true" />
-              </a>
-
-              {/* Facebook */}
-              <a
-                href={contactInfo.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md p-1"
-                aria-label="Follow us on Facebook"
-              >
-                <Facebook className="w-5 h-5" aria-hidden="true" />
-              </a>
+                {col.heading}
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {col.links.map((link) => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    style={{
+                      fontSize: 13,
+                      color: "var(--ink)",  // light text in .dark context
+                      opacity: 0.8,
+                      textDecoration: "none",
+                    }}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-          {/* Copyright and Links */}
-          <div className="flex items-center md:items-end gap-4">
-            <Link
-              href={`/${locale}/privacy-policy`}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md cursor-pointer"
-            >
-              {tFooter("privacyPolicy")}
-            </Link>
-            <Link
-              href={`/${locale}/terms-of-service`}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md cursor-pointer"
-            >
-              {tFooter("termsOfService")}
-            </Link>
-          </div>
+          ))}
         </div>
-        <p
-          className="text-sm text-muted-foreground text-center"
-          suppressHydrationWarning
+
+        {/* Bottom bar */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "20px 0",
+            borderTop: "1px solid rgba(255,255,255,0.1)",
+            fontSize: 12,
+            opacity: 0.6,
+            flexWrap: "wrap",
+            gap: 8,
+          }}
         >
-          © {currentYear} GoRun
-        </p>
+          <span suppressHydrationWarning>
+            © {new Date().getFullYear()} GoRun · Lviv, Ukraine
+          </span>
+          <span>gorunteam.ua@gmail.com</span>
+        </div>
       </div>
     </footer>
   );

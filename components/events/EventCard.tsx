@@ -85,7 +85,7 @@ export function EventCard({ event }: EventCardProps) {
           <div
             style={{
               position: "relative",
-              height: 180,
+              height: 240,
               backgroundImage: coverImage
                 ? `linear-gradient(180deg, rgba(15,26,18,0) 30%, rgba(15,26,18,0.85)), url(${coverImage})`
                 : undefined,

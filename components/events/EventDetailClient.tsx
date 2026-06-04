@@ -110,7 +110,7 @@ export function EventDetailClient({
       <div
         style={{
           position: "relative",
-          minHeight: 280,
+          minHeight: 460,
           backgroundImage: coverImage
             ? `linear-gradient(180deg, rgba(15,26,18,0.4), rgba(15,26,18,0.85)), url(${coverImage})`
             : undefined,
@@ -225,7 +225,7 @@ export function EventDetailClient({
           <h1
             className="gr-display"
             style={{
-              fontSize: "clamp(26px, 5vw, 52px)",
+              fontSize: "clamp(28px, 5vw, 64px)",
               fontWeight: 800,
               lineHeight: 1.05,
               marginTop: 10,

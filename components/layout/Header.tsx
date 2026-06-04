@@ -103,7 +103,10 @@ export default function Header() {
                     )}
                     <DropdownMenuItem asChild className="cursor-pointer">
                       <Link href={`/${locale}/profile`}>
-                        <UserCircle className="mr-2 h-4 w-4" aria-hidden="true" />
+                        <UserCircle
+                          className="mr-2 h-4 w-4"
+                          aria-hidden="true"
+                        />
                         {t("profile")}
                       </Link>
                     </DropdownMenuItem>

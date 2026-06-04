@@ -98,94 +98,77 @@ export function ProfileClient() {
               padding: 18,
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              {/* Avatar */}
-              <div
-                style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: 999,
-                  background:
-                    "linear-gradient(135deg, var(--brand), var(--brand-active))",
-                  color: "var(--surface)",
-                  display: "grid",
-                  placeItems: "center",
-                  fontSize: 22,
-                  fontWeight: 800,
-                  flexShrink: 0,
-                }}
-              >
-                {initials}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  className="gr-display"
-                  style={{ fontSize: 20, fontWeight: 800 }}
-                >
-                  {user.name}
-                </div>
+            {/* Mobile: avatar + name row, stats below. Desktop: single horizontal strip */}
+            <div className="flex flex-col md:flex-row md:items-center md:gap-6">
+              {/* Avatar + name (always flex row) */}
+              <div className="flex items-center gap-4 flex-1 min-w-0">
                 <div
                   style={{
-                    fontSize: 12,
-                    color: "var(--ink-3)",
-                    marginTop: 2,
+                    width: 64,
+                    height: 64,
+                    borderRadius: 999,
+                    background:
+                      "linear-gradient(135deg, var(--brand), var(--brand-active))",
+                    color: "var(--surface)",
+                    display: "grid",
+                    placeItems: "center",
+                    fontSize: 22,
+                    fontWeight: 800,
+                    flexShrink: 0,
                   }}
                 >
-                  {user.runningClub ? `${user.runningClub} · ` : ""}
-                  {user.city || user.email}
+                  {initials}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="gr-display" style={{ fontSize: 20, fontWeight: 800 }}>
+                    {user.name}
+                  </div>
+                  <div style={{ fontSize: 12, color: "var(--ink-3)", marginTop: 2 }}>
+                    {user.runningClub ? `${user.runningClub} · ` : ""}
+                    {user.city || user.email}
+                  </div>
                 </div>
               </div>
+
+              {/* Stats — below on mobile, inline on desktop */}
+              <div className="grid grid-cols-3 mt-4 pt-4 border-t border-dashed border-(--line-strong) md:flex md:gap-8 md:mt-0 md:pt-0 md:border-0">
+                {[
+                  [String(user.totalKm ?? "—"), t("stats.km")],
+                  [String(registrations.length), t("stats.races")],
+                  [`${user.totalDonated ?? 0}₴`, t("stats.afu")],
+                ].map(([n, l]) => (
+                  <div key={l}>
+                    <div
+                      className="gr-display"
+                      style={{ fontSize: 20, fontWeight: 800, color: "var(--ink)" }}
+                    >
+                      {n}
+                    </div>
+                    <div style={{ fontSize: 11, color: "var(--ink-3)", fontWeight: 600 }}>
+                      {l}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Edit — end of strip */}
               <Link
                 href={`/${locale}/profile/settings`}
-                style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: "var(--brand-active)",
-                  textDecoration: "none",
-                }}
+                className="hidden md:block"
+                style={{ fontSize: 13, fontWeight: 700, color: "var(--brand-active)", textDecoration: "none", flexShrink: 0 }}
               >
                 Edit
               </Link>
             </div>
 
-            {/* Stats strip */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: 8,
-                marginTop: 16,
-                paddingTop: 16,
-                borderTop: "1px dashed var(--line-strong)",
-              }}
-            >
-              {[
-                [String(user.totalKm ?? "—"), t("stats.km")],
-                [String(registrations.length), t("stats.races")],
-                [`${user.totalDonated ?? 0}₴`, t("stats.afu")],
-              ].map(([n, l]) => (
-                <div key={l}>
-                  <div
-                    className="gr-display"
-                    style={{
-                      fontSize: 20,
-                      fontWeight: 800,
-                      color: "var(--ink)",
-                    }}
-                  >
-                    {n}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 11,
-                      color: "var(--ink-3)",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {l}
-                  </div>
-                </div>
-              ))}
+            {/* Edit link — mobile only (below stats) */}
+            <div className="flex justify-end mt-3 md:hidden">
+              <Link
+                href={`/${locale}/profile/settings`}
+                style={{ fontSize: 13, fontWeight: 700, color: "var(--brand-active)", textDecoration: "none" }}
+              >
+                Edit
+              </Link>
             </div>
           </div>
         </div>
