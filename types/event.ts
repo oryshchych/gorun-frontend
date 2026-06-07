@@ -1,4 +1,4 @@
-import { User } from "./auth";
+import type { User } from "./auth";
 
 export type SupportedLocale = "en" | "uk";
 
@@ -65,6 +65,13 @@ export interface SpotsInfo {
   total: number;
 }
 
+/** A single timed pricing tier for a distance */
+export interface PricePeriod {
+  from: Date;
+  to: Date;
+  price: number;
+}
+
 /** A runnable distance option within an event */
 export interface Distance {
   id: string;
@@ -77,6 +84,30 @@ export interface Distance {
   elevation?: string; // "+520m" — trail events
   laps?: string; // "7.5 laps" — track events
   spots: SpotsInfo;
+  /** Distance in meters (canonical; `km` kept for backward-compat) */
+  distanceMeters?: number;
+  /** Optional per-distance start time; falls back to event date when absent */
+  startAt?: Date;
+  /** Maximum number of participants on this distance */
+  participantLimit?: number;
+  /** Start of bib-number range */
+  bibFrom?: number;
+  /** End of bib-number range (inclusive) */
+  bibTo?: number;
+  /** Marks this as a kids' race */
+  isKids?: boolean;
+  /** Discount % for pensioners (0–100) */
+  discountPensioner?: number;
+  /** Discount % for combat veterans / АТО-УБД (0–100) */
+  discountVeteran?: number;
+  /** Discount % for participants with disabilities (0–100) */
+  discountDisability?: number;
+  /** Minimum participant age */
+  minAge?: number;
+  /** Maximum participant age (no limit when absent) */
+  maxAge?: number;
+  /** Timed pricing tiers */
+  pricePeriods?: PricePeriod[];
 }
 
 /** A kids' race option within an event */

@@ -10,6 +10,7 @@ import type {
   ScheduleItem,
   Distance,
   KidsDistance,
+  PricePeriod,
 } from "@/types/event";
 
 const optionalUrl = z
@@ -57,11 +58,30 @@ const optionalSpotsPairSchema = z
     return { taken: s.taken, total: s.total };
   });
 
+const pricePeriodSchema = z.object({
+  from: z
+    .union([z.string(), z.date()])
+    .transform((val) => (val ? new Date(val) : undefined))
+    .refine((d): d is Date => d !== undefined && !Number.isNaN(d.getTime()), {
+      message: "Invalid from date",
+    }),
+  to: z
+    .union([z.string(), z.date()])
+    .transform((val) => (val ? new Date(val) : undefined))
+    .refine((d): d is Date => d !== undefined && !Number.isNaN(d.getTime()), {
+      message: "Invalid to date",
+    }),
+  price: z.preprocess(
+    emptyNumberToUndefined,
+    z.number().positive("Price must be greater than 0")
+  ),
+});
+
 const distanceSchema = z
   .object({
     id: z.string().min(1),
-    label: z.string().min(1, "Distance label is required"),
-    name: z.string().min(1, "Distance name is required"),
+    label: z.string().optional(),
+    name: z.string().min(1, "Distance name is required").max(100),
     km: z.preprocess(
       emptyNumberToUndefined,
       z.number().nonnegative().optional()
@@ -73,15 +93,62 @@ const distanceSchema = z
     elevation: z.string().optional(),
     laps: z.string().optional(),
     spots: optionalSpotsPairSchema,
+    distanceMeters: z.preprocess(
+      emptyNumberToUndefined,
+      z.number().int().min(1).max(999999).optional()
+    ),
+    startAt: z
+      .union([z.string(), z.date()])
+      .transform((val) => (val ? new Date(val) : undefined))
+      .refine((d) => d === undefined || !Number.isNaN(d.getTime()), {
+        message: "Invalid start date",
+      })
+      .optional(),
+    participantLimit: z.preprocess(
+      emptyNumberToUndefined,
+      z.number().int().min(1).optional()
+    ),
+    bibFrom: z.preprocess(
+      emptyNumberToUndefined,
+      z.number().int().min(0).optional()
+    ),
+    bibTo: z.preprocess(
+      emptyNumberToUndefined,
+      z.number().int().min(0).optional()
+    ),
+    isKids: z.boolean().optional(),
+    discountPensioner: z.preprocess(
+      emptyNumberToUndefined,
+      z.number().int().min(0).max(100).optional()
+    ),
+    discountVeteran: z.preprocess(
+      emptyNumberToUndefined,
+      z.number().int().min(0).max(100).optional()
+    ),
+    discountDisability: z.preprocess(
+      emptyNumberToUndefined,
+      z.number().int().min(0).max(100).optional()
+    ),
+    minAge: z.preprocess(
+      emptyNumberToUndefined,
+      z.number().int().min(0).optional()
+    ),
+    maxAge: z.preprocess(
+      emptyNumberToUndefined,
+      z.number().int().min(0).optional()
+    ),
+    pricePeriods: z.array(pricePeriodSchema).optional(),
   })
-  .refine((d) => d.km !== undefined, {
-    path: ["km"],
-    message: "Distance (km) is required",
-  })
-  .refine((d) => d.spots !== undefined, {
-    path: ["spots"],
-    message: "Spots taken and total are required for each distance",
-  });
+  .refine(
+    (d) =>
+      d.bibTo === undefined || d.bibFrom === undefined || d.bibTo >= d.bibFrom,
+    { path: ["bibTo"], message: "Bib range end must be ≥ start" }
+  )
+  .refine(
+    (d) =>
+      d.maxAge === undefined || d.minAge === undefined || d.maxAge > d.minAge,
+    { path: ["maxAge"], message: "Max age must be greater than min age" }
+  );
 
 const kidsDistanceSchema = z.object({
   id: z.string().min(1),
@@ -265,13 +332,29 @@ export type AdminEventFormInput = {
   schedule?: { time: string; what: string }[];
   distances?: Array<{
     id: string;
-    label: string;
+    label?: string;
     name: string;
     km?: number | "";
     feeUah?: number | "";
     elevation?: string;
     laps?: string;
     spots?: { taken?: number | ""; total?: number | "" };
+    distanceMeters?: number | "";
+    startAt?: Date | string;
+    participantLimit?: number | "";
+    bibFrom?: number | "";
+    bibTo?: number | "";
+    isKids?: boolean;
+    discountPensioner?: number | "";
+    discountVeteran?: number | "";
+    discountDisability?: number | "";
+    minAge?: number | "";
+    maxAge?: number | "";
+    pricePeriods?: Array<{
+      from: Date | string;
+      to: Date | string;
+      price: number | "";
+    }>;
   }>;
   kidsDistances?: Array<{
     id: string;
@@ -311,7 +394,7 @@ export function sanitizeAdminFormBeforeParse(
 ): AdminEventFormInput {
   return {
     ...data,
-    distances: data.distances?.filter((d) => d.label?.trim() && d.name?.trim()),
+    distances: data.distances?.filter((d) => d.name?.trim()),
     kidsDistances: data.kidsDistances?.filter(
       (k) => k.label?.trim() && k.name?.trim() && k.age?.trim()
     ),
@@ -384,12 +467,60 @@ function scheduleToProgram(
   return schedule.map((r) => [r.time, r.what]);
 }
 
+function normalizePricePeriods(
+  periods: Array<{ from: Date; to: Date; price: number }> | undefined
+): PricePeriod[] | undefined {
+  if (!periods?.length) return undefined;
+  const rows = periods.filter((p) => p.price > 0);
+  return rows.length ? rows : undefined;
+}
+
 function normalizeDistances(
   distances: AdminEventFormData["distances"]
 ): Distance[] | undefined {
   if (!distances?.length) return undefined;
-  const rows = distances.filter((d) => d.label.trim() && d.name.trim());
+  const rows = distances
+    .filter((d) => d.name.trim())
+    .map((d) => ({
+      ...d,
+      pricePeriods: normalizePricePeriods(d.pricePeriods),
+    }));
   return rows.length ? (rows as Distance[]) : undefined;
+}
+
+/** Create a blank distance row for "Add distance" buttons. */
+export function createEmptyDistance(): NonNullable<
+  AdminEventFormInput["distances"]
+>[number] {
+  return {
+    id: crypto.randomUUID(),
+    name: "",
+    label: "",
+    km: "",
+    feeUah: "",
+    elevation: "",
+    laps: "",
+    spots: { taken: "", total: "" },
+    distanceMeters: "",
+    startAt: undefined,
+    participantLimit: "",
+    bibFrom: "",
+    bibTo: "",
+    isKids: false,
+    discountPensioner: "",
+    discountVeteran: "",
+    discountDisability: "",
+    minAge: "",
+    maxAge: "",
+    pricePeriods: [],
+  };
+}
+
+/** Create a blank price period row for "Add period" buttons. */
+export function createEmptyPricePeriod(): NonNullable<
+  NonNullable<AdminEventFormInput["distances"]>[number]["pricePeriods"]
+>[number] {
+  return { from: "", to: "", price: "" };
 }
 
 function normalizeKids(
@@ -619,7 +750,26 @@ export function eventToAdminFormDefaults(event: {
     afu: event.afu ?? "",
     schedule: schedule.length ? schedule : [],
     distances: event.distances?.length
-      ? event.distances.map((x) => ({ ...x }))
+      ? event.distances.map((x) => ({
+          ...x,
+          distanceMeters: x.distanceMeters ?? "",
+          participantLimit: x.participantLimit ?? "",
+          bibFrom: x.bibFrom ?? "",
+          bibTo: x.bibTo ?? "",
+          discountPensioner: x.discountPensioner ?? "",
+          discountVeteran: x.discountVeteran ?? "",
+          discountDisability: x.discountDisability ?? "",
+          minAge: x.minAge ?? "",
+          maxAge: x.maxAge ?? "",
+          isKids: x.isKids ?? false,
+          startAt: x.startAt ? new Date(x.startAt) : undefined,
+          pricePeriods:
+            x.pricePeriods?.map((p) => ({
+              from: new Date(p.from),
+              to: new Date(p.to),
+              price: p.price,
+            })) ?? [],
+        }))
       : [],
     kidsDistances: event.kidsDistances?.length
       ? event.kidsDistances.map((x) => ({ ...x }))
