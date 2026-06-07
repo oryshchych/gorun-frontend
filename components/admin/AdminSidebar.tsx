@@ -1,7 +1,12 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { CalendarDays, LayoutDashboard, TicketPercent } from "lucide-react";
+import {
+  CalendarDays,
+  LayoutDashboard,
+  TicketPercent,
+  Users,
+} from "lucide-react";
 import { AppShell } from "@/components/layout/shell";
 import type { ShellNavItem } from "@/components/layout/shell";
 
@@ -14,6 +19,7 @@ const NAV = [
   },
   { segment: "promo-codes", labelKey: "promoCodes", icon: TicketPercent },
   { segment: "events", labelKey: "events", icon: CalendarDays },
+  { segment: "users", labelKey: "users", icon: Users },
 ] as const;
 
 export function useAdminShellConfig() {
