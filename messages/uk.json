@@ -532,8 +532,85 @@
       "auditLogs": "Журнал дій"
     },
     "dashboard": {
-      "title": "Дашборд",
-      "placeholder": "Незабаром тут буде більше."
+      "title": "Аналітика реєстрацій",
+      "subtitle": "Динаміка реєстрацій та оплат по активних подіях",
+      "period": {
+        "week": "Тиждень",
+        "month": "Місяць",
+        "threeMonths": "3 місяці",
+        "year": "Рік",
+        "custom": "Період",
+        "from": "Від",
+        "to": "До"
+      },
+      "scope": {
+        "general": "Загальна",
+        "byEvent": "По події",
+        "backToGeneral": "← Усі активні події",
+        "allEvents": "Усі активні події"
+      },
+      "kpi": {
+        "totalRegistrations": "Реєстрацій",
+        "paidRegistrations": "оплачених",
+        "moneyGathered": "Зібрано коштів",
+        "conversion": "Конверсія",
+        "conversionHint": "оплачені / реєстрації",
+        "averageCheck": "Середній чек",
+        "afuDonations": "Донати на ЗСУ",
+        "refunds": "Повернення",
+        "netRevenue": "Чистий дохід",
+        "cancelled": "Скасовані",
+        "kids": "Дитячі реєстрації",
+        "newParticipants": "Нові учасники",
+        "returningParticipants": "Повторні учасники"
+      },
+      "charts": {
+        "registrationsByDay": "Кумулятивні реєстрації по днях",
+        "paymentsByDay": "Оплати по днях (грн)",
+        "regsVsPayments": "Реєстрації vs Оплати по днях",
+        "registrations": "Реєстрації",
+        "payments": "Оплати",
+        "revenue": "Сума (грн)",
+        "paymentsCount": "Кількість оплат"
+      },
+      "demographics": {
+        "title": "Демографія учасників",
+        "gender": "Стать",
+        "ageCategory": "Вікові категорії",
+        "adultsVsKids": "Тип учасника",
+        "adults": "Дорослі",
+        "kids": "Діти",
+        "kidAges": "Вік дітей",
+        "topCities": "Топ міст",
+        "topClubs": "Бігові клуби",
+        "topDistances": "Дистанції",
+        "promoUsage": "Промокоди",
+        "withPromo": "З промокодом",
+        "withoutPromo": "Без промокоду",
+        "notCollected": "Дані ще не збираються",
+        "countryGap": "Розподіл за країнами",
+        "benefitGap": "Пільговий статус",
+        "unknown": "Не вказано",
+        "genderLabels": {
+          "male": "Чоловіки",
+          "female": "Жінки",
+          "other": "Інше",
+          "prefer_not_to_say": "Не вказано",
+          "unknown": "Не вказано"
+        }
+      },
+      "table": {
+        "title": "По подіях",
+        "event": "Подія",
+        "date": "Дата",
+        "registrations": "Реєстрацій",
+        "paid": "Оплачених",
+        "conversion": "Конверсія",
+        "revenue": "Сума (грн)",
+        "capacityFill": "Заповненість"
+      },
+      "empty": "Немає даних за цей період",
+      "loadingError": "Не вдалося завантажити аналітику"
     },
     "events": {
       "title": "Події",

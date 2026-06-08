@@ -532,8 +532,85 @@
       "auditLogs": "Audit Logs"
     },
     "dashboard": {
-      "title": "Dashboard",
-      "placeholder": "More here soon."
+      "title": "Registration analytics",
+      "subtitle": "Registration and payment trends across active events",
+      "period": {
+        "week": "Week",
+        "month": "Month",
+        "threeMonths": "3 months",
+        "year": "Year",
+        "custom": "Custom",
+        "from": "From",
+        "to": "To"
+      },
+      "scope": {
+        "general": "Overview",
+        "byEvent": "By event",
+        "backToGeneral": "← All active events",
+        "allEvents": "All active events"
+      },
+      "kpi": {
+        "totalRegistrations": "Registrations",
+        "paidRegistrations": "paid",
+        "moneyGathered": "Funds collected",
+        "conversion": "Conversion",
+        "conversionHint": "paid / registrations",
+        "averageCheck": "Average check",
+        "afuDonations": "AFU donations",
+        "refunds": "Refunds",
+        "netRevenue": "Net revenue",
+        "cancelled": "Cancelled",
+        "kids": "Kids registrations",
+        "newParticipants": "New participants",
+        "returningParticipants": "Returning participants"
+      },
+      "charts": {
+        "registrationsByDay": "Cumulative registrations by day",
+        "paymentsByDay": "Payments by day (UAH)",
+        "regsVsPayments": "Registrations vs payments by day",
+        "registrations": "Registrations",
+        "payments": "Payments",
+        "revenue": "Amount (UAH)",
+        "paymentsCount": "Payments count"
+      },
+      "demographics": {
+        "title": "Participant demographics",
+        "gender": "Gender",
+        "ageCategory": "Age categories",
+        "adultsVsKids": "Participant type",
+        "adults": "Adults",
+        "kids": "Kids",
+        "kidAges": "Kids ages",
+        "topCities": "Top cities",
+        "topClubs": "Running clubs",
+        "topDistances": "Distances",
+        "promoUsage": "Promo codes",
+        "withPromo": "With promo",
+        "withoutPromo": "Without promo",
+        "notCollected": "Not collected yet",
+        "countryGap": "Breakdown by country",
+        "benefitGap": "Benefit status",
+        "unknown": "Not specified",
+        "genderLabels": {
+          "male": "Men",
+          "female": "Women",
+          "other": "Other",
+          "prefer_not_to_say": "Not specified",
+          "unknown": "Not specified"
+        }
+      },
+      "table": {
+        "title": "By event",
+        "event": "Event",
+        "date": "Date",
+        "registrations": "Registrations",
+        "paid": "Paid",
+        "conversion": "Conversion",
+        "revenue": "Amount (UAH)",
+        "capacityFill": "Capacity fill"
+      },
+      "empty": "No data for this period",
+      "loadingError": "Failed to load analytics"
     },
     "events": {
       "title": "Events",
