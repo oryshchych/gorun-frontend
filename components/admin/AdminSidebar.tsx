@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import {
   CalendarDays,
+  ClipboardList,
   LayoutDashboard,
   TicketPercent,
   Users,
@@ -20,6 +21,7 @@ const NAV = [
   { segment: "promo-codes", labelKey: "promoCodes", icon: TicketPercent },
   { segment: "events", labelKey: "events", icon: CalendarDays },
   { segment: "users", labelKey: "users", icon: Users },
+  { segment: "registrations", labelKey: "registrations", icon: ClipboardList },
 ] as const;
 
 export function useAdminShellConfig() {
