@@ -2,3 +2,4 @@
 export const ADMIN_PROMO_CODES_PATH = "/admin/promo-codes" as const;
 export const ADMIN_USERS_PATH = "/admin/users" as const;
 export const ADMIN_REGISTRATIONS_PATH = "/admin/registrations" as const;
+export const ADMIN_AUDIT_LOGS_PATH = "/admin/audit-logs" as const;

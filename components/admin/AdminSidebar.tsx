@@ -5,13 +5,16 @@ import {
   CalendarDays,
   ClipboardList,
   LayoutDashboard,
+  ScrollText,
   TicketPercent,
   Users,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { isSuperAdminUser } from "@/lib/admin/access";
 import { AppShell } from "@/components/layout/shell";
 import type { ShellNavItem } from "@/components/layout/shell";
 
-const NAV = [
+const BASE_NAV = [
   {
     segment: "dashboard",
     labelKey: "dashboard",
@@ -24,12 +27,23 @@ const NAV = [
   { segment: "registrations", labelKey: "registrations", icon: ClipboardList },
 ] as const;
 
+const SUPER_ADMIN_NAV = [
+  { segment: "audit-logs", labelKey: "auditLogs", icon: ScrollText },
+] as const;
+
+type NavItem = (typeof BASE_NAV)[number] | (typeof SUPER_ADMIN_NAV)[number];
+
 export function useAdminShellConfig() {
   const locale = useLocale();
   const t = useTranslations("admin.nav");
+  const { user } = useAuth();
   const basePath = `/${locale}/admin`;
 
-  const navItems: ShellNavItem[] = NAV.map((item) => ({
+  const nav: NavItem[] = isSuperAdminUser(user)
+    ? [...BASE_NAV, ...SUPER_ADMIN_NAV]
+    : [...BASE_NAV];
+
+  const navItems: ShellNavItem[] = nav.map((item) => ({
     segment: item.segment,
     label: t(item.labelKey),
     icon: item.icon,

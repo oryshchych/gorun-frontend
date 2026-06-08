@@ -166,6 +166,12 @@ If any check fails, fix it before considering the task complete. Do not suppress
 - The `[locale]` route segment is required for every user-facing page. Configured locales: `["uk", "en"]`; default: `uk`. See `i18n.ts` and `middleware.ts`.
 - For bilingual user-generated content (event titles/descriptions), follow the `{ en, uk }` object pair pattern in Zod schemas — see `pair()` in `lib/validations/admin-event.ts`.
 
+### Audit logging — check before shipping any mutation
+
+When adding or editing a feature that **creates, updates, or deletes** backend data, ask: does the corresponding backend controller call `writeAuditLog()`? If you add a new mutation endpoint, the backend controller must be instrumented (see `gorun-backend/AGENTS.md` → "Audit logging"). On the frontend there is nothing to wire — the audit log page at `/admin/audit-logs` reads from the backend automatically.
+
+The sidebar item for audit logs is **visible only to `super_admin` users** (checked via `isSuperAdminUser()` in `lib/admin/access.ts`). If you add new role-gated UI, follow the same pattern.
+
 ### Data layer
 
 - **Never call `fetch` directly.** Use `apiClient` from `lib/api/client.ts` — it attaches JWT, refreshes on 401, normalizes errors.
