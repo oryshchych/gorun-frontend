@@ -193,6 +193,8 @@ export interface Event {
   organizerInfo?: string;
   organizerContactName?: string;
   organizerContactInfo?: string;
+  changeFee?: number;
+  transferFee?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -238,6 +240,8 @@ interface BaseEventPayload {
   organizerInfo?: string;
   organizerContactName?: string;
   organizerContactInfo?: string;
+  changeFee?: number;
+  transferFee?: number;
 }
 
 export interface CreateEventRequest extends BaseEventPayload {}

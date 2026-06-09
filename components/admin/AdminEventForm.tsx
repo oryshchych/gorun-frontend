@@ -70,6 +70,7 @@ interface AdminEventFormProps {
 type ConfirmDialogState =
   | { type: "status"; pendingValue: string }
   | { type: "isActive"; pendingValue: boolean }
+  | { type: "deleteDistance"; pendingIndex: number }
   | null;
 
 function formatDateForInput(date: Date) {
@@ -348,8 +349,10 @@ export function AdminEventForm({
         "status",
         confirmDialog.pendingValue as AdminEventFormInput["status"]
       );
-    } else {
+    } else if (confirmDialog.type === "isActive") {
       form.setValue("isActive", confirmDialog.pendingValue);
+    } else if (confirmDialog.type === "deleteDistance") {
+      da.remove(confirmDialog.pendingIndex);
     }
     setConfirmDialog(null);
   }
@@ -943,374 +946,467 @@ export function AdminEventForm({
                 </ShellFormSection>
               )}
 
-              {da.fields.map((field, i) => (
-                <Card key={field.id} className="border-line">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-base font-semibold">
-                      {t("sectionDistances")} #{i + 1}
-                    </CardTitle>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      disabled={isLoading}
-                      onClick={() => da.remove(i)}
-                      className="text-danger hover:text-danger"
-                      aria-label={t("removeDistance")}
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Main info */}
-                    <div className="space-y-4">
-                      <h4 className="text-sm font-semibold text-ink">
-                        {t("sectionDistanceMain")}
-                      </h4>
-                      <div className="grid gap-4 sm:grid-cols-2">
+              {da.fields.map((field, i) => {
+                const isKids = form.watch(`distances.${i}.isKids`);
+                return (
+                  <Card key={field.id} className="border-line">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-base font-semibold">
+                        {t("sectionDistances")} #{i + 1}
+                      </CardTitle>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        disabled={isLoading}
+                        onClick={() =>
+                          setConfirmDialog({
+                            type: "deleteDistance",
+                            pendingIndex: i,
+                          })
+                        }
+                        className="text-danger hover:text-danger"
+                        aria-label={t("removeDistance")}
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* Main info */}
+                      <div className="space-y-4">
+                        <h4 className="text-sm font-semibold text-ink">
+                          {t("sectionDistanceMain")}
+                        </h4>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          <FormField
+                            control={form.control}
+                            name={`distances.${i}.name`}
+                            render={({ field: f }) => (
+                              <FormItem>
+                                <FormLabel>{t("distanceName")}</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    {...f}
+                                    value={f.value ?? ""}
+                                    disabled={isLoading}
+                                    placeholder="5 км"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name={`distances.${i}.distanceMeters`}
+                            render={({ field: f }) => (
+                              <FormItem>
+                                <FormLabel>{t("distanceMeters")}</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    min={1}
+                                    max={999999}
+                                    step={1}
+                                    disabled={isLoading}
+                                    value={f.value ?? ""}
+                                    onChange={(e) =>
+                                      f.onChange(
+                                        e.target.value === ""
+                                          ? ""
+                                          : parseInt(e.target.value, 10)
+                                      )
+                                    }
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          <FormField
+                            control={form.control}
+                            name={`distances.${i}.startAt`}
+                            render={({ field: f }) => (
+                              <FormItem>
+                                <FormLabel>{t("distanceStartAt")}</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="datetime-local"
+                                    disabled={isLoading}
+                                    value={
+                                      f.value instanceof Date
+                                        ? formatDateForInput(f.value)
+                                        : f.value
+                                          ? formatDateForInput(
+                                              new Date(f.value as string)
+                                            )
+                                          : ""
+                                    }
+                                    onChange={(e) =>
+                                      f.onChange(
+                                        e.target.value
+                                          ? new Date(e.target.value)
+                                          : undefined
+                                      )
+                                    }
+                                  />
+                                </FormControl>
+                                <p className="text-xs text-ink-3">
+                                  {t("distanceStartAtHint")}
+                                </p>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name={`distances.${i}.participantLimit`}
+                            render={({ field: f }) => (
+                              <FormItem>
+                                <FormLabel>{t("participantLimit")}</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    min={1}
+                                    step={1}
+                                    disabled={isLoading}
+                                    value={f.value ?? ""}
+                                    onChange={(e) =>
+                                      f.onChange(
+                                        e.target.value === ""
+                                          ? ""
+                                          : parseInt(e.target.value, 10)
+                                      )
+                                    }
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          <FormField
+                            control={form.control}
+                            name={`distances.${i}.bibFrom`}
+                            render={({ field: f }) => (
+                              <FormItem>
+                                <FormLabel>{t("bibFrom")}</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    min={0}
+                                    step={1}
+                                    disabled={isLoading}
+                                    value={f.value ?? ""}
+                                    onChange={(e) =>
+                                      f.onChange(
+                                        e.target.value === ""
+                                          ? ""
+                                          : parseInt(e.target.value, 10)
+                                      )
+                                    }
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name={`distances.${i}.bibTo`}
+                            render={({ field: f }) => (
+                              <FormItem>
+                                <FormLabel>{t("bibTo")}</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    min={0}
+                                    step={1}
+                                    disabled={isLoading}
+                                    value={f.value ?? ""}
+                                    onChange={(e) =>
+                                      f.onChange(
+                                        e.target.value === ""
+                                          ? ""
+                                          : parseInt(e.target.value, 10)
+                                      )
+                                    }
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
                         <FormField
                           control={form.control}
-                          name={`distances.${i}.name`}
+                          name={`distances.${i}.isKids`}
                           render={({ field: f }) => (
-                            <FormItem>
-                              <FormLabel>{t("distanceName")}</FormLabel>
+                            <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-md border border-line p-3">
                               <FormControl>
-                                <Input
-                                  {...f}
-                                  value={f.value ?? ""}
+                                <Checkbox
+                                  checked={!!f.value}
                                   disabled={isLoading}
-                                  placeholder="5 км"
+                                  onChange={() => f.onChange(!f.value)}
                                 />
                               </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name={`distances.${i}.distanceMeters`}
-                          render={({ field: f }) => (
-                            <FormItem>
-                              <FormLabel>{t("distanceMeters")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  min={1}
-                                  max={999999}
-                                  step={1}
-                                  disabled={isLoading}
-                                  value={f.value ?? ""}
-                                  onChange={(e) =>
-                                    f.onChange(
-                                      e.target.value === ""
-                                        ? ""
-                                        : parseInt(e.target.value, 10)
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
+                              <FormLabel className="mt-0 cursor-pointer font-normal">
+                                {t("isKids")}
+                              </FormLabel>
                             </FormItem>
                           )}
                         />
                       </div>
 
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <FormField
-                          control={form.control}
-                          name={`distances.${i}.startAt`}
-                          render={({ field: f }) => (
-                            <FormItem>
-                              <FormLabel>{t("distanceStartAt")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="datetime-local"
-                                  disabled={isLoading}
-                                  value={
-                                    f.value instanceof Date
-                                      ? formatDateForInput(f.value)
-                                      : f.value
-                                        ? formatDateForInput(
-                                            new Date(f.value as string)
-                                          )
-                                        : ""
-                                  }
-                                  onChange={(e) =>
-                                    f.onChange(
-                                      e.target.value
-                                        ? new Date(e.target.value)
-                                        : undefined
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <p className="text-xs text-ink-3">
-                                {t("distanceStartAtHint")}
-                              </p>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name={`distances.${i}.participantLimit`}
-                          render={({ field: f }) => (
-                            <FormItem>
-                              <FormLabel>{t("participantLimit")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  min={1}
-                                  step={1}
-                                  disabled={isLoading}
-                                  value={f.value ?? ""}
-                                  onChange={(e) =>
-                                    f.onChange(
-                                      e.target.value === ""
-                                        ? ""
-                                        : parseInt(e.target.value, 10)
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
+                      {/* Discounts — only for non-kids distances */}
+                      {!isKids && (
+                        <div className="space-y-4">
+                          <h4 className="text-sm font-semibold text-ink">
+                            {t("sectionDiscounts")}
+                          </h4>
+                          <div className="grid gap-4 sm:grid-cols-3">
+                            <FormField
+                              control={form.control}
+                              name={`distances.${i}.discountPensioner`}
+                              render={({ field: f }) => (
+                                <FormItem>
+                                  <FormLabel>
+                                    {t("discountPensioner")}
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      type="number"
+                                      min={0}
+                                      max={100}
+                                      step={1}
+                                      disabled={isLoading}
+                                      value={f.value ?? ""}
+                                      onChange={(e) =>
+                                        f.onChange(
+                                          e.target.value === ""
+                                            ? ""
+                                            : parseInt(e.target.value, 10)
+                                        )
+                                      }
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name={`distances.${i}.discountVeteran`}
+                              render={({ field: f }) => (
+                                <FormItem>
+                                  <FormLabel>{t("discountVeteran")}</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      type="number"
+                                      min={0}
+                                      max={100}
+                                      step={1}
+                                      disabled={isLoading}
+                                      value={f.value ?? ""}
+                                      onChange={(e) =>
+                                        f.onChange(
+                                          e.target.value === ""
+                                            ? ""
+                                            : parseInt(e.target.value, 10)
+                                        )
+                                      }
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name={`distances.${i}.discountDisability`}
+                              render={({ field: f }) => (
+                                <FormItem>
+                                  <FormLabel>
+                                    {t("discountDisability")}
+                                  </FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      type="number"
+                                      min={0}
+                                      max={100}
+                                      step={1}
+                                      disabled={isLoading}
+                                      value={f.value ?? ""}
+                                      onChange={(e) =>
+                                        f.onChange(
+                                          e.target.value === ""
+                                            ? ""
+                                            : parseInt(e.target.value, 10)
+                                        )
+                                      }
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <div className="grid gap-4 sm:grid-cols-2">
+                            <FormField
+                              control={form.control}
+                              name={`distances.${i}.minAge`}
+                              render={({ field: f }) => (
+                                <FormItem>
+                                  <FormLabel>{t("minAge")}</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      type="number"
+                                      min={0}
+                                      step={1}
+                                      disabled={isLoading}
+                                      value={f.value ?? ""}
+                                      onChange={(e) =>
+                                        f.onChange(
+                                          e.target.value === ""
+                                            ? ""
+                                            : parseInt(e.target.value, 10)
+                                        )
+                                      }
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </div>
+                      )}
 
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <FormField
-                          control={form.control}
-                          name={`distances.${i}.bibFrom`}
-                          render={({ field: f }) => (
-                            <FormItem>
-                              <FormLabel>{t("bibFrom")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  min={0}
-                                  step={1}
-                                  disabled={isLoading}
-                                  value={f.value ?? ""}
-                                  onChange={(e) =>
-                                    f.onChange(
-                                      e.target.value === ""
-                                        ? ""
-                                        : parseInt(e.target.value, 10)
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name={`distances.${i}.bibTo`}
-                          render={({ field: f }) => (
-                            <FormItem>
-                              <FormLabel>{t("bibTo")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  min={0}
-                                  step={1}
-                                  disabled={isLoading}
-                                  value={f.value ?? ""}
-                                  onChange={(e) =>
-                                    f.onChange(
-                                      e.target.value === ""
-                                        ? ""
-                                        : parseInt(e.target.value, 10)
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
+                      {/* Max age — only for kids distances */}
+                      {isKids && (
+                        <div className="space-y-4">
+                          <div className="grid gap-4 sm:grid-cols-2">
+                            <FormField
+                              control={form.control}
+                              name={`distances.${i}.maxAge`}
+                              render={({ field: f }) => (
+                                <FormItem>
+                                  <FormLabel>{t("maxAge")}</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      type="number"
+                                      min={0}
+                                      step={1}
+                                      disabled={isLoading}
+                                      value={f.value ?? ""}
+                                      onChange={(e) =>
+                                        f.onChange(
+                                          e.target.value === ""
+                                            ? ""
+                                            : parseInt(e.target.value, 10)
+                                        )
+                                      }
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </div>
+                      )}
 
-                      <FormField
+                      {/* Price periods */}
+                      <DistancePricePeriods
                         control={form.control}
-                        name={`distances.${i}.isKids`}
-                        render={({ field: f }) => (
-                          <FormItem className="flex flex-row items-center gap-3 space-y-0 rounded-md border border-line p-3">
-                            <FormControl>
-                              <Checkbox
-                                checked={!!f.value}
-                                disabled={isLoading}
-                                onChange={() => f.onChange(!f.value)}
-                              />
-                            </FormControl>
-                            <FormLabel className="mt-0 cursor-pointer font-normal">
-                              {t("isKids")}
-                            </FormLabel>
-                          </FormItem>
-                        )}
+                        distanceIndex={i}
+                        isLoading={isLoading}
                       />
-                    </div>
-
-                    {/* Discounts */}
-                    <div className="space-y-4">
-                      <h4 className="text-sm font-semibold text-ink">
-                        {t("sectionDiscounts")}
-                      </h4>
-                      <div className="grid gap-4 sm:grid-cols-3">
-                        <FormField
-                          control={form.control}
-                          name={`distances.${i}.discountPensioner`}
-                          render={({ field: f }) => (
-                            <FormItem>
-                              <FormLabel>{t("discountPensioner")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  min={0}
-                                  max={100}
-                                  step={1}
-                                  disabled={isLoading}
-                                  value={f.value ?? ""}
-                                  onChange={(e) =>
-                                    f.onChange(
-                                      e.target.value === ""
-                                        ? ""
-                                        : parseInt(e.target.value, 10)
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name={`distances.${i}.discountVeteran`}
-                          render={({ field: f }) => (
-                            <FormItem>
-                              <FormLabel>{t("discountVeteran")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  min={0}
-                                  max={100}
-                                  step={1}
-                                  disabled={isLoading}
-                                  value={f.value ?? ""}
-                                  onChange={(e) =>
-                                    f.onChange(
-                                      e.target.value === ""
-                                        ? ""
-                                        : parseInt(e.target.value, 10)
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name={`distances.${i}.discountDisability`}
-                          render={({ field: f }) => (
-                            <FormItem>
-                              <FormLabel>{t("discountDisability")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  min={0}
-                                  max={100}
-                                  step={1}
-                                  disabled={isLoading}
-                                  value={f.value ?? ""}
-                                  onChange={(e) =>
-                                    f.onChange(
-                                      e.target.value === ""
-                                        ? ""
-                                        : parseInt(e.target.value, 10)
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <FormField
-                          control={form.control}
-                          name={`distances.${i}.minAge`}
-                          render={({ field: f }) => (
-                            <FormItem>
-                              <FormLabel>{t("minAge")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  min={0}
-                                  step={1}
-                                  disabled={isLoading}
-                                  value={f.value ?? ""}
-                                  onChange={(e) =>
-                                    f.onChange(
-                                      e.target.value === ""
-                                        ? ""
-                                        : parseInt(e.target.value, 10)
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name={`distances.${i}.maxAge`}
-                          render={({ field: f }) => (
-                            <FormItem>
-                              <FormLabel>{t("maxAge")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  min={0}
-                                  step={1}
-                                  disabled={isLoading}
-                                  value={f.value ?? ""}
-                                  onChange={(e) =>
-                                    f.onChange(
-                                      e.target.value === ""
-                                        ? ""
-                                        : parseInt(e.target.value, 10)
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Price periods */}
-                    <DistancePricePeriods
-                      control={form.control}
-                      distanceIndex={i}
-                      isLoading={isLoading}
-                    />
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </TabsContent>
-            <TabsContent value="payments" className="space-y-4">
+            <TabsContent value="payments" className="space-y-6">
               <ShellFormSection>
-                <p className="text-sm text-ink-3">{t("tabPayments")}</p>
+                <div className="flex items-center gap-3 rounded-md border border-line bg-surface-2 px-4 py-3">
+                  <span className="min-w-40 text-sm font-medium text-ink-2">
+                    {t("paymentProvider")}
+                  </span>
+                  <span className="text-sm font-semibold text-ink">
+                    {t("paymentProviderValue")}
+                  </span>
+                </div>
+                <p className="text-xs text-ink-3">{t("paymentNote")}</p>
+              </ShellFormSection>
+
+              <ShellFormSection>
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="changeFee"
+                    render={({ field: f }) => (
+                      <FormItem>
+                        <FormLabel>{t("changeFee")}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min={0}
+                            step={1}
+                            disabled={isLoading}
+                            value={f.value ?? ""}
+                            onChange={(e) =>
+                              f.onChange(
+                                e.target.value === ""
+                                  ? ""
+                                  : parseFloat(e.target.value)
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <p className="text-xs text-ink-3">
+                          {t("changeFeeHint")}
+                        </p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="transferFee"
+                    render={({ field: f }) => (
+                      <FormItem>
+                        <FormLabel>{t("transferFee")}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min={0}
+                            step={1}
+                            disabled={isLoading}
+                            value={f.value ?? ""}
+                            onChange={(e) =>
+                              f.onChange(
+                                e.target.value === ""
+                                  ? ""
+                                  : parseFloat(e.target.value)
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <p className="text-xs text-ink-3">
+                          {t("transferFeeHint")}
+                        </p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </ShellFormSection>
             </TabsContent>
             <TabsContent value="promoCodes" className="space-y-4">
@@ -1389,12 +1485,16 @@ export function AdminEventForm({
             <DialogTitle>
               {confirmDialog?.type === "status"
                 ? t("confirmStatusTitle")
-                : t("confirmIsActiveTitle")}
+                : confirmDialog?.type === "deleteDistance"
+                  ? t("confirmDeleteDistanceTitle")
+                  : t("confirmIsActiveTitle")}
             </DialogTitle>
             <DialogDescription>
               {confirmDialog?.type === "status"
                 ? t("confirmStatusDesc")
-                : t("confirmIsActiveDesc")}
+                : confirmDialog?.type === "deleteDistance"
+                  ? t("confirmDeleteDistanceDesc")
+                  : t("confirmIsActiveDesc")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

@@ -303,6 +303,14 @@ export const adminEventFormSchema = z.object({
   organizerInfo: z.string().max(300).optional(),
   organizerContactName: z.string().max(200).optional(),
   organizerContactInfo: z.string().max(500).optional(),
+  changeFee: z.preprocess(
+    emptyNumberToUndefined,
+    z.number().nonnegative().optional()
+  ),
+  transferFee: z.preprocess(
+    emptyNumberToUndefined,
+    z.number().nonnegative().optional()
+  ),
 });
 
 export type AdminEventFormData = z.output<typeof adminEventFormSchema>;
@@ -384,6 +392,8 @@ export type AdminEventFormInput = {
   organizerInfo?: string;
   organizerContactName?: string;
   organizerContactInfo?: string;
+  changeFee?: number | "";
+  transferFee?: number | "";
 };
 
 /**
@@ -613,6 +623,8 @@ export function adminFormToCreatePayload(
     organizerInfo: data.organizerInfo?.trim() || undefined,
     organizerContactName: data.organizerContactName?.trim() || undefined,
     organizerContactInfo: data.organizerContactInfo?.trim() || undefined,
+    changeFee: data.changeFee,
+    transferFee: data.transferFee,
   };
 }
 
@@ -675,6 +687,8 @@ export function eventToAdminFormDefaults(event: {
   organizerInfo?: string;
   organizerContactName?: string;
   organizerContactInfo?: string;
+  changeFee?: number;
+  transferFee?: number;
 }): AdminEventFormInput {
   const d = new Date(event.date);
   const tr = event.translations;
@@ -789,6 +803,8 @@ export function eventToAdminFormDefaults(event: {
     organizerInfo: event.organizerInfo ?? "",
     organizerContactName: event.organizerContactName ?? "",
     organizerContactInfo: event.organizerContactInfo ?? "",
+    changeFee: event.changeFee ?? "",
+    transferFee: event.transferFee ?? "",
   };
 }
 
@@ -834,5 +850,7 @@ export function createEmptyAdminEventForm(): AdminEventFormInput {
     organizerInfo: "",
     organizerContactName: "",
     organizerContactInfo: "",
+    changeFee: "",
+    transferFee: "",
   };
 }

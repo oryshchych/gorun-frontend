@@ -766,7 +766,16 @@
       "basePriceLabel": "Base price",
       "basePriceHint": "Taken from the first price period",
       "noPricePeriods": "No price periods yet. Add one to set pricing.",
-      "noDistances": "No distances yet. Add one to configure race options."
+      "noDistances": "No distances yet. Add one to configure race options.",
+      "confirmDeleteDistanceTitle": "Delete distance?",
+      "confirmDeleteDistanceDesc": "Are you sure you want to delete this distance? This cannot be undone.",
+      "paymentProvider": "Payment provider",
+      "paymentProviderValue": "Plata by Mono",
+      "paymentNote": "Payment settings are managed centrally and cannot be changed from here.",
+      "changeFee": "Distance change fee (UAH)",
+      "changeFeeHint": "Charged when a participant changes to a different distance.",
+      "transferFee": "Registration transfer fee (UAH)",
+      "transferFeeHint": "Charged when a participant transfers their registration to another person."
     },
     "promoCodes": {
       "title": "Promo codes",
