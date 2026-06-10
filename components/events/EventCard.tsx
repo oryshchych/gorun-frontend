@@ -163,19 +163,17 @@ export function EventCard({ event }: EventCardProps) {
             }}
           >
             {/* Title (when no cover image) */}
-            {!coverImage && (
-              <h3
-                className="gr-display"
-                style={{
-                  fontSize: 18,
-                  fontWeight: 700,
-                  color: "var(--ink)",
-                  margin: 0,
-                }}
-              >
-                {title}
-              </h3>
-            )}
+            <h3
+              className="gr-display"
+              style={{
+                fontSize: 18,
+                fontWeight: 700,
+                color: "var(--ink)",
+                margin: 0,
+              }}
+            >
+              {title}
+            </h3>
 
             {/* Meta row */}
             <div
