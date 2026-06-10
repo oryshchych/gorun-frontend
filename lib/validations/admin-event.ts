@@ -898,12 +898,9 @@ export function createEmptyAdminEventForm(): AdminEventFormInput {
   const dateLabel = format(date, "PPP 'at' p");
   return {
     translations: {
-      title: { en: "New event", uk: "Нова подія" },
-      description: {
-        en: "Describe the event in English for participants (min. 10 characters).",
-        uk: "Опишіть подію українською для учасників (мін. 10 символів).",
-      },
-      location: { en: "City, venue", uk: "Місто, локація" },
+      title: { en: "", uk: "" },
+      description: { en: "", uk: "" },
+      location: { en: "", uk: "" },
       date: { en: dateLabel, uk: dateLabel },
     },
     slug: "",

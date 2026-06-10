@@ -640,7 +640,10 @@
       "colStatus": "Статус",
       "page": "Сторінка {current} з {total}",
       "prev": "Назад",
-      "next": "Далі"
+      "next": "Далі",
+      "preview": "Переглянути",
+      "previewTitle": "Перегляд події",
+      "previewEdit": "Редагувати"
     },
     "eventForm": {
       "tabMain": "Основне",
@@ -660,6 +663,9 @@
       "sectionKids": "Дитячі забіги",
       "sectionSpeakers": "Спікери",
       "isActiveLabel": "Активна (видно на сайті)",
+      "titlePlaceholder": "Назва події",
+      "locationPlaceholder": "Місто, локація",
+      "descriptionPlaceholder": "Опишіть подію для учасників…",
       "isActiveHint": "Неактивні події лишаються в адмінці, але приховані з публічних списків, якщо API це підтримує.",
       "statusLabel": "Статус",
       "status": {
@@ -790,7 +796,14 @@
       "changeFee": "Комісія за зміну дистанції (грн)",
       "changeFeeHint": "Стягується при переході учасника на іншу дистанцію.",
       "transferFee": "Комісія за передачу реєстрації (грн)",
-      "transferFeeHint": "Стягується при передачі реєстрації іншій особі."
+      "transferFeeHint": "Стягується при передачі реєстрації іншій особі.",
+      "closeButton": "Закрити",
+      "unsavedCloseTitle": "Незбережені зміни",
+      "unsavedCloseDesc": "У вас є незбережені зміни. Закрити і втратити їх?",
+      "unsavedCloseConfirm": "Закрити і скасувати зміни",
+      "savedTitle": "Збережено",
+      "savedDesc": "Подію успішно збережено.",
+      "savedClose": "OK"
     },
     "promoCodes": {
       "title": "Промокоди",

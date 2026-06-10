@@ -640,7 +640,10 @@
       "colStatus": "Status",
       "page": "Page {current} of {total}",
       "prev": "Previous",
-      "next": "Next"
+      "next": "Next",
+      "preview": "Preview",
+      "previewTitle": "Event preview",
+      "previewEdit": "Edit"
     },
     "eventForm": {
       "tabMain": "Main",
@@ -660,6 +663,9 @@
       "sectionKids": "Kids races",
       "sectionSpeakers": "Speakers",
       "isActiveLabel": "Active (visible on site)",
+      "titlePlaceholder": "Event name",
+      "locationPlaceholder": "City, venue",
+      "descriptionPlaceholder": "Describe the event for participants…",
       "isActiveHint": "Inactive events stay in the admin list but are hidden from public listings when the API supports it.",
       "statusLabel": "Status",
       "status": {
@@ -790,7 +796,14 @@
       "changeFee": "Distance change fee (UAH)",
       "changeFeeHint": "Charged when a participant changes to a different distance.",
       "transferFee": "Registration transfer fee (UAH)",
-      "transferFeeHint": "Charged when a participant transfers their registration to another person."
+      "transferFeeHint": "Charged when a participant transfers their registration to another person.",
+      "closeButton": "Close",
+      "unsavedCloseTitle": "Unsaved changes",
+      "unsavedCloseDesc": "You have unsaved changes. Close anyway and lose them?",
+      "unsavedCloseConfirm": "Close and discard",
+      "savedTitle": "Saved",
+      "savedDesc": "Event saved successfully.",
+      "savedClose": "OK"
     },
     "promoCodes": {
       "title": "Promo codes",

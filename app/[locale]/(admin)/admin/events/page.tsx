@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale/en-US";
 import { uk } from "date-fns/locale/uk";
-import { Loader2, Pencil } from "lucide-react";
+import { Eye, Loader2, Pencil } from "lucide-react";
 import { useEvents } from "@/hooks/useEvents";
 import { getLocalizedString } from "@/lib/utils";
 import { handleApiError } from "@/lib/error-handler";
@@ -19,6 +20,7 @@ import {
 } from "@/components/layout/shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { EventPreviewModal } from "@/components/admin/EventPreviewModal";
 import type { Event } from "@/types/event";
 
 function eventTitle(event: Event, locale: string): string {
@@ -38,11 +40,13 @@ function eventTitle(event: Event, locale: string): string {
 
 export default function AdminEventsListPage() {
   const locale = useLocale();
+  const router = useRouter();
   const t = useTranslations("admin.events");
   const tForm = useTranslations("admin.eventForm");
   const tCommon = useTranslations("common");
   const tApi = useTranslations("apiCodes");
   const [page, setPage] = useState(1);
+  const [previewEvent, setPreviewEvent] = useState<Event | null>(null);
   const limit = 20;
   const dateLocale = locale === "uk" ? uk : enUS;
 
@@ -90,7 +94,7 @@ export default function AdminEventsListPage() {
                   <th className="px-4 py-3 font-medium">{t("colDate")}</th>
                   <th className="px-4 py-3 font-medium">{t("colActive")}</th>
                   <th className="px-4 py-3 font-medium">{t("colStatus")}</th>
-                  <th className="w-24 px-4 py-3 font-medium" />
+                  <th className="w-28 px-4 py-3 font-medium" />
                 </ShellTableHeadRow>
               </thead>
               <tbody>
@@ -126,14 +130,25 @@ export default function AdminEventsListPage() {
                         {row.status ? tForm(`status.${row.status}`) : "—"}
                       </td>
                       <td className="px-4 py-3">
-                        <Button variant="ghost" size="icon" asChild>
-                          <Link
-                            href={`/${locale}/admin/events/${row.id}/edit`}
-                            aria-label={t("edit")}
+                        <div className="flex items-center gap-1">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            aria-label={t("preview")}
+                            onClick={() => setPreviewEvent(row)}
                           >
-                            <Pencil className="size-4" />
-                          </Link>
-                        </Button>
+                            <Eye className="size-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" asChild>
+                            <Link
+                              href={`/${locale}/admin/events/${row.id}/edit`}
+                              aria-label={t("edit")}
+                            >
+                              <Pencil className="size-4" />
+                            </Link>
+                          </Button>
+                        </div>
                       </td>
                     </ShellTableBodyRow>
                   );
@@ -179,6 +194,16 @@ export default function AdminEventsListPage() {
           </Button>
         </div>
       )}
+
+      <EventPreviewModal
+        event={previewEvent}
+        open={previewEvent !== null}
+        onClose={() => setPreviewEvent(null)}
+        onEdit={(id) => {
+          setPreviewEvent(null);
+          router.push(`/${locale}/admin/events/${id}/edit`);
+        }}
+      />
     </>
   );
 }

@@ -64,6 +64,7 @@ interface CloudinarySignatureResponse {
 interface AdminEventFormProps {
   defaultValues: AdminEventFormInput;
   onSubmit: (data: AdminEventFormData) => void | Promise<void>;
+  onClose?: () => void;
   isLoading?: boolean;
   submitLabel?: string;
   eventId?: string;
@@ -73,6 +74,7 @@ type ConfirmDialogState =
   | { type: "status"; pendingValue: string }
   | { type: "isActive"; pendingValue: boolean }
   | { type: "deleteDistance"; pendingIndex: number }
+  | { type: "unsavedClose" }
   | null;
 
 function formatDateForInput(date: Date) {
@@ -283,6 +285,7 @@ function DistancePricePeriods({
 export function AdminEventForm({
   defaultValues,
   onSubmit,
+  onClose,
   isLoading = false,
   submitLabel,
   eventId,
@@ -373,8 +376,20 @@ export function AdminEventForm({
       form.setValue("isActive", confirmDialog.pendingValue);
     } else if (confirmDialog.type === "deleteDistance") {
       da.remove(confirmDialog.pendingIndex);
+    } else if (confirmDialog.type === "unsavedClose") {
+      setConfirmDialog(null);
+      onClose?.();
+      return;
     }
     setConfirmDialog(null);
+  }
+
+  function handleClose() {
+    if (form.formState.isDirty) {
+      setConfirmDialog({ type: "unsavedClose" });
+    } else {
+      onClose?.();
+    }
   }
 
   async function handleBannerUpload(file: File) {
@@ -529,7 +544,11 @@ export function AdminEventForm({
                     <FormItem>
                       <FormLabel>{t("title")}</FormLabel>
                       <FormControl>
-                        <Input {...field} disabled={isLoading} />
+                        <Input
+                          {...field}
+                          disabled={isLoading}
+                          placeholder={t("titlePlaceholder")}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -573,7 +592,11 @@ export function AdminEventForm({
                       <FormItem>
                         <FormLabel>{t("startLocation")}</FormLabel>
                         <FormControl>
-                          <Input {...field} disabled={isLoading} />
+                          <Input
+                            {...field}
+                            disabled={isLoading}
+                            placeholder={t("locationPlaceholder")}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -619,7 +642,12 @@ export function AdminEventForm({
                     <FormItem>
                       <FormLabel>{t("description")}</FormLabel>
                       <FormControl>
-                        <Textarea {...field} disabled={isLoading} rows={5} />
+                        <Textarea
+                          {...field}
+                          disabled={isLoading}
+                          rows={5}
+                          placeholder={t("descriptionPlaceholder")}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1203,7 +1231,27 @@ export function AdminEventForm({
                                 <Checkbox
                                   checked={!!f.value}
                                   disabled={isLoading}
-                                  onChange={() => f.onChange(!f.value)}
+                                  onChange={() => {
+                                    const next = !f.value;
+                                    f.onChange(next);
+                                    if (next) {
+                                      form.setValue(
+                                        `distances.${i}.discountPensioner`,
+                                        ""
+                                      );
+                                      form.setValue(
+                                        `distances.${i}.discountVeteran`,
+                                        ""
+                                      );
+                                      form.setValue(
+                                        `distances.${i}.discountDisability`,
+                                        ""
+                                      );
+                                    } else {
+                                      form.setValue(`distances.${i}.minAge`, "");
+                                      form.setValue(`distances.${i}.maxAge`, "");
+                                    }
+                                  }}
                                 />
                               </FormControl>
                               <FormLabel className="mt-0 cursor-pointer font-normal">
@@ -1338,37 +1386,61 @@ export function AdminEventForm({
                         </div>
                       )}
 
-                      {/* Max age — only for kids distances */}
+                      {/* Min + Max age — only for kids distances */}
                       {isKids && (
-                        <div className="space-y-4">
-                          <div className="grid gap-4 sm:grid-cols-2">
-                            <FormField
-                              control={form.control}
-                              name={`distances.${i}.maxAge`}
-                              render={({ field: f }) => (
-                                <FormItem>
-                                  <FormLabel>{t("maxAge")}</FormLabel>
-                                  <FormControl>
-                                    <Input
-                                      type="number"
-                                      min={0}
-                                      step={1}
-                                      disabled={isLoading}
-                                      value={f.value ?? ""}
-                                      onChange={(e) =>
-                                        f.onChange(
-                                          e.target.value === ""
-                                            ? ""
-                                            : parseInt(e.target.value, 10)
-                                        )
-                                      }
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          </div>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          <FormField
+                            control={form.control}
+                            name={`distances.${i}.minAge`}
+                            render={({ field: f }) => (
+                              <FormItem>
+                                <FormLabel>{t("minAge")}</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    min={0}
+                                    step={1}
+                                    disabled={isLoading}
+                                    value={f.value ?? ""}
+                                    onChange={(e) =>
+                                      f.onChange(
+                                        e.target.value === ""
+                                          ? ""
+                                          : parseInt(e.target.value, 10)
+                                      )
+                                    }
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name={`distances.${i}.maxAge`}
+                            render={({ field: f }) => (
+                              <FormItem>
+                                <FormLabel>{t("maxAge")}</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    min={0}
+                                    step={1}
+                                    disabled={isLoading}
+                                    value={f.value ?? ""}
+                                    onChange={(e) =>
+                                      f.onChange(
+                                        e.target.value === ""
+                                          ? ""
+                                          : parseInt(e.target.value, 10)
+                                      )
+                                    }
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                         </div>
                       )}
 
@@ -1509,17 +1581,30 @@ export function AdminEventForm({
             ))}
           </div>
 
-          <Button
-            type="submit"
-            variant="brand"
-            disabled={isLoading || bannerUploading || regulationUploading}
-            className="w-full sm:w-auto"
-          >
-            {isLoading && (
-              <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              type="submit"
+              variant="brand"
+              disabled={isLoading || bannerUploading || regulationUploading}
+              className="w-full sm:w-auto"
+            >
+              {isLoading && (
+                <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
+              )}
+              {submitLabel ?? tCommon("submit")}
+            </Button>
+            {onClose && (
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isLoading}
+                className="w-full sm:w-auto"
+                onClick={handleClose}
+              >
+                {t("closeButton")}
+              </Button>
             )}
-            {submitLabel ?? tCommon("submit")}
-          </Button>
+          </div>
         </form>
       </Form>
 
@@ -1537,14 +1622,18 @@ export function AdminEventForm({
                 ? t("confirmStatusTitle")
                 : confirmDialog?.type === "deleteDistance"
                   ? t("confirmDeleteDistanceTitle")
-                  : t("confirmIsActiveTitle")}
+                  : confirmDialog?.type === "unsavedClose"
+                    ? t("unsavedCloseTitle")
+                    : t("confirmIsActiveTitle")}
             </DialogTitle>
             <DialogDescription>
               {confirmDialog?.type === "status"
                 ? t("confirmStatusDesc")
                 : confirmDialog?.type === "deleteDistance"
                   ? t("confirmDeleteDistanceDesc")
-                  : t("confirmIsActiveDesc")}
+                  : confirmDialog?.type === "unsavedClose"
+                    ? t("unsavedCloseDesc")
+                    : t("confirmIsActiveDesc")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -1556,7 +1645,9 @@ export function AdminEventForm({
               {t("confirmCancel")}
             </Button>
             <Button type="button" variant="brand" onClick={handleConfirm}>
-              {t("confirmProceed")}
+              {confirmDialog?.type === "unsavedClose"
+                ? t("unsavedCloseConfirm")
+                : t("confirmProceed")}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -49,6 +49,7 @@ export default function AdminNewEventPage() {
         <AdminEventForm
           defaultValues={defaultValues}
           onSubmit={handleSubmit}
+          onClose={() => router.push(`/${locale}/admin/events`)}
           isLoading={createEvent.isPending}
           submitLabel={tCommon("create")}
         />
