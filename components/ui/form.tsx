@@ -12,8 +12,11 @@ import {
   type FieldValues,
 } from "react-hook-form";
 
+import { useTranslations } from "next-intl";
+
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
+import { decodeZodMessage } from "@/lib/validations/i18n-error";
 
 const Form = FormProvider;
 
@@ -150,7 +153,16 @@ const FormMessage = React.forwardRef<
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, children, ...props }, ref) => {
   const { error, formMessageId } = useFormField();
-  const body = error ? String(error?.message ?? "") : children;
+  const t = useTranslations();
+
+  let body: React.ReactNode = children;
+  if (error) {
+    const raw = String(error?.message ?? "");
+    const decoded = decodeZodMessage(raw);
+    // Translate i18n-encoded Zod messages; fall back to the raw string for
+    // schemas that still emit plain text or keys not present in the catalog.
+    body = decoded && t.has(decoded.key) ? t(decoded.key, decoded.values) : raw;
+  }
 
   if (!body) {
     return null;

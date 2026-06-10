@@ -22,13 +22,18 @@ import { Badge } from "@/components/ui/badge";
 import type { Event } from "@/types/event";
 
 function eventTitle(event: Event, locale: string): string {
-  if (event.title?.trim()) return event.title.trim();
-  const tr = event.translations?.title;
-  if (tr) {
-    const s = getLocalizedString(tr, locale, "en", "");
-    if (s.trim()) return s.trim();
-  }
-  return event.id;
+  // Prefer the API-localized field (returned when `lang` is sent), then the
+  // localized translations object, then the legacy flat title — same
+  // precedence as the public site (see app/[locale]/page.tsx).
+  const resolved =
+    event.resolvedTitle?.trim() ||
+    getLocalizedString(
+      event.translations?.title,
+      locale,
+      "en",
+      event.title ?? ""
+    ).trim();
+  return resolved || event.id;
 }
 
 export default function AdminEventsListPage() {

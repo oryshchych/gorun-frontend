@@ -49,6 +49,8 @@ import {
 import { Trash2, Plus } from "lucide-react";
 import apiClient from "@/lib/api/client";
 import { EventPromoCodesTab } from "@/components/admin/EventPromoCodesTab";
+import { showWarningToast } from "@/lib/error-handler";
+import type { FieldErrors } from "react-hook-form";
 
 const EVENT_STATUS = ["UPCOMING", "LIVE", "FINISHED", "CANCELLED"] as const;
 
@@ -319,20 +321,38 @@ export function AdminEventForm({
   const ka = useFieldArray({ control: form.control, name: "kidsDistances" });
   const spa = useFieldArray({ control: form.control, name: "speakers" });
 
-  const handleSubmit = form.handleSubmit(async (data) => {
-    const d = data.date instanceof Date ? data.date : new Date(data.date);
-    const fallbackLabel = format(d, "PPP 'at' p");
-    await onSubmit({
-      ...data,
-      translations: {
-        ...data.translations,
-        date: {
-          en: data.translations.date.en?.trim() || fallbackLabel,
-          uk: data.translations.date.uk?.trim() || fallbackLabel,
+  const handleSubmit = form.handleSubmit(
+    async (data) => {
+      const d = data.date instanceof Date ? data.date : new Date(data.date);
+      const fallbackLabel = format(d, "PPP 'at' p");
+      await onSubmit({
+        ...data,
+        translations: {
+          ...data.translations,
+          date: {
+            en: data.translations.date.en?.trim() || fallbackLabel,
+            uk: data.translations.date.uk?.trim() || fallbackLabel,
+          },
         },
-      },
-    });
-  });
+      });
+    },
+    (errors: FieldErrors<AdminEventFormInput>) => {
+      // Surface validation errors that live on a different tab than the one
+      // currently visible — otherwise the submit silently does nothing.
+      const errored = Object.keys(errors);
+      if (errored.length === 0) return;
+      const paymentsKeys = ["changeFee", "transferFee"];
+      const onDistances = errored.includes("distances");
+      const onPayments = errored.some((k) => paymentsKeys.includes(k));
+      const targetTab = onDistances
+        ? "distances"
+        : onPayments
+          ? "payments"
+          : "description";
+      if (targetTab !== activeTab) setActiveTab(targetTab);
+      showWarningToast(t("validationError"), t("validationErrorTitle"));
+    }
+  );
 
   function handleStatusChange(value: string) {
     setConfirmDialog({ type: "status", pendingValue: value });
@@ -560,6 +580,36 @@ export function AdminEventForm({
                     )}
                   />
                 </div>
+
+                {/* Capacity — required by the API */}
+                <FormField
+                  control={form.control}
+                  name="capacity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("capacity")}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={1}
+                          max={10000}
+                          step={1}
+                          disabled={isLoading}
+                          value={field.value ?? ""}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value === ""
+                                ? ""
+                                : parseInt(e.target.value, 10)
+                            )
+                          }
+                        />
+                      </FormControl>
+                      <p className="text-xs text-ink-3">{t("capacityHint")}</p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 {/* Description — full width */}
                 <FormField
