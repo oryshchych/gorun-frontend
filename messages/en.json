@@ -643,7 +643,11 @@
       "next": "Next",
       "preview": "Preview",
       "previewTitle": "Event preview",
-      "previewEdit": "Edit"
+      "previewEdit": "Edit",
+      "delete": "Delete event",
+      "deleteConfirmTitle": "Delete event",
+      "deleteConfirmDesc": "This action cannot be undone. The event and all its data will be permanently deleted.",
+      "deleteConfirm": "Delete"
     },
     "eventForm": {
       "tabMain": "Main",

@@ -7,8 +7,8 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale/en-US";
 import { uk } from "date-fns/locale/uk";
-import { Eye, Loader2, Pencil } from "lucide-react";
-import { useEvents } from "@/hooks/useEvents";
+import { Eye, Loader2, Pencil, Trash2 } from "lucide-react";
+import { useDeleteEvent, useEvents } from "@/hooks/useEvents";
 import { getLocalizedString } from "@/lib/utils";
 import { handleApiError } from "@/lib/error-handler";
 import {
@@ -20,13 +20,18 @@ import {
 } from "@/components/layout/shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { EventPreviewModal } from "@/components/admin/EventPreviewModal";
 import type { Event } from "@/types/event";
 
 function eventTitle(event: Event, locale: string): string {
-  // Prefer the API-localized field (returned when `lang` is sent), then the
-  // localized translations object, then the legacy flat title — same
-  // precedence as the public site (see app/[locale]/page.tsx).
   const resolved =
     event.resolvedTitle?.trim() ||
     getLocalizedString(
@@ -47,6 +52,7 @@ export default function AdminEventsListPage() {
   const tApi = useTranslations("apiCodes");
   const [page, setPage] = useState(1);
   const [previewEvent, setPreviewEvent] = useState<Event | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const limit = 20;
   const dateLocale = locale === "uk" ? uk : enUS;
 
@@ -55,6 +61,7 @@ export default function AdminEventsListPage() {
     limit,
     lang: locale,
   });
+  const deleteEvent = useDeleteEvent();
 
   useEffect(() => {
     if (isError && error) {
@@ -65,6 +72,13 @@ export default function AdminEventsListPage() {
   const rows = data?.data ?? [];
   const pagination = data?.pagination;
   const totalPages = pagination?.totalPages ?? 1;
+
+  function handleConfirmDelete() {
+    if (!deleteTargetId) return;
+    deleteEvent.mutate(deleteTargetId, {
+      onSettled: () => setDeleteTargetId(null),
+    });
+  }
 
   return (
     <>
@@ -94,7 +108,7 @@ export default function AdminEventsListPage() {
                   <th className="px-4 py-3 font-medium">{t("colDate")}</th>
                   <th className="px-4 py-3 font-medium">{t("colActive")}</th>
                   <th className="px-4 py-3 font-medium">{t("colStatus")}</th>
-                  <th className="w-28 px-4 py-3 font-medium" />
+                  <th className="w-36 px-4 py-3 font-medium" />
                 </ShellTableHeadRow>
               </thead>
               <tbody>
@@ -147,6 +161,15 @@ export default function AdminEventsListPage() {
                             >
                               <Pencil className="size-4" />
                             </Link>
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            aria-label={t("delete")}
+                            onClick={() => setDeleteTargetId(row.id)}
+                          >
+                            <Trash2 className="size-4 text-danger" />
                           </Button>
                         </div>
                       </td>
@@ -203,7 +226,43 @@ export default function AdminEventsListPage() {
           setPreviewEvent(null);
           router.push(`/${locale}/admin/events/${id}/edit`);
         }}
+        onDelete={(id) => {
+          setPreviewEvent(null);
+          setDeleteTargetId(id);
+        }}
       />
+
+      {/* Delete confirmation dialog */}
+      <Dialog
+        open={deleteTargetId !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTargetId(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("deleteConfirmTitle")}</DialogTitle>
+            <DialogDescription>{t("deleteConfirmDesc")}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setDeleteTargetId(null)}
+            >
+              {tCommon("cancel")}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deleteEvent.isPending}
+              onClick={handleConfirmDelete}
+            >
+              {t("deleteConfirm")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

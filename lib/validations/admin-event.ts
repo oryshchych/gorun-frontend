@@ -20,11 +20,8 @@ const optionalUrl = z
     message: zMsg("validation.urlInvalid"),
   });
 
-const pair = (min: number, max: number) => {
-  const localized = z
-    .string()
-    .min(min, zMsg("validation.minChars", { min }))
-    .max(max, zMsg("validation.maxChars", { max }));
+const pair = (_min: number, max: number) => {
+  const localized = z.string().max(max, zMsg("validation.maxChars", { max }));
   return z.object({ en: localized, uk: localized });
 };
 
@@ -275,10 +272,7 @@ export const adminEventFormSchema = z.object({
     title: pair(3, 100),
     description: pair(10, 2000),
     location: pair(3, 200),
-    date: z.object({
-      en: z.string().min(1, zMsg("validation.required")),
-      uk: z.string().min(1, zMsg("validation.required")),
-    }),
+    date: z.object({ en: z.string(), uk: z.string() }),
   }),
   slug: z
     .string()
@@ -305,17 +299,11 @@ export const adminEventFormSchema = z.object({
   capacity: z.preprocess(
     (val) => (val === "" ? undefined : val),
     z
-      .union([
-        z.undefined(),
-        z
-          .number({ message: zMsg("validation.capacityRequired") })
-          .int(zMsg("validation.integer"))
-          .positive(zMsg("validation.capacityPositive"))
-          .max(10000, zMsg("validation.max", { max: 10000 })),
-      ])
-      .refine((v): v is number => v !== undefined, {
-        message: zMsg("validation.capacityRequired"),
-      })
+      .number({ message: zMsg("validation.capacityRequired") })
+      .int(zMsg("validation.integer"))
+      .positive(zMsg("validation.capacityPositive"))
+      .max(10000, zMsg("validation.max", { max: 10000 }))
+      .optional()
   ),
   basePrice: z.preprocess(
     (val) => (val === "" ? undefined : val),
@@ -734,12 +722,12 @@ export function eventToAdminFormDefaults(event: {
   venue?: string;
   city?: string;
   date: Date | string;
-  capacity: number;
+  capacity?: number;
   basePrice?: number;
   fee?: string;
   imageUrl?: { portrait?: string; landscape?: string };
   cover?: string;
-  spots?: { taken: number; total: number };
+  spots?: { taken?: number; total?: number };
   gallery?: string[];
   perks?: string[];
   afu?: string;

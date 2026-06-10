@@ -34,7 +34,11 @@ export function getLocalizedString(
 ): string {
   if (!field) return fallbackValue;
   const normalizedLocale = (locale as SupportedLocale) || fallbackLocale;
-  return field[normalizedLocale] ?? field[fallbackLocale] ?? fallbackValue;
+  return (
+    field[normalizedLocale]?.trim() ||
+    field[fallbackLocale]?.trim() ||
+    fallbackValue
+  );
 }
 
 /**

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { use, useState } from "react";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
 import { AdminEventForm } from "@/components/admin/AdminEventForm";
 import { ShellPageHeader } from "@/components/layout/shell";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useEvent, useUpdateEvent } from "@/hooks/useEvents";
+import { useDeleteEvent, useEvent, useUpdateEvent } from "@/hooks/useEvents";
 import {
   adminFormToUpdatePayload,
   eventToAdminFormDefaults,
@@ -37,7 +37,9 @@ export default function AdminEditEventPage({ params }: Props) {
 
   const { data: event, isLoading, error } = useEvent(id);
   const updateEvent = useUpdateEvent(id);
+  const deleteEvent = useDeleteEvent();
   const [savedOk, setSavedOk] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const handleSubmit = async (data: AdminEventFormData) => {
     try {
@@ -47,6 +49,13 @@ export default function AdminEditEventPage({ params }: Props) {
       /* mutation handles toast */
     }
   };
+
+  function handleConfirmDelete() {
+    deleteEvent.mutate(id, {
+      onSuccess: () => router.push(`/${locale}/admin/events`),
+      onSettled: () => setConfirmDelete(false),
+    });
+  }
 
   if (isLoading) {
     return (
@@ -76,12 +85,23 @@ export default function AdminEditEventPage({ params }: Props) {
 
   return (
     <>
-      <Button variant="ghost" asChild className="mb-4 -ml-2">
-        <Link href={`/${locale}/admin/events`}>
-          <ArrowLeft className="mr-2 size-4" />
-          {tCommon("back")}
-        </Link>
-      </Button>
+      <div className="mb-4 flex items-center justify-between -ml-2">
+        <Button variant="ghost" asChild>
+          <Link href={`/${locale}/admin/events`}>
+            <ArrowLeft className="mr-2 size-4" />
+            {tCommon("back")}
+          </Link>
+        </Button>
+        <Button
+          type="button"
+          variant="destructive"
+          size="sm"
+          onClick={() => setConfirmDelete(true)}
+        >
+          <Trash2 className="mr-2 size-4" aria-hidden />
+          {t("delete")}
+        </Button>
+      </div>
 
       <ShellPageHeader title={t("edit")} className="mb-6" />
 
@@ -97,7 +117,13 @@ export default function AdminEditEventPage({ params }: Props) {
         />
       </div>
 
-      <Dialog open={savedOk} onOpenChange={(open) => { if (!open) setSavedOk(false); }}>
+      {/* Save success modal */}
+      <Dialog
+        open={savedOk}
+        onOpenChange={(open) => {
+          if (!open) setSavedOk(false);
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{tForm("savedTitle")}</DialogTitle>
@@ -106,6 +132,38 @@ export default function AdminEditEventPage({ params }: Props) {
           <DialogFooter>
             <Button variant="brand" onClick={() => setSavedOk(false)}>
               {tForm("savedClose")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation modal */}
+      <Dialog
+        open={confirmDelete}
+        onOpenChange={(open) => {
+          if (!open) setConfirmDelete(false);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("deleteConfirmTitle")}</DialogTitle>
+            <DialogDescription>{t("deleteConfirmDesc")}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setConfirmDelete(false)}
+            >
+              {tCommon("cancel")}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deleteEvent.isPending}
+              onClick={handleConfirmDelete}
+            >
+              {t("deleteConfirm")}
             </Button>
           </DialogFooter>
         </DialogContent>

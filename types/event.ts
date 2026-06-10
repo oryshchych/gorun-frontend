@@ -215,7 +215,7 @@ interface BaseEventPayload {
   date: Date;
   dateLabel?: string;
   timeLabel?: string;
-  capacity: number;
+  capacity?: number;
   imageUrl?: EventImageUrl;
   cover?: string;
   basePrice?: number;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useFieldArray, useForm, type Resolver } from "react-hook-form";
+import { useUpdateEvent } from "@/hooks/useEvents";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { useMemo, useState } from "react";
@@ -317,6 +318,8 @@ export function AdminEventForm({
     defaultValues: mergedDefaults,
   });
 
+  const updateMutation = useUpdateEvent(eventId ?? "");
+
   const ga = useFieldArray({ control: form.control, name: "gallery" });
   const pa = useFieldArray({ control: form.control, name: "perks" });
   const sa = useFieldArray({ control: form.control, name: "schedule" });
@@ -368,12 +371,12 @@ export function AdminEventForm({
   function handleConfirm() {
     if (!confirmDialog) return;
     if (confirmDialog.type === "status") {
-      form.setValue(
-        "status",
-        confirmDialog.pendingValue as AdminEventFormInput["status"]
-      );
+      const value = confirmDialog.pendingValue as AdminEventFormInput["status"];
+      form.setValue("status", value);
+      if (eventId) updateMutation.mutate({ status: value });
     } else if (confirmDialog.type === "isActive") {
       form.setValue("isActive", confirmDialog.pendingValue);
+      if (eventId) updateMutation.mutate({ isActive: confirmDialog.pendingValue });
     } else if (confirmDialog.type === "deleteDistance") {
       da.remove(confirmDialog.pendingIndex);
     } else if (confirmDialog.type === "unsavedClose") {

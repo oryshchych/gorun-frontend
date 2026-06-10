@@ -643,7 +643,11 @@
       "next": "Далі",
       "preview": "Переглянути",
       "previewTitle": "Перегляд події",
-      "previewEdit": "Редагувати"
+      "previewEdit": "Редагувати",
+      "delete": "Видалити подію",
+      "deleteConfirmTitle": "Видалити подію",
+      "deleteConfirmDesc": "Цю дію не можна скасувати. Подію та всі її дані буде видалено назавжди.",
+      "deleteConfirm": "Видалити"
     },
     "eventForm": {
       "tabMain": "Основне",

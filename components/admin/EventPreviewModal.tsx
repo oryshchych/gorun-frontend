@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { enUS } from "date-fns/locale/en-US";
 import { uk } from "date-fns/locale/uk";
 import { useLocale, useTranslations } from "next-intl";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -23,6 +23,7 @@ interface EventPreviewModalProps {
   open: boolean;
   onClose: () => void;
   onEdit: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
 function PreviewRow({
@@ -45,6 +46,7 @@ export function EventPreviewModal({
   open,
   onClose,
   onEdit,
+  onDelete,
 }: EventPreviewModalProps) {
   const locale = useLocale();
   const t = useTranslations("admin.events");
@@ -158,13 +160,20 @@ export function EventPreviewModal({
         </div>
 
         <DialogFooter className="gap-2">
+          {onDelete && (
+            <Button
+              variant="destructive"
+              onClick={() => onDelete(event.id)}
+              className="mr-auto"
+            >
+              <Trash2 className="mr-2 size-4" aria-hidden />
+              {t("delete")}
+            </Button>
+          )}
           <Button variant="ghost" onClick={onClose}>
             {tCommon("close")}
           </Button>
-          <Button
-            variant="brand"
-            onClick={() => onEdit(event.id)}
-          >
+          <Button variant="brand" onClick={() => onEdit(event.id)}>
             <Pencil className="mr-2 size-4" aria-hidden />
             {t("previewEdit")}
           </Button>
