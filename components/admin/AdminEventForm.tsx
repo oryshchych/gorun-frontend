@@ -101,6 +101,7 @@ async function uploadToCloudinary(
   formData.append("timestamp", String(data.timestamp));
   formData.append("signature", data.signature);
   formData.append("folder", "events");
+  formData.append("type", "upload");
 
   const uploadUrl = `https://api.cloudinary.com/v1_1/${data.cloudName}/${resourceType}/upload`;
   const response = await axios.post<{ secure_url: string }>(
