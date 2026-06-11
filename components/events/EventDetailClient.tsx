@@ -106,23 +106,25 @@ export function EventDetailClient({
         paddingBottom: showMobileSticky ? 120 : 40,
       }}
     >
-      {/* ── Hero ── */}
+      {/* ── Hero (image only) ── */}
       <div
         style={{
           position: "relative",
           minHeight: 460,
-          backgroundImage: coverImage
-            ? `linear-gradient(180deg, rgba(15,26,18,0.4), rgba(15,26,18,0.85)), url(${coverImage})`
-            : undefined,
-          background: coverImage ? undefined : "var(--ink)",
-          backgroundSize: "cover",
+          backgroundImage: coverImage ? `url(${coverImage})` : undefined,
+          backgroundColor: "var(--surface-2)",
+          backgroundSize: "contain",
           backgroundPosition: "center",
-          color: "var(--surface)",
+          backgroundRepeat: "no-repeat",
         }}
       >
-        {/* Nav row */}
+        {/* ── Nav row (overlay) ── */}
         <div
           style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
             display: "flex",
             justifyContent: "space-between",
             padding: "14px 18px",
@@ -136,7 +138,8 @@ export function EventDetailClient({
               width: 40,
               height: 40,
               borderRadius: 999,
-              background: "rgba(255,255,255,0.95)",
+              background: "var(--surface)",
+              border: "1px solid var(--line)",
               color: "var(--ink)",
               display: "grid",
               placeItems: "center",
@@ -151,11 +154,11 @@ export function EventDetailClient({
                 width: 40,
                 height: 40,
                 borderRadius: 999,
-                background: "rgba(255,255,255,0.95)",
+                background: "var(--surface)",
                 color: "var(--ink)",
                 display: "grid",
                 placeItems: "center",
-                border: 0,
+                border: "1px solid var(--line)",
                 cursor: "pointer",
               }}
               aria-label="Save event"
@@ -167,11 +170,11 @@ export function EventDetailClient({
                 width: 40,
                 height: 40,
                 borderRadius: 999,
-                background: "rgba(255,255,255,0.95)",
+                background: "var(--surface)",
                 color: "var(--ink)",
                 display: "grid",
                 placeItems: "center",
-                border: 0,
+                border: "1px solid var(--line)",
                 cursor: "pointer",
               }}
               aria-label="Share event"
@@ -180,73 +183,56 @@ export function EventDetailClient({
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Event info overlay */}
+      {/* ── Event info ── */}
+      <div
+        style={{
+          padding: "0 18px 20px",
+          maxWidth: 1280,
+          margin: "0 auto",
+        }}
+      >
         <div
           style={{
-            padding: "0 18px 20px",
-            maxWidth: 1280,
-            margin: "0 auto",
-            marginTop: 60,
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 8,
+            alignItems: "center",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 8,
-              alignItems: "center",
-            }}
-          >
-            <Tag
-              style={{
-                background: "rgba(255,255,255,0.2)",
-                color: "var(--surface)",
-                backdropFilter: "blur(6px)",
-                textTransform: "none",
-              }}
-            >
-              {dateLabel}
+          <Tag style={{ textTransform: "none" }}>{dateLabel}</Tag>
+          {pastExperience && (
+            <Tag tone="dark" style={{ textTransform: "none" }}>
+              {t("past.badge")}
             </Tag>
-            {pastExperience && (
-              <Tag
-                tone="dark"
-                style={{
-                  background: "rgba(0,0,0,0.35)",
-                  color: "var(--surface)",
-                  border: "1px solid rgba(255,255,255,0.35)",
-                  textTransform: "none",
-                }}
-              >
-                {t("past.badge")}
-              </Tag>
-            )}
-          </div>
-          <h1
-            className="gr-display"
-            style={{
-              fontSize: "clamp(28px, 5vw, 64px)",
-              fontWeight: 800,
-              lineHeight: 1.05,
-              marginTop: 10,
-              textWrap: "balance",
-            }}
-          >
-            {title}
-          </h1>
-          <div
-            style={{
-              fontSize: 13,
-              opacity: 0.85,
-              marginTop: 8,
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-            }}
-          >
-            <MapPin size={14} />
-            {event.venue || location}
-          </div>
+          )}
+        </div>
+        <h1
+          className="gr-display"
+          style={{
+            fontSize: "clamp(28px, 5vw, 64px)",
+            fontWeight: 800,
+            lineHeight: 1.05,
+            marginTop: 10,
+            textWrap: "balance",
+            color: "var(--ink)",
+          }}
+        >
+          {title}
+        </h1>
+        <div
+          style={{
+            fontSize: 13,
+            color: "var(--ink-3)",
+            marginTop: 8,
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+          }}
+        >
+          <MapPin size={14} />
+          {event.venue || location}
         </div>
       </div>
 

@@ -89,7 +89,7 @@ export function EventCard({ event }: EventCardProps) {
               backgroundImage: coverImage
                 ? `linear-gradient(180deg, rgba(15,26,18,0) 30%, rgba(15,26,18,0.85)), url(${coverImage})`
                 : undefined,
-              background: coverImage ? undefined : "var(--surface-2)",
+              backgroundColor: coverImage ? undefined : "var(--surface-2)",
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
