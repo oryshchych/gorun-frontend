@@ -8,7 +8,7 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({ taken, total, className }: ProgressBarProps) {
-  const pct = Math.min(100, (taken / total) * 100);
+  const pct = total > 0 ? Math.min(100, (taken / total) * 100) : 0;
   const isOver = taken > total;
 
   return (

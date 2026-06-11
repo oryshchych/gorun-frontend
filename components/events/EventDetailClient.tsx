@@ -667,8 +667,8 @@ export function EventDetailClient({
                     </div>
                     <div style={{ marginTop: 12 }}>
                       <ProgressBar
-                        taken={d.spots.taken}
-                        total={d.spots.total}
+                        taken={d.spots?.taken ?? 0}
+                        total={d.spots?.total ?? d.participantLimit ?? 0}
                       />
                     </div>
                   </div>

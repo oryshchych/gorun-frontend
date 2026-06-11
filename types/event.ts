@@ -83,7 +83,8 @@ export interface Distance {
   fee?: number;
   elevation?: string; // "+520m" — trail events
   laps?: string; // "7.5 laps" — track events
-  spots: SpotsInfo;
+  /** Per-distance availability; may be absent for some backend payloads */
+  spots?: SpotsInfo;
   /** Distance in meters (canonical; `km` kept for backward-compat) */
   distanceMeters?: number;
   /** Optional per-distance start time; falls back to event date when absent */
