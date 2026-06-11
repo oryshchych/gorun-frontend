@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  adminEventFormResolverSchema,
   adminEventFormSchema,
   adminFormToCreatePayload,
   eventToAdminFormDefaults,
@@ -48,9 +49,9 @@ describe("adminEventFormSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("rejects invalid capacity", () => {
+  it("accepts any capacity (validation removed)", () => {
     const result = adminEventFormSchema.safeParse(buildForm({ capacity: 0 }));
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
   });
 
   it("accepts optional image URLs as empty strings", () => {
@@ -62,13 +63,33 @@ describe("adminEventFormSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("rejects malformed image URL", () => {
+  it("accepts a distance without a spots object", () => {
+    const result = adminEventFormSchema.safeParse(
+      buildForm({
+        distances: [{ id: "d1", name: "10K", label: "10K" }],
+      })
+    );
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts null string fields from the API (resolver coerces null)", () => {
+    const result = adminEventFormResolverSchema.safeParse(
+      buildForm({
+        distances: [
+          { id: "d1", name: "10K", label: "10K", laps: null, elevation: null },
+        ],
+      })
+    );
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts a malformed image URL (validation removed)", () => {
     const result = adminEventFormSchema.safeParse(
       buildForm({
         imageUrl: { portrait: "not-a-url", landscape: "" },
       })
     );
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
   });
 });
 

@@ -545,43 +545,20 @@ export function EventDetailClient({
 
             {activeTab === "schedule" && (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {/* `event.program` is [[time, what], ...]; `event.schedule` is [{time, what}, ...] */}
-                {(
-                  event.program ??
-                  event.schedule?.map(
-                    (s) => [s.time, s.what] as [string, string]
-                  ) ??
-                  []
-                ).map(([time, what], i) => (
-                  <div
-                    key={i}
+                {/* `event.scheduleText` is free-form, multi-line text */}
+                {event.scheduleText ? (
+                  <p
                     style={{
-                      display: "flex",
-                      gap: 14,
-                      padding: "14px 16px",
-                      background: "var(--surface)",
-                      borderRadius: "var(--r-md)",
-                      border: "1px solid var(--line)",
-                      alignItems: "center",
+                      fontSize: 15,
+                      lineHeight: 1.6,
+                      color: "var(--ink-2)",
+                      whiteSpace: "pre-wrap",
+                      margin: 0,
                     }}
                   >
-                    <div
-                      className="gr-mono"
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 700,
-                        color: "var(--brand-active)",
-                        minWidth: 50,
-                      }}
-                    >
-                      {time}
-                    </div>
-                    <div style={{ fontSize: 14, color: "var(--ink)" }}>
-                      {what}
-                    </div>
-                  </div>
-                ))}
-                {!(event.program ?? event.schedule)?.length && (
+                    {event.scheduleText}
+                  </p>
+                ) : (
                   <p style={{ color: "var(--ink-3)", fontSize: 14 }}>
                     {t("scheduleEmpty")}
                   </p>

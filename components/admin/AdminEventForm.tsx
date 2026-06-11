@@ -346,6 +346,33 @@ export function AdminEventForm({
       // Surface validation errors that live on a different tab than the one
       // currently visible — otherwise the submit silently does nothing.
       const errored = Object.keys(errors);
+
+      // Log every failing field path + message so it's clear what blocked save.
+      const flattened: { field: string; message: string }[] = [];
+      const walk = (node: unknown, path: string) => {
+        if (!node || typeof node !== "object") return;
+        if (
+          "message" in node &&
+          typeof (node as { message?: unknown }).message === "string"
+        ) {
+          flattened.push({
+            field: path,
+            message: (node as { message: string }).message,
+          });
+          return;
+        }
+        for (const [key, value] of Object.entries(node)) {
+          if (key === "ref" || key === "type") continue;
+          walk(value, path ? `${path}.${key}` : key);
+        }
+      };
+      walk(errors, "");
+      console.warn(
+        "[AdminEventForm] validation failed for fields:",
+        flattened.length ? flattened : errored,
+        errors
+      );
+
       if (errored.length === 0) return;
       const paymentsKeys = ["changeFee", "transferFee"];
       const onDistances = errored.includes("distances");
@@ -376,7 +403,8 @@ export function AdminEventForm({
       if (eventId) updateMutation.mutate({ status: value });
     } else if (confirmDialog.type === "isActive") {
       form.setValue("isActive", confirmDialog.pendingValue);
-      if (eventId) updateMutation.mutate({ isActive: confirmDialog.pendingValue });
+      if (eventId)
+        updateMutation.mutate({ isActive: confirmDialog.pendingValue });
     } else if (confirmDialog.type === "deleteDistance") {
       da.remove(confirmDialog.pendingIndex);
     } else if (confirmDialog.type === "unsavedClose") {
@@ -1251,8 +1279,14 @@ export function AdminEventForm({
                                         ""
                                       );
                                     } else {
-                                      form.setValue(`distances.${i}.minAge`, "");
-                                      form.setValue(`distances.${i}.maxAge`, "");
+                                      form.setValue(
+                                        `distances.${i}.minAge`,
+                                        ""
+                                      );
+                                      form.setValue(
+                                        `distances.${i}.maxAge`,
+                                        ""
+                                      );
                                     }
                                   }}
                                 />

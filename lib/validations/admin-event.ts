@@ -1,7 +1,6 @@
 import { addDays, format } from "date-fns";
 import { z } from "zod";
 import { emptyNumberToUndefined } from "@/lib/forms/number-field";
-import { zMsg } from "@/lib/validations/i18n-error";
 import type {
   CreateEventRequest,
   UpdateEventRequest,
@@ -14,47 +13,24 @@ import type {
   PricePeriod,
 } from "@/types/event";
 
-const optionalUrl = z
-  .string()
-  .refine((s) => s === "" || /^https?:\/\/.+/i.test(s), {
-    message: zMsg("validation.urlInvalid"),
-  });
+// NOTE: All validation constraints were intentionally removed from this form.
+// These schemas keep ONLY the data transforms (string→Date, ""→undefined,
+// number coercion) that the payload builders rely on — they never reject input.
+const optionalUrl = z.string();
 
-const pair = (_min: number, max: number) => {
-  const localized = z.string().max(max, zMsg("validation.maxChars", { max }));
-  return z.object({ en: localized, uk: localized });
-};
+const pair = (_min: number, _max: number) =>
+  z.object({ en: z.string(), uk: z.string() });
 
 const spotsSchema = z.object({
-  taken: z.number().int().min(0),
-  total: z.number().int().min(1),
+  taken: z.number(),
+  total: z.number(),
 });
 
 const optionalSpotsPairSchema = z
   .object({
-    taken: z.preprocess(
-      emptyNumberToUndefined,
-      z
-        .number()
-        .int(zMsg("validation.integer"))
-        .min(0, zMsg("validation.nonnegative"))
-        .optional()
-    ),
-    total: z.preprocess(
-      emptyNumberToUndefined,
-      z
-        .number()
-        .int(zMsg("validation.integer"))
-        .min(1, zMsg("validation.min", { min: 1 }))
-        .optional()
-    ),
+    taken: z.preprocess(emptyNumberToUndefined, z.number().optional()),
+    total: z.preprocess(emptyNumberToUndefined, z.number().optional()),
   })
-  .refine(
-    (s) =>
-      (s.taken === undefined && s.total === undefined) ||
-      (s.taken !== undefined && s.total !== undefined),
-    { message: zMsg("validation.spotsBoth") }
-  )
   .transform((s): z.infer<typeof spotsSchema> | undefined => {
     if (s.taken === undefined || s.total === undefined) return undefined;
     return { taken: s.taken, total: s.total };
@@ -63,147 +39,53 @@ const optionalSpotsPairSchema = z
 const pricePeriodSchema = z.object({
   from: z
     .union([z.string(), z.date()])
-    .transform((val) => (val ? new Date(val) : undefined))
-    .refine((d): d is Date => d !== undefined && !Number.isNaN(d.getTime()), {
-      message: zMsg("validation.invalidDate"),
-    }),
+    .transform((val) => (val ? new Date(val) : new Date(NaN))),
   to: z
     .union([z.string(), z.date()])
-    .transform((val) => (val ? new Date(val) : undefined))
-    .refine((d): d is Date => d !== undefined && !Number.isNaN(d.getTime()), {
-      message: zMsg("validation.invalidDate"),
-    }),
-  price: z.preprocess(
-    emptyNumberToUndefined,
-    z.number().positive(zMsg("validation.pricePositive"))
-  ),
+    .transform((val) => (val ? new Date(val) : new Date(NaN))),
+  price: z
+    .preprocess(emptyNumberToUndefined, z.number().optional())
+    .transform((p) => p ?? 0),
 });
 
-const distanceSchema = z
-  .object({
-    id: z.string().min(1),
-    label: z.string().optional(),
-    name: z
-      .string()
-      .min(1, zMsg("validation.required"))
-      .max(100, zMsg("validation.maxChars", { max: 100 })),
-    km: z.preprocess(
-      emptyNumberToUndefined,
-      z.number().nonnegative(zMsg("validation.nonnegative")).optional()
-    ),
-    feeUah: z.preprocess(
-      emptyNumberToUndefined,
-      z.number().nonnegative(zMsg("validation.nonnegative")).optional()
-    ),
-    elevation: z.string().optional(),
-    laps: z.string().optional(),
-    spots: optionalSpotsPairSchema,
-    distanceMeters: z.preprocess(
-      emptyNumberToUndefined,
-      z
-        .number()
-        .int(zMsg("validation.integer"))
-        .min(1, zMsg("validation.min", { min: 1 }))
-        .max(999999, zMsg("validation.max", { max: 999999 }))
-        .optional()
-    ),
-    startAt: z
-      .union([z.string(), z.date()])
-      .transform((val) => (val ? new Date(val) : undefined))
-      .refine((d) => d === undefined || !Number.isNaN(d.getTime()), {
-        message: zMsg("validation.invalidDate"),
-      })
-      .optional(),
-    participantLimit: z.preprocess(
-      emptyNumberToUndefined,
-      z
-        .number()
-        .int(zMsg("validation.integer"))
-        .min(1, zMsg("validation.min", { min: 1 }))
-        .optional()
-    ),
-    bibFrom: z.preprocess(
-      emptyNumberToUndefined,
-      z
-        .number()
-        .int(zMsg("validation.integer"))
-        .min(0, zMsg("validation.nonnegative"))
-        .optional()
-    ),
-    bibTo: z.preprocess(
-      emptyNumberToUndefined,
-      z
-        .number()
-        .int(zMsg("validation.integer"))
-        .min(0, zMsg("validation.nonnegative"))
-        .optional()
-    ),
-    isKids: z.boolean().optional(),
-    discountPensioner: z.preprocess(
-      emptyNumberToUndefined,
-      z
-        .number()
-        .int(zMsg("validation.integer"))
-        .min(0, zMsg("validation.nonnegative"))
-        .max(100, zMsg("validation.max", { max: 100 }))
-        .optional()
-    ),
-    discountVeteran: z.preprocess(
-      emptyNumberToUndefined,
-      z
-        .number()
-        .int(zMsg("validation.integer"))
-        .min(0, zMsg("validation.nonnegative"))
-        .max(100, zMsg("validation.max", { max: 100 }))
-        .optional()
-    ),
-    discountDisability: z.preprocess(
-      emptyNumberToUndefined,
-      z
-        .number()
-        .int(zMsg("validation.integer"))
-        .min(0, zMsg("validation.nonnegative"))
-        .max(100, zMsg("validation.max", { max: 100 }))
-        .optional()
-    ),
-    minAge: z.preprocess(
-      emptyNumberToUndefined,
-      z
-        .number()
-        .int(zMsg("validation.integer"))
-        .min(0, zMsg("validation.nonnegative"))
-        .optional()
-    ),
-    maxAge: z.preprocess(
-      emptyNumberToUndefined,
-      z
-        .number()
-        .int(zMsg("validation.integer"))
-        .min(0, zMsg("validation.nonnegative"))
-        .optional()
-    ),
-    pricePeriods: z.array(pricePeriodSchema).optional(),
-  })
-  .refine(
-    (d) =>
-      d.bibTo === undefined || d.bibFrom === undefined || d.bibTo >= d.bibFrom,
-    { path: ["bibTo"], message: zMsg("validation.bibRange") }
-  )
-  .refine(
-    (d) =>
-      d.maxAge === undefined || d.minAge === undefined || d.maxAge > d.minAge,
-    { path: ["maxAge"], message: zMsg("validation.ageRange") }
-  );
+const distanceSchema = z.object({
+  id: z.string(),
+  label: z.string().optional(),
+  name: z.string(),
+  km: z.preprocess(emptyNumberToUndefined, z.number().optional()),
+  feeUah: z.preprocess(emptyNumberToUndefined, z.number().optional()),
+  elevation: z.string().optional(),
+  laps: z.string().optional(),
+  spots: optionalSpotsPairSchema.optional(),
+  distanceMeters: z.preprocess(emptyNumberToUndefined, z.number().optional()),
+  startAt: z
+    .union([z.string(), z.date()])
+    .transform((val) => (val ? new Date(val) : undefined))
+    .optional(),
+  participantLimit: z.preprocess(emptyNumberToUndefined, z.number().optional()),
+  bibFrom: z.preprocess(emptyNumberToUndefined, z.number().optional()),
+  bibTo: z.preprocess(emptyNumberToUndefined, z.number().optional()),
+  isKids: z.boolean().optional(),
+  discountPensioner: z.preprocess(
+    emptyNumberToUndefined,
+    z.number().optional()
+  ),
+  discountVeteran: z.preprocess(emptyNumberToUndefined, z.number().optional()),
+  discountDisability: z.preprocess(
+    emptyNumberToUndefined,
+    z.number().optional()
+  ),
+  minAge: z.preprocess(emptyNumberToUndefined, z.number().optional()),
+  maxAge: z.preprocess(emptyNumberToUndefined, z.number().optional()),
+  pricePeriods: z.array(pricePeriodSchema).optional(),
+});
 
 const kidsDistanceSchema = z.object({
-  id: z.string().min(1),
-  label: z.string().min(1),
-  name: z.string().min(1),
-  age: z.string().min(1),
-  feeUah: z.preprocess(
-    emptyNumberToUndefined,
-    z.number().nonnegative().optional()
-  ),
+  id: z.string(),
+  label: z.string(),
+  name: z.string(),
+  age: z.string(),
+  feeUah: z.preprocess(emptyNumberToUndefined, z.number().optional()),
 });
 
 const scheduleRowSchema = z.object({
@@ -274,49 +156,22 @@ export const adminEventFormSchema = z.object({
     location: pair(3, 200),
     date: z.object({ en: z.string(), uk: z.string() }),
   }),
-  slug: z
-    .string()
-    .max(120, zMsg("validation.maxChars", { max: 120 }))
-    .optional(),
-  shortDesc: z
-    .string()
-    .max(500, zMsg("validation.maxChars", { max: 500 }))
-    .optional(),
-  venue: z
-    .string()
-    .max(200, zMsg("validation.maxChars", { max: 200 }))
-    .optional(),
-  city: z
-    .string()
-    .max(120, zMsg("validation.maxChars", { max: 120 }))
-    .optional(),
+  slug: z.string().optional(),
+  shortDesc: z.string().optional(),
+  venue: z.string().optional(),
+  city: z.string().optional(),
   date: z
     .union([z.string(), z.date()])
-    .transform((val) => (typeof val === "string" ? new Date(val) : val))
-    .refine((d) => !Number.isNaN(d.getTime()), {
-      message: zMsg("validation.invalidDate"),
-    }),
+    .transform((val) => (typeof val === "string" ? new Date(val) : val)),
   capacity: z.preprocess(
     (val) => (val === "" ? undefined : val),
-    z
-      .number({ message: zMsg("validation.capacityRequired") })
-      .int(zMsg("validation.integer"))
-      .positive(zMsg("validation.capacityPositive"))
-      .max(10000, zMsg("validation.max", { max: 10000 }))
-      .optional()
+    z.number().optional()
   ),
   basePrice: z.preprocess(
     (val) => (val === "" ? undefined : val),
-    z
-      .number()
-      .nonnegative(zMsg("validation.nonnegative"))
-      .max(1_000_000, zMsg("validation.max", { max: 1000000 }))
-      .optional()
+    z.number().optional()
   ),
-  fee: z
-    .string()
-    .max(120, zMsg("validation.maxChars", { max: 120 }))
-    .optional(),
+  fee: z.string().optional(),
   imageUrl: z
     .object({
       portrait: optionalUrl,
@@ -327,10 +182,7 @@ export const adminEventFormSchema = z.object({
   spots: optionalSpotsPairSchema.optional(),
   gallery: z.array(z.object({ url: optionalUrl })).optional(),
   perks: z.array(z.object({ line: z.string() })).optional(),
-  afu: z
-    .string()
-    .max(2000, zMsg("validation.maxChars", { max: 2000 }))
-    .optional(),
+  afu: z.string().optional(),
   schedule: z.array(scheduleRowSchema).optional(),
   distances: z.array(distanceSchema).optional(),
   kidsDistances: z.array(kidsDistanceSchema).optional(),
@@ -340,16 +192,10 @@ export const adminEventFormSchema = z.object({
   registrationStart: z
     .union([z.string(), z.date()])
     .transform((val) => (val ? new Date(val) : undefined))
-    .refine((d) => d === undefined || !Number.isNaN(d.getTime()), {
-      message: zMsg("validation.invalidDate"),
-    })
     .optional(),
   registrationEnd: z
     .union([z.string(), z.date()])
     .transform((val) => (val ? new Date(val) : undefined))
-    .refine((d) => d === undefined || !Number.isNaN(d.getTime()), {
-      message: zMsg("validation.invalidDate"),
-    })
     .optional(),
   socials: z
     .object({
@@ -359,30 +205,12 @@ export const adminEventFormSchema = z.object({
     })
     .optional(),
   regulationUrl: optionalUrl.optional(),
-  scheduleText: z
-    .string()
-    .max(5000, zMsg("validation.maxChars", { max: 5000 }))
-    .optional(),
-  organizerInfo: z
-    .string()
-    .max(300, zMsg("validation.maxChars", { max: 300 }))
-    .optional(),
-  organizerContactName: z
-    .string()
-    .max(200, zMsg("validation.maxChars", { max: 200 }))
-    .optional(),
-  organizerContactInfo: z
-    .string()
-    .max(500, zMsg("validation.maxChars", { max: 500 }))
-    .optional(),
-  changeFee: z.preprocess(
-    emptyNumberToUndefined,
-    z.number().nonnegative(zMsg("validation.nonnegative")).optional()
-  ),
-  transferFee: z.preprocess(
-    emptyNumberToUndefined,
-    z.number().nonnegative(zMsg("validation.nonnegative")).optional()
-  ),
+  scheduleText: z.string().optional(),
+  organizerInfo: z.string().optional(),
+  organizerContactName: z.string().optional(),
+  organizerContactInfo: z.string().optional(),
+  changeFee: z.preprocess(emptyNumberToUndefined, z.number().optional()),
+  transferFee: z.preprocess(emptyNumberToUndefined, z.number().optional()),
 });
 
 export type AdminEventFormData = z.output<typeof adminEventFormSchema>;
@@ -495,9 +323,33 @@ export function sanitizeAdminFormBeforeParse(
   };
 }
 
+/**
+ * The API serializes empty fields as `null`, but the form schema's optional
+ * strings expect `undefined`. Recursively replace every `null` with `undefined`
+ * so a stray `null` (e.g. `laps`, `elevation`) never blocks save.
+ */
+function deepNullToUndefined<T>(value: T): T {
+  if (value === null) return undefined as T;
+  if (Array.isArray(value)) {
+    return value.map((item) => deepNullToUndefined(item)) as T;
+  }
+  if (value instanceof Date) return value;
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [key, val] of Object.entries(value)) {
+      out[key] = deepNullToUndefined(val);
+    }
+    return out as T;
+  }
+  return value;
+}
+
 /** Use with react-hook-form `zodResolver` so incomplete array rows validate. */
 export const adminEventFormResolverSchema = z.preprocess(
-  (raw) => sanitizeAdminFormBeforeParse(raw as AdminEventFormInput),
+  (raw) =>
+    sanitizeAdminFormBeforeParse(
+      deepNullToUndefined(raw as AdminEventFormInput)
+    ),
   adminEventFormSchema
 );
 
@@ -838,6 +690,13 @@ export function eventToAdminFormDefaults(event: {
     distances: event.distances?.length
       ? event.distances.map((x) => ({
           ...x,
+          label: x.label ?? "",
+          elevation: x.elevation ?? "",
+          laps: x.laps ?? "",
+          spots: {
+            taken: x.spots?.taken ?? "",
+            total: x.spots?.total ?? "",
+          },
           distanceMeters: x.distanceMeters ?? "",
           participantLimit: x.participantLimit ?? "",
           bibFrom: x.bibFrom ?? "",
