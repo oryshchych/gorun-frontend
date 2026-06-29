@@ -555,7 +555,15 @@ export function adminFormToCreatePayload(
 export function adminFormToUpdatePayload(
   data: AdminEventFormData
 ): UpdateEventRequest {
-  return adminFormToCreatePayload(data);
+  const base = adminFormToCreatePayload(data);
+  // For updates: send "" when the field was cleared so the backend preprocessor
+  // converts it to null and $unsets the MongoDB field. On create (adminFormToCreatePayload)
+  // we use `|| undefined` which is fine since there's nothing to clear.
+  const regulationUrl: string | undefined =
+    (data.regulationUrl?.trim() ?? "") === ""
+      ? ""  // explicit clear signal → backend will $unset
+      : data.regulationUrl!.trim();
+  return { ...base, regulationUrl };
 }
 
 export function eventToAdminFormDefaults(event: {

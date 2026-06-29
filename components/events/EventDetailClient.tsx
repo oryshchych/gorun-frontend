@@ -14,7 +14,6 @@ import {
   Baby,
   Check,
   Trophy,
-  Loader2,
 } from "lucide-react";
 import { Event } from "@/types/event";
 import { Participant } from "@/types/registration";
@@ -27,7 +26,6 @@ import {
   isPastEventExperience,
   isRegistrationClosed,
 } from "@/lib/event-registration";
-import { getCloudinarySignedUrl } from "@/lib/api/events";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale/en-US";
 import { uk } from "date-fns/locale/uk";
@@ -46,19 +44,8 @@ export function EventDetailClient({
   locale: _localeProp,
 }: EventDetailClientProps) {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
-  const [regulationLoading, setRegulationLoading] = useState(false);
   const locale = useLocale();
   const t = useTranslations("eventDetail");
-
-  async function openRegulation(url: string) {
-    setRegulationLoading(true);
-    try {
-      const signed = await getCloudinarySignedUrl(url);
-      window.open(signed, "_blank", "noopener,noreferrer");
-    } finally {
-      setRegulationLoading(false);
-    }
-  }
   const dateLocale = locale === "uk" ? uk : enUS;
 
   const title =
@@ -556,10 +543,10 @@ export function EventDetailClient({
 
                 {event.regulationUrl && (
                   <div>
-                    <button
-                      type="button"
-                      disabled={regulationLoading}
-                      onClick={() => void openRegulation(event.regulationUrl!)}
+                    <a
+                      href={event.regulationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       style={{
                         display: "inline-flex",
                         alignItems: "center",
@@ -568,18 +555,10 @@ export function EventDetailClient({
                         color: "var(--brand-active)",
                         textDecoration: "underline",
                         textUnderlineOffset: 3,
-                        background: "none",
-                        border: "none",
-                        padding: 0,
-                        cursor: regulationLoading ? "wait" : "pointer",
-                        opacity: regulationLoading ? 0.6 : 1,
                       }}
                     >
-                      {regulationLoading && (
-                        <Loader2 size={13} style={{ animation: "spin 1s linear infinite" }} />
-                      )}
                       {t("regulation")}
-                    </button>
+                    </a>
                   </div>
                 )}
               </div>

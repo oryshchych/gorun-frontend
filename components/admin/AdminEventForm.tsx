@@ -88,6 +88,9 @@ function formatDateForInput(date: Date) {
   return `${y}-${m}-${day}T${h}:${min}`;
 }
 
+const PDF_MIME_TYPE = "application/pdf";
+const MAX_REGULATION_BYTES = 10 * 1024 * 1024; // 10 MB
+
 async function uploadToCloudinary(
   file: File,
   resourceType: "image" | "raw"
@@ -101,8 +104,10 @@ async function uploadToCloudinary(
   formData.append("timestamp", String(data.timestamp));
   formData.append("signature", data.signature);
   formData.append("folder", "events");
-  formData.append("type", "upload");
 
+  // Public delivery type — the returned secure_url is openable directly.
+  // (PDF delivery must also be enabled in Cloudinary: Settings → Security →
+  // "Allow delivery of PDF and ZIP files".)
   const uploadUrl = `https://api.cloudinary.com/v1_1/${data.cloudName}/${resourceType}/upload`;
   const response = await axios.post<{ secure_url: string }>(
     uploadUrl,
@@ -435,10 +440,25 @@ export function AdminEventForm({
   }
 
   async function handleRegulationUpload(file: File) {
+    // PDF only — reject anything else (the accept="" attr is bypassable).
+    const isPdf =
+      file.type === PDF_MIME_TYPE ||
+      file.name.toLowerCase().endsWith(".pdf");
+    if (!isPdf) {
+      showWarningToast(t("invalidPdfType"), t("invalidFileTitle"));
+      return;
+    }
+    if (file.size > MAX_REGULATION_BYTES) {
+      showWarningToast(t("fileTooLarge"), t("invalidFileTitle"));
+      return;
+    }
+
     setRegulationUploading(true);
     try {
       const url = await uploadToCloudinary(file, "raw");
-      form.setValue("regulationUrl", url);
+      form.setValue("regulationUrl", url, { shouldDirty: true });
+    } catch {
+      showWarningToast(t("uploadFailed"), t("invalidFileTitle"));
     } finally {
       setRegulationUploading(false);
     }
@@ -822,6 +842,9 @@ export function AdminEventForm({
                                   ? t("uploadingFile")
                                   : t("uploadRegulation")}
                               </span>
+                              <span className="text-xs text-ink-4">
+                                {t("regulationHint")}
+                              </span>
                               <input
                                 type="file"
                                 accept="application/pdf"
@@ -829,6 +852,8 @@ export function AdminEventForm({
                                 disabled={regulationUploading || isLoading}
                                 onChange={(e) => {
                                   const file = e.target.files?.[0];
+                                  // Reset so selecting the same file again still fires onChange.
+                                  e.target.value = "";
                                   if (file) {
                                     void handleRegulationUpload(file);
                                   }

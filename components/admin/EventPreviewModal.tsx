@@ -5,8 +5,7 @@ import { format } from "date-fns";
 import { enUS } from "date-fns/locale/en-US";
 import { uk } from "date-fns/locale/uk";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
-import { Loader2, Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -17,7 +16,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { getLocalizedString } from "@/lib/utils";
-import { getCloudinarySignedUrl } from "@/lib/api/events";
 import type { Event } from "@/types/event";
 
 interface EventPreviewModalProps {
@@ -55,18 +53,6 @@ export function EventPreviewModal({
   const tForm = useTranslations("admin.eventForm");
   const tCommon = useTranslations("common");
   const dateLocale = locale === "uk" ? uk : enUS;
-  const [regulationLoading, setRegulationLoading] = useState(false);
-
-  async function openRegulation(url: string) {
-    setRegulationLoading(true);
-    try {
-      const signed = await getCloudinarySignedUrl(url);
-      window.open(signed, "_blank", "noopener,noreferrer");
-    } finally {
-      setRegulationLoading(false);
-    }
-  }
-
   if (!event) return null;
 
   const titleEn =
@@ -173,15 +159,14 @@ export function EventPreviewModal({
               <PreviewRow
                 label={tForm("regulation")}
                 value={
-                  <button
-                    type="button"
-                    disabled={regulationLoading}
-                    onClick={() => void openRegulation(event.regulationUrl!)}
-                    className="text-brand underline underline-offset-2 hover:text-brand-hover disabled:opacity-50 inline-flex items-center gap-1"
+                  <a
+                    href={event.regulationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-brand underline underline-offset-2 hover:text-brand-hover"
                   >
-                    {regulationLoading && <Loader2 className="size-3 animate-spin" />}
                     {tForm("regulation")}
-                  </button>
+                  </a>
                 }
               />
             )}

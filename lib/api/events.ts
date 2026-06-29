@@ -109,11 +109,3 @@ export const getMyEvents = async (
 
   return response.data;
 };
-
-export async function getCloudinarySignedUrl(url: string): Promise<string> {
-  const response = await apiClient.get<{ success: boolean; data: { signedUrl: string } }>(
-    "/cloudinary/signed-url",
-    { params: { url } }
-  );
-  return response.data.data.signedUrl;
-}
