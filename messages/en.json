@@ -1088,10 +1088,19 @@
       "details": "Details",
       "pay": "Pay"
     },
+    "goBack": "Go back",
+    "close": "Close",
+    "price": "{amount} ₴",
+    "free": "Free",
     "pickDistance": "Pick your distance",
     "spotsLeft": "{count} spots left",
+    "distancesEmpty": "Distance info coming soon.",
     "bringKids": "Bring your kids? (optional)",
     "kidsDesc": "Pick a distance for each child you'd like to register.",
+    "kidAge": "Age {age}",
+    "kidShirt": "Shirt {size}",
+    "addKid": "Add",
+    "removeKid": "Remove",
     "noKidsSaved": "No kids saved to your profile yet.",
     "addChildInProfile": "Add a child in profile",
     "shirtSize": "T-shirt size",
@@ -1099,20 +1108,32 @@
     "paceHint": "Used to seed your starting corral",
     "donation": "Add a donation to AFU",
     "donationHint": "100% goes to the Armed Forces of Ukraine",
+    "donationOption": "+{amount} ₴",
     "noDonation": "No",
     "payWith": "Pay with",
+    "payMethods": {
+      "apple": "Apple Pay",
+      "google": "Google Pay",
+      "mono": "Monobank · Privat24",
+      "card": "Card · Visa / Mastercard"
+    },
     "summary": "Summary",
     "total": "Total",
     "kidDist": "Kid — {dist}",
     "donationLine": "Donation to AFU",
+    "afuNote": "<highlight>{amount} ₴</highlight> from this purchase goes to the Armed Forces of Ukraine via the registered foundation.",
     "pay": "Pay {amount} ₴",
     "processing": "Processing…",
     "continue": "Continue",
     "success": {
       "title": "You're in.",
-      "bib": "Bib #{bib}",
+      "bib": "Bib <value>#{bib}</value>",
       "confirmEmail": "We sent your confirmation by email.",
       "racePass": "Race pass",
+      "qrCode": "QR",
+      "passBib": "Bib",
+      "passDistance": "Dist",
+      "passStart": "Start",
       "backToEvents": "Back to events"
     }
   },
@@ -1175,5 +1196,10 @@
     "runners": "Runners",
     "results": "Results",
     "profile": "Profile"
+  },
+  "progressBar": {
+    "runners": "{taken} / {total} runners",
+    "spotsLeft": "{count} spots left",
+    "waitlist": "Waitlist"
   }
 }

@@ -1088,10 +1088,19 @@
       "details": "Деталі",
       "pay": "Оплата"
     },
+    "goBack": "Назад",
+    "close": "Закрити",
+    "price": "{amount} ₴",
+    "free": "Безкоштовно",
     "pickDistance": "Оберіть дистанцію",
     "spotsLeft": "Залишилось {count} місць",
+    "distancesEmpty": "Інформація про дистанції з'явиться згодом.",
     "bringKids": "Берете дітей? (необов'язково)",
     "kidsDesc": "Оберіть дистанцію для кожної дитини.",
+    "kidAge": "{age} р.",
+    "kidShirt": "Футболка {size}",
+    "addKid": "Додати",
+    "removeKid": "Прибрати",
     "noKidsSaved": "У профілі ще немає збережених дітей.",
     "addChildInProfile": "Додати дитину у профілі",
     "shirtSize": "Розмір футболки",
@@ -1099,20 +1108,32 @@
     "paceHint": "Використовується для розподілу за стартовими зонами",
     "donation": "Додати донат на ЗСУ",
     "donationHint": "100% коштів передається ЗСУ",
+    "donationOption": "+{amount} ₴",
     "noDonation": "Ні",
     "payWith": "Сплатити через",
+    "payMethods": {
+      "apple": "Apple Pay",
+      "google": "Google Pay",
+      "mono": "Monobank · Privat24",
+      "card": "Картка · Visa / Mastercard"
+    },
     "summary": "Підсумок",
     "total": "Разом",
     "kidDist": "Дитина — {dist}",
     "donationLine": "Донат на ЗСУ",
+    "afuNote": "<highlight>{amount} ₴</highlight> з цієї покупки буде передано Збройним Силам України через зареєстрований фонд.",
     "pay": "Сплатити {amount} ₴",
     "processing": "Обробляємо…",
     "continue": "Далі",
     "success": {
       "title": "Ви в грі.",
-      "bib": "Номер #{bib}",
+      "bib": "Номер <value>#{bib}</value>",
       "confirmEmail": "Ми надіслали підтвердження на пошту.",
       "racePass": "Стартовий паспорт",
+      "qrCode": "QR",
+      "passBib": "Номер",
+      "passDistance": "Дист.",
+      "passStart": "Старт",
       "backToEvents": "До заходів"
     }
   },
@@ -1175,5 +1196,10 @@
     "runners": "Учасники",
     "results": "Результати",
     "profile": "Профіль"
+  },
+  "progressBar": {
+    "runners": "{taken} / {total} учасників",
+    "spotsLeft": "Залишилось {count} місць",
+    "waitlist": "Список очікування"
   }
 }

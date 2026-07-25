@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight, X, Check, Baby } from "lucide-react";
-import { Event, Distance, KidsDistance } from "@/types/event";
+import { Event, Distance } from "@/types/event";
 import { useAuth } from "@/hooks/useAuth";
 import { useCreateRegistration } from "@/hooks/useRegistrations";
-import { toast } from "sonner";
 
 interface RegistrationWizardProps {
   event: Event;
@@ -20,12 +20,24 @@ interface KidPick {
   distId: string;
 }
 
-const STEP_LABELS = ["Distance", "Kids", "Details", "Pay"];
+const STEP_KEYS = [
+  "steps.distance",
+  "steps.kids",
+  "steps.details",
+  "steps.pay",
+] as const;
 const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 const AFU_OPTIONS = [0, 100, 250, 500, 1000];
+const PAY_METHODS: { id: PayMethod; icon: string; labelKey: string }[] = [
+  { id: "apple", icon: "🍎", labelKey: "payMethods.apple" },
+  { id: "google", icon: "G", labelKey: "payMethods.google" },
+  { id: "mono", icon: "m", labelKey: "payMethods.mono" },
+  { id: "card", icon: "💳", labelKey: "payMethods.card" },
+];
 
 export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
   const router = useRouter();
+  const t = useTranslations("registration");
   const { user } = useAuth();
   const createRegistration = useCreateRegistration();
 
@@ -34,7 +46,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
     event.distances?.[0]?.id ?? ""
   );
   const [pickedKids, setPickedKids] = useState<KidPick[]>([]);
-  const [shirt, setShirt] = useState(user ? "M" : "M");
+  const [shirt, setShirt] = useState("M");
   const [pace, setPace] = useState("5:30");
   const [donate, setDonate] = useState(0);
   const [payMethod, setPayMethod] = useState<PayMethod>("card");
@@ -57,7 +69,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
       );
       return;
     }
-    if (step < STEP_LABELS.length - 1) {
+    if (step < STEP_KEYS.length - 1) {
       setStep((s) => s + 1);
     }
   };
@@ -137,7 +149,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               placeItems: "center",
               cursor: "pointer",
             }}
-            aria-label="Go back"
+            aria-label={t("goBack")}
           >
             <ArrowLeft size={18} />
           </button>
@@ -154,13 +166,14 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                 whiteSpace: "nowrap",
               }}
             >
-              Registering · {eventTitle}
+              {t("registering")} · {eventTitle}
             </div>
             <div
               className="gr-display"
               style={{ fontSize: 18, fontWeight: 800 }}
             >
-              Step {step + 1} of {STEP_LABELS.length} · {STEP_LABELS[step]}
+              {t("step", { current: step + 1, total: STEP_KEYS.length })} ·{" "}
+              {t(STEP_KEYS[step])}
             </div>
           </div>
           <button
@@ -170,7 +183,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               display: "grid",
               placeItems: "center",
             }}
-            aria-label="Close"
+            aria-label={t("close")}
           >
             <X size={22} />
           </button>
@@ -178,7 +191,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
 
         {/* Progress bar */}
         <div style={{ display: "flex", gap: 4, marginTop: 12 }}>
-          {STEP_LABELS.map((_, i) => (
+          {STEP_KEYS.map((_, i) => (
             <div
               key={i}
               style={{
@@ -211,7 +224,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                 marginBottom: 4,
               }}
             >
-              Pick your distance
+              {t("pickDistance")}
             </div>
             {event.distances?.map((d) => {
               const sel = pickedDistId === d.id;
@@ -261,7 +274,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     >
                       {d.elevation || d.laps}
                       {d.spots
-                        ? ` · ${d.spots.total - d.spots.taken} spots left`
+                        ? ` · ${t("spotsLeft", {
+                            count: d.spots.total - d.spots.taken,
+                          })}`
                         : ""}
                     </div>
                   </div>
@@ -269,14 +284,14 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     className="gr-display"
                     style={{ fontWeight: 800, fontSize: 16 }}
                   >
-                    {d.feeUah ?? d.fee} ₴
+                    {t("price", { amount: d.feeUah ?? d.fee ?? 0 })}
                   </div>
                 </button>
               );
             })}
             {!event.distances?.length && (
               <p style={{ color: "var(--ink-3)", fontSize: 14 }}>
-                Distance info coming soon.
+                {t("distancesEmpty")}
               </p>
             )}
           </div>
@@ -287,12 +302,12 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div>
               <div style={{ fontSize: 14, color: "var(--ink-3)" }}>
-                Bring your kids? (optional)
+                {t("bringKids")}
               </div>
               <div
                 style={{ fontSize: 12, color: "var(--ink-4)", marginTop: 4 }}
               >
-                Pick a distance for each child you&apos;d like to register.
+                {t("kidsDesc")}
               </div>
             </div>
 
@@ -333,8 +348,10 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                         {kid.name}
                       </div>
                       <div style={{ fontSize: 12, color: "var(--ink-3)" }}>
-                        Age {kid.age}
-                        {kid.shirt ? ` · Shirt ${kid.shirt}` : ""}
+                        {t("kidAge", { age: kid.age })}
+                        {kid.shirt
+                          ? ` · ${t("kidShirt", { size: kid.shirt })}`
+                          : ""}
                       </div>
                     </div>
                     <button
@@ -363,13 +380,14 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                         cursor: "pointer",
                       }}
                     >
-                      {reg ? "Remove" : "+ Add"}
+                      {reg ? t("removeKid") : `+ ${t("addKid")}`}
                     </button>
                   </div>
                   {reg && event.kidsDistances && (
                     <div style={{ display: "flex", gap: 6 }}>
                       {event.kidsDistances.map((d) => {
                         const sel = reg.distId === d.id;
+                        const fee = d.feeUah ?? d.fee ?? 0;
                         return (
                           <button
                             key={d.id}
@@ -403,9 +421,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                                 marginTop: 2,
                               }}
                             >
-                              {(d.feeUah ?? d.fee) === 0
-                                ? "Free"
-                                : `${d.feeUah ?? d.fee}₴`}
+                              {fee === 0
+                                ? t("free")
+                                : t("price", { amount: fee })}
                             </div>
                           </button>
                         );
@@ -427,7 +445,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                   textAlign: "center",
                 }}
               >
-                No kids saved to your profile yet.
+                {t("noKidsSaved")}
               </div>
             )}
 
@@ -448,7 +466,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               }}
               onClick={() => router.push(`/${locale}/profile`)}
             >
-              + Add a child in profile
+              + {t("addChildInProfile")}
             </button>
           </div>
         )}
@@ -510,7 +528,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                   marginBottom: 8,
                 }}
               >
-                T-shirt size
+                {t("shirtSize")}
               </div>
               <div style={{ display: "flex", gap: 6 }}>
                 {SHIRT_SIZES.map((s) => (
@@ -547,7 +565,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     marginBottom: 8,
                   }}
                 >
-                  Estimated pace (min/km)
+                  {t("pace")}
                 </div>
                 <input
                   value={pace}
@@ -571,7 +589,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     marginTop: 6,
                   }}
                 >
-                  Used to seed your starting corral
+                  {t("paceHint")}
                 </div>
               </label>
             </div>
@@ -587,7 +605,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                   marginBottom: 8,
                 }}
               >
-                Add a donation to AFU
+                {t("donation")}
               </div>
               <div style={{ display: "flex", gap: 6 }}>
                 {AFU_OPTIONS.map((v) => (
@@ -608,14 +626,16 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                       cursor: "pointer",
                     }}
                   >
-                    {v === 0 ? "No" : `+${v}₴`}
+                    {v === 0
+                      ? t("noDonation")
+                      : t("donationOption", { amount: v })}
                   </button>
                 ))}
               </div>
               <div
                 style={{ fontSize: 12, color: "var(--ink-4)", marginTop: 6 }}
               >
-                100% goes to the Armed Forces of Ukraine
+                {t("donationHint")}
               </div>
             </div>
           </div>
@@ -637,30 +657,33 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                 className="gr-display"
                 style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}
               >
-                Summary
+                {t("summary")}
               </div>
               {selectedDist && (
                 <SummaryRow
                   label={`${selectedDist.label} — ${selectedDist.name}`}
-                  value={`${selectedDist.feeUah ?? selectedDist.fee} ₴`}
+                  value={t("price", {
+                    amount: selectedDist.feeUah ?? selectedDist.fee ?? 0,
+                  })}
                 />
               )}
               {pickedKids.map((k) => {
                 const d = event.kidsDistances?.find((x) => x.id === k.distId);
-                return d ? (
+                if (!d) return null;
+                const fee = d.feeUah ?? d.fee ?? 0;
+                return (
                   <SummaryRow
                     key={k.kidId}
-                    label={`Kid — ${d.label}`}
-                    value={
-                      (d.feeUah ?? d.fee) === 0
-                        ? "Free"
-                        : `${d.feeUah ?? d.fee} ₴`
-                    }
+                    label={t("kidDist", { dist: d.label })}
+                    value={fee === 0 ? t("free") : t("price", { amount: fee })}
                   />
-                ) : null;
+                );
               })}
               {donate > 0 && (
-                <SummaryRow label="Donation to AFU" value={`${donate} ₴`} />
+                <SummaryRow
+                  label={t("donationLine")}
+                  value={t("price", { amount: donate })}
+                />
               )}
               <div
                 style={{
@@ -670,10 +693,10 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                 }}
               />
               <SummaryRow
-                label={<strong>Total</strong>}
+                label={<strong>{t("total")}</strong>}
                 value={
                   <strong className="gr-display" style={{ fontSize: 20 }}>
-                    {total} ₴
+                    {t("price", { amount: total })}
                   </strong>
                 }
               />
@@ -691,17 +714,10 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                   marginBottom: 8,
                 }}
               >
-                Pay with
+                {t("payWith")}
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {(
-                  [
-                    ["apple", "Apple Pay"],
-                    ["google", "Google Pay"],
-                    ["mono", "Monobank · Privat24"],
-                    ["card", "Card · Visa / Mastercard"],
-                  ] as [PayMethod, string][]
-                ).map(([id, label]) => (
+                {PAY_METHODS.map(({ id, icon, labelKey }) => (
                   <button
                     key={id}
                     onClick={() => setPayMethod(id)}
@@ -721,6 +737,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     }}
                   >
                     <div
+                      aria-hidden="true"
                       style={{
                         width: 32,
                         height: 32,
@@ -732,15 +749,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                         fontWeight: 800,
                       }}
                     >
-                      {id === "apple"
-                        ? "🍎"
-                        : id === "google"
-                          ? "G"
-                          : id === "mono"
-                            ? "m"
-                            : "💳"}
+                      {icon}
                     </div>
-                    <div style={{ flex: 1 }}>{label}</div>
+                    <div style={{ flex: 1 }}>{t(labelKey)}</div>
                     {payMethod === id && (
                       <Check size={18} color="var(--brand-active)" />
                     )}
@@ -760,11 +771,14 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                 }}
               >
                 <div style={{ fontSize: 13, lineHeight: 1.5 }}>
-                  <strong style={{ color: "var(--afu-yellow)" }}>
-                    {donate} ₴
-                  </strong>{" "}
-                  from this purchase goes to the Armed Forces of Ukraine via the
-                  registered foundation.
+                  {t.rich("afuNote", {
+                    amount: donate,
+                    highlight: (chunks) => (
+                      <strong style={{ color: "var(--afu-yellow)" }}>
+                        {chunks}
+                      </strong>
+                    ),
+                  })}
                 </div>
               </div>
             )}
@@ -795,14 +809,14 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
           }}
         >
           <div style={{ fontSize: 12, color: "var(--ink-3)", fontWeight: 600 }}>
-            Total
+            {t("total")}
           </div>
           <div className="gr-display" style={{ fontSize: 22, fontWeight: 800 }}>
-            {total} ₴
+            {t("price", { amount: total })}
           </div>
         </div>
 
-        {step < STEP_LABELS.length - 1 ? (
+        {step < STEP_KEYS.length - 1 ? (
           <button
             onClick={handleNext}
             style={{
@@ -821,7 +835,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               border: 0,
             }}
           >
-            Continue <ArrowRight size={18} />
+            {t("continue")} <ArrowRight size={18} />
           </button>
         ) : (
           <button
@@ -845,7 +859,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               opacity: createRegistration.isPending ? 0.7 : 1,
             }}
           >
-            {createRegistration.isPending ? "Processing…" : `Pay ${total} ₴`}
+            {createRegistration.isPending
+              ? t("processing")
+              : t("pay", { amount: total })}
             <Check size={18} />
           </button>
         )}
@@ -885,10 +901,11 @@ function RegSuccess({
 }: {
   event: Event;
   bib: string | null;
-  selectedDist?: import("@/types/event").Distance;
+  selectedDist?: Distance;
   locale: string;
 }) {
   const router = useRouter();
+  const t = useTranslations("registration");
   const eventTitle =
     event.title ||
     event.name ||
@@ -944,7 +961,7 @@ function RegSuccess({
             textWrap: "balance",
           }}
         >
-          You&apos;re in.
+          {t("success.title")}
         </h1>
         <p
           style={{
@@ -957,16 +974,20 @@ function RegSuccess({
         >
           {bib && (
             <>
-              Bib{" "}
-              <strong className="gr-mono" style={{ color: "var(--ink)" }}>
-                #{bib}
-              </strong>{" "}
-              ·{" "}
+              {t.rich("success.bib", {
+                bib,
+                value: (chunks) => (
+                  <strong className="gr-mono" style={{ color: "var(--ink)" }}>
+                    {chunks}
+                  </strong>
+                ),
+              })}
+              {" · "}
             </>
           )}
           {eventTitle}
           <br />
-          We sent your confirmation by email.
+          {t("success.confirmEmail")}
         </p>
 
         {/* Race pass card */}
@@ -995,9 +1016,10 @@ function RegSuccess({
                   fontWeight: 700,
                   color: "var(--brand)",
                   letterSpacing: "0.08em",
+                  textTransform: "uppercase",
                 }}
               >
-                RACE PASS
+                {t("success.racePass")}
               </div>
               <div
                 className="gr-display"
@@ -1019,14 +1041,14 @@ function RegSuccess({
                 fontWeight: 700,
               }}
             >
-              QR
+              {t("success.qrCode")}
             </div>
           </div>
           <div style={{ display: "flex", gap: 18 }}>
             {[
-              ["BIB", bib ? `#${bib}` : "—"],
-              ["DIST", selectedDist?.label ?? "—"],
-              ["START", event.timeLabel ?? "—"],
+              [t("success.passBib"), bib ? `#${bib}` : "—"],
+              [t("success.passDistance"), selectedDist?.label ?? "—"],
+              [t("success.passStart"), event.timeLabel ?? "—"],
             ].map(([k, v]) => (
               <div key={k}>
                 <div
@@ -1035,6 +1057,7 @@ function RegSuccess({
                     opacity: 0.6,
                     fontWeight: 700,
                     letterSpacing: "0.08em",
+                    textTransform: "uppercase",
                   }}
                 >
                   {k}
@@ -1065,7 +1088,7 @@ function RegSuccess({
           border: 0,
         }}
       >
-        Back to events
+        {t("success.backToEvents")}
       </button>
     </div>
   );
