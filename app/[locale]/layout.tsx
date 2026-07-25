@@ -122,7 +122,7 @@ export default async function LocaleLayout({
             <NextIntlClientProvider messages={messages}>
               <AuthProvider>
                 <ErrorBoundary>{children}</ErrorBoundary>
-                <BottomNav />
+                {/* <BottomNav /> */}
                 <Toaster />
               </AuthProvider>
             </NextIntlClientProvider>
