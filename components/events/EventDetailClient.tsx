@@ -16,6 +16,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { Event } from "@/types/event";
+import { resolveDistancePrice } from "@/lib/distance-price";
 import { Participant } from "@/types/registration";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Tag } from "@/components/ui/tag";
@@ -640,7 +641,7 @@ export function EventDetailClient({
                             color: "var(--brand-active)",
                           }}
                         >
-                          {d.feeUah ?? d.fee} ₴
+                          {resolveDistancePrice(d)} ₴
                         </div>
                         {(d.elevation || d.laps) && (
                           <div style={{ fontSize: 11, color: "var(--ink-3)" }}>
@@ -720,9 +721,9 @@ export function EventDetailClient({
                               marginTop: 2,
                             }}
                           >
-                            {(d.feeUah ?? d.fee) === 0
+                            {resolveDistancePrice(d) === 0
                               ? t("free")
-                              : `${d.feeUah ?? d.fee} ₴`}
+                              : `${resolveDistancePrice(d)} ₴`}
                           </div>
                         </div>
                       ))}

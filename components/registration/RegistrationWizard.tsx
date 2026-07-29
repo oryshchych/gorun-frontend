@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight, X, Check, Baby } from "lucide-react";
 import { Event, Distance } from "@/types/event";
+import { resolveDistancePrice } from "@/lib/distance-price";
 import { useAuth } from "@/hooks/useAuth";
 import { useCreateRegistration } from "@/hooks/useRegistrations";
 
@@ -56,10 +57,10 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
   const selectedDist = event.distances?.find((d) => d.id === pickedDistId);
   const kidFee = pickedKids.reduce((sum, k) => {
     const d = event.kidsDistances?.find((x) => x.id === k.distId);
-    return sum + (d?.feeUah ?? d?.fee ?? 0);
+    return sum + (d ? resolveDistancePrice(d) : 0);
   }, 0);
   const total =
-    (selectedDist?.feeUah ?? selectedDist?.fee ?? 0) + kidFee + donate;
+    (selectedDist ? resolveDistancePrice(selectedDist) : 0) + kidFee + donate;
 
   const handleNext = () => {
     // Before step 1 (distance → kids), require auth
@@ -284,7 +285,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     className="gr-display"
                     style={{ fontWeight: 800, fontSize: 16 }}
                   >
-                    {t("price", { amount: d.feeUah ?? d.fee ?? 0 })}
+                    {t("price", { amount: resolveDistancePrice(d) })}
                   </div>
                 </button>
               );
@@ -387,7 +388,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     <div style={{ display: "flex", gap: 6 }}>
                       {event.kidsDistances.map((d) => {
                         const sel = reg.distId === d.id;
-                        const fee = d.feeUah ?? d.fee ?? 0;
+                        const fee = resolveDistancePrice(d);
                         return (
                           <button
                             key={d.id}
@@ -663,14 +664,14 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                 <SummaryRow
                   label={`${selectedDist.label} — ${selectedDist.name}`}
                   value={t("price", {
-                    amount: selectedDist.feeUah ?? selectedDist.fee ?? 0,
+                    amount: resolveDistancePrice(selectedDist),
                   })}
                 />
               )}
               {pickedKids.map((k) => {
                 const d = event.kidsDistances?.find((x) => x.id === k.distId);
                 if (!d) return null;
-                const fee = d.feeUah ?? d.fee ?? 0;
+                const fee = resolveDistancePrice(d);
                 return (
                   <SummaryRow
                     key={k.kidId}
