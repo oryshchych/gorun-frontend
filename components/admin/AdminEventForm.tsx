@@ -305,6 +305,7 @@ export function AdminEventForm({
   const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>(null);
   const [bannerUploading, setBannerUploading] = useState(false);
   const [regulationUploading, setRegulationUploading] = useState(false);
+  const [consentLetterUploading, setConsentLetterUploading] = useState(false);
 
   const mergedDefaults = useMemo(
     () => ({
@@ -442,8 +443,7 @@ export function AdminEventForm({
   async function handleRegulationUpload(file: File) {
     // PDF only — reject anything else (the accept="" attr is bypassable).
     const isPdf =
-      file.type === PDF_MIME_TYPE ||
-      file.name.toLowerCase().endsWith(".pdf");
+      file.type === PDF_MIME_TYPE || file.name.toLowerCase().endsWith(".pdf");
     if (!isPdf) {
       showWarningToast(t("invalidPdfType"), t("invalidFileTitle"));
       return;
@@ -464,8 +464,33 @@ export function AdminEventForm({
     }
   }
 
+  async function handleConsentLetterUpload(file: File) {
+    // PDF only — reject anything else (the accept="" attr is bypassable).
+    const isPdf =
+      file.type === PDF_MIME_TYPE || file.name.toLowerCase().endsWith(".pdf");
+    if (!isPdf) {
+      showWarningToast(t("invalidPdfType"), t("invalidFileTitle"));
+      return;
+    }
+    if (file.size > MAX_REGULATION_BYTES) {
+      showWarningToast(t("fileTooLarge"), t("invalidFileTitle"));
+      return;
+    }
+
+    setConsentLetterUploading(true);
+    try {
+      const url = await uploadToCloudinary(file, "raw");
+      form.setValue("consentLetterUrl", url, { shouldDirty: true });
+    } catch {
+      showWarningToast(t("uploadFailed"), t("invalidFileTitle"));
+    } finally {
+      setConsentLetterUploading(false);
+    }
+  }
+
   const coverValue = form.watch("cover");
   const regulationUrlValue = form.watch("regulationUrl");
+  const consentLetterUrlValue = form.watch("consentLetterUrl");
 
   const titleFieldName =
     contentLang === "uk" ? "translations.title.uk" : "translations.title.en";
@@ -856,6 +881,77 @@ export function AdminEventForm({
                                   e.target.value = "";
                                   if (file) {
                                     void handleRegulationUpload(file);
+                                  }
+                                }}
+                              />
+                            </label>
+                          )}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </ShellFormSection>
+
+              {/* Consent letter PDF upload */}
+              <ShellFormSection>
+                <FormField
+                  control={form.control}
+                  name="consentLetterUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("consentLetter")}</FormLabel>
+                      <FormControl>
+                        <div className="space-y-2">
+                          {consentLetterUrlValue ? (
+                            <div className="flex items-center gap-3 rounded-md border border-line bg-surface-2 p-3">
+                              <FileText className="size-5 shrink-0 text-ink-3" />
+                              <span className="flex-1 truncate text-sm text-ink-2">
+                                {consentLetterUrlValue}
+                              </span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => field.onChange("")}
+                                disabled={isLoading}
+                              >
+                                {t("removeFile")}
+                              </Button>
+                            </div>
+                          ) : (
+                            <label
+                              className={`flex cursor-pointer flex-col items-center gap-2 rounded-md border border-dashed border-line bg-surface-2 p-6 transition-colors hover:bg-surface ${
+                                consentLetterUploading
+                                  ? "pointer-events-none opacity-60"
+                                  : ""
+                              }`}
+                            >
+                              {consentLetterUploading ? (
+                                <Loader2 className="size-6 animate-spin text-ink-3" />
+                              ) : (
+                                <Upload className="size-6 text-ink-3" />
+                              )}
+                              <span className="text-sm text-ink-2">
+                                {consentLetterUploading
+                                  ? t("uploadingFile")
+                                  : t("uploadConsentLetter")}
+                              </span>
+                              <span className="text-xs text-ink-4">
+                                {t("consentLetterHint")}
+                              </span>
+                              <input
+                                type="file"
+                                accept="application/pdf"
+                                className="sr-only"
+                                disabled={consentLetterUploading || isLoading}
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  // Reset so selecting the same file again still fires onChange.
+                                  e.target.value = "";
+                                  if (file) {
+                                    void handleConsentLetterUpload(file);
                                   }
                                 }}
                               />
@@ -1648,7 +1744,12 @@ export function AdminEventForm({
             <Button
               type="submit"
               variant="brand"
-              disabled={isLoading || bannerUploading || regulationUploading}
+              disabled={
+                isLoading ||
+                bannerUploading ||
+                regulationUploading ||
+                consentLetterUploading
+              }
               className="w-full sm:w-auto"
             >
               {isLoading && (

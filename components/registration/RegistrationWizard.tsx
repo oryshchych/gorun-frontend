@@ -9,8 +9,10 @@ import "react-phone-number-input/style.css";
 import { Event, Distance } from "@/types/event";
 import { User } from "@/types/auth";
 import { CreateKidRegistration } from "@/types/registration";
+import { PromoCodeValidationResponse } from "@/types/promo-code";
 import { resolveDistancePrice } from "@/lib/distance-price";
 import { updateProfile } from "@/lib/api/auth";
+import { validatePromoCode } from "@/lib/api/promo-codes";
 import { handleApiError } from "@/lib/error-handler";
 import { useAuth } from "@/hooks/useAuth";
 import { useCreateRegistration } from "@/hooks/useRegistrations";
@@ -20,7 +22,18 @@ interface RegistrationWizardProps {
   locale: string;
 }
 
-type PayMethod = "apple" | "google" | "mono" | "card";
+/** Discount amount a validated promo code applies to the race (distance) price. */
+const computePromoDiscount = (
+  distancePrice: number,
+  promo: PromoCodeValidationResponse | null
+): number => {
+  if (!promo) return 0;
+  const raw =
+    promo.discountType === "percentage"
+      ? (distancePrice * promo.discountValue) / 100
+      : promo.discountValue;
+  return Math.min(Math.max(0, raw), distancePrice);
+};
 
 interface KidPick {
   kidId: string;
@@ -90,12 +103,6 @@ const personalFromUser = (user: User | null | undefined): PersonalInfo => ({
 });
 const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 const AFU_OPTIONS = [0, 100, 250, 500, 1000];
-const PAY_METHODS: { id: PayMethod; icon: string; labelKey: string }[] = [
-  { id: "apple", icon: "🍎", labelKey: "payMethods.apple" },
-  { id: "google", icon: "G", labelKey: "payMethods.google" },
-  { id: "mono", icon: "m", labelKey: "payMethods.mono" },
-  { id: "card", icon: "💳", labelKey: "payMethods.card" },
-];
 
 export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
   const router = useRouter();
@@ -112,9 +119,14 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
   const [shirt, setShirt] = useState("M");
   const [pace, setPace] = useState("5:30");
   const [donate, setDonate] = useState(0);
-  const [payMethod, setPayMethod] = useState<PayMethod>("card");
   const [done, setDone] = useState(false);
   const [regBib, setRegBib] = useState<string | null>(null);
+  const [agreed, setAgreed] = useState(false);
+  const [promoInput, setPromoInput] = useState("");
+  const [appliedPromo, setAppliedPromo] =
+    useState<PromoCodeValidationResponse | null>(null);
+  const [promoError, setPromoError] = useState<string | null>(null);
+  const [promoChecking, setPromoChecking] = useState(false);
   const [personal, setPersonal] = useState<PersonalInfo>(() =>
     personalFromUser(user)
   );
@@ -149,8 +161,33 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
         return sum + (d ? resolveDistancePrice(d) : 0);
       }, 0)
     : 0;
-  const total =
-    (selectedDist ? resolveDistancePrice(selectedDist) : 0) + kidFee + donate;
+  const distancePrice = selectedDist ? resolveDistancePrice(selectedDist) : 0;
+  // A promo code discounts the race (distance) price only; kids fees and any
+  // donation are added on top at full value (mirrors the backend pricing).
+  const promoDiscount = computePromoDiscount(distancePrice, appliedPromo);
+  const total = Math.max(0, distancePrice - promoDiscount) + kidFee + donate;
+
+  const applyPromo = async () => {
+    const code = promoInput.trim();
+    if (!code) return;
+    setPromoChecking(true);
+    setPromoError(null);
+    try {
+      const result = await validatePromoCode({ code, eventId: event.id });
+      setAppliedPromo(result);
+    } catch {
+      setAppliedPromo(null);
+      setPromoError(t("promoInvalid"));
+    } finally {
+      setPromoChecking(false);
+    }
+  };
+
+  const clearPromo = () => {
+    setAppliedPromo(null);
+    setPromoInput("");
+    setPromoError(null);
+  };
 
   const handleNext = () => {
     // Before leaving the distance step, require auth
@@ -194,7 +231,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
     : [];
 
   const handlePay = async () => {
-    if (!user || !selectedDist || !personalComplete) return;
+    if (!user || !selectedDist || !personalComplete || !agreed) return;
 
     // Persist the confirmed personal details back to the user's profile.
     try {
@@ -228,7 +265,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
         email: user.email,
         ...(donate > 0 ? { afuDonation: donate } : {}),
         ...(kidsRegistrations.length > 0 ? { kidsRegistrations } : {}),
-        promoCode: undefined,
+        ...(appliedPromo ? { promoCode: appliedPromo.code } : {}),
       });
 
       if (result.paymentLink) {
@@ -794,7 +831,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
         {/* Step: Pay */}
         {currentKey === "steps.pay" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {/* Summary */}
+            {/* Order summary */}
             <div
               style={{
                 background: "var(--surface)",
@@ -809,12 +846,15 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               >
                 {t("summary")}
               </div>
+              <div
+                style={{ fontSize: 12, color: "var(--ink-3)", marginBottom: 8 }}
+              >
+                {t("orderItemLabel", { event: eventTitle })}
+              </div>
               {selectedDist && (
                 <SummaryRow
                   label={`${selectedDist.label} — ${selectedDist.name}`}
-                  value={t("price", {
-                    amount: resolveDistancePrice(selectedDist),
-                  })}
+                  value={t("price", { amount: distancePrice })}
                 />
               )}
               {showKidsStep &&
@@ -838,6 +878,14 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                   value={t("price", { amount: donate })}
                 />
               )}
+              {promoDiscount > 0 && (
+                <SummaryRow
+                  label={`${t("discountLine")}${
+                    appliedPromo ? ` · ${appliedPromo.code}` : ""
+                  }`}
+                  value={`− ${t("price", { amount: promoDiscount })}`}
+                />
+              )}
               <div
                 style={{
                   height: 1,
@@ -855,86 +903,92 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               />
             </div>
 
-            {/* Payment methods */}
-            <div>
-              <div
+            {/* Agreement */}
+            <label
+              style={{
+                display: "flex",
+                gap: 12,
+                alignItems: "flex-start",
+                cursor: "pointer",
+                fontSize: 13,
+                lineHeight: 1.5,
+                color: "var(--ink-2)",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
                 style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: "var(--ink-3)",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  marginBottom: 8,
+                  width: 22,
+                  height: 22,
+                  flexShrink: 0,
+                  accentColor: "var(--brand)",
+                  cursor: "pointer",
                 }}
-              >
-                {t("payWith")}
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {PAY_METHODS.map(({ id, icon, labelKey }) => (
+              />
+              <span>
+                {t.rich("agree", {
+                  consent: (chunks) => (
+                    <DocLink url={event.consentLetterUrl}>{chunks}</DocLink>
+                  ),
+                  regulation: (chunks) => (
+                    <DocLink url={event.regulationUrl}>{chunks}</DocLink>
+                  ),
+                })}
+              </span>
+            </label>
+
+            {/* Promo code */}
+            <div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  value={promoInput}
+                  onChange={(e) => setPromoInput(e.target.value)}
+                  placeholder={t("promoPlaceholder")}
+                  disabled={!!appliedPromo || promoChecking}
+                  style={{ ...fieldControlStyle(false), flex: 1 }}
+                />
+                {appliedPromo ? (
                   <button
-                    key={id}
-                    onClick={() => setPayMethod(id)}
+                    type="button"
+                    onClick={clearPromo}
+                    style={promoButtonStyle}
+                  >
+                    {t("removePromo")}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={applyPromo}
+                    disabled={promoChecking || !promoInput.trim()}
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 12,
-                      padding: 14,
-                      borderRadius: "var(--r-md)",
-                      background: "var(--surface)",
-                      border: `2px solid ${payMethod === id ? "var(--brand)" : "var(--line)"}`,
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: "var(--ink)",
-                      textAlign: "left",
-                      cursor: "pointer",
+                      ...promoButtonStyle,
+                      opacity: promoChecking || !promoInput.trim() ? 0.6 : 1,
                     }}
                   >
-                    <div
-                      aria-hidden="true"
-                      style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: 999,
-                        background: "var(--surface-2)",
-                        display: "grid",
-                        placeItems: "center",
-                        fontSize: 11,
-                        fontWeight: 800,
-                      }}
-                    >
-                      {icon}
-                    </div>
-                    <div style={{ flex: 1 }}>{t(labelKey)}</div>
-                    {payMethod === id && (
-                      <Check size={18} color="var(--brand-active)" />
-                    )}
+                    {t("applyPromo")}
                   </button>
-                ))}
+                )}
               </div>
-            </div>
-
-            {/* AFU note */}
-            {donate > 0 && (
               <div
+                role="status"
+                aria-live="polite"
                 style={{
-                  background: "var(--ink)",
-                  color: "var(--bg)",
-                  borderRadius: "var(--r-lg)",
-                  padding: 16,
+                  fontSize: 12,
+                  marginTop: 6,
+                  color: appliedPromo
+                    ? "var(--success)"
+                    : promoError
+                      ? "var(--danger)"
+                      : "var(--ink-4)",
                 }}
               >
-                <div style={{ fontSize: 13, lineHeight: 1.5 }}>
-                  {t.rich("afuNote", {
-                    amount: donate,
-                    highlight: (chunks) => (
-                      <strong style={{ color: "var(--afu-yellow)" }}>
-                        {chunks}
-                      </strong>
-                    ),
-                  })}
-                </div>
+                {appliedPromo
+                  ? t("promoApplied")
+                  : (promoError ?? t("promoNotApplied"))}
               </div>
-            )}
+            </div>
           </div>
         )}
       </div>
@@ -991,32 +1045,49 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
             {t("continue")} <ArrowRight size={18} />
           </button>
         ) : (
-          <button
-            onClick={handlePay}
-            disabled={createRegistration.isPending}
-            style={{
-              width: "100%",
-              height: 56,
-              borderRadius: 999,
-              background: "var(--brand)",
-              color: "var(--on-brand)",
-              fontWeight: 700,
-              fontSize: 16,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              cursor: "pointer",
-              border: 0,
-              boxShadow: "0 8px 28px var(--brand-glow)",
-              opacity: createRegistration.isPending ? 0.7 : 1,
-            }}
-          >
-            {createRegistration.isPending
-              ? t("processing")
-              : t("pay", { amount: total })}
-            <Check size={18} />
-          </button>
+          <>
+            <button
+              onClick={handlePay}
+              disabled={createRegistration.isPending || !agreed}
+              style={{
+                width: "100%",
+                height: 56,
+                borderRadius: 999,
+                background: "var(--brand)",
+                color: "var(--on-brand)",
+                fontWeight: 700,
+                fontSize: 16,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                cursor:
+                  createRegistration.isPending || !agreed
+                    ? "not-allowed"
+                    : "pointer",
+                border: 0,
+                boxShadow: "0 8px 28px var(--brand-glow)",
+                opacity: createRegistration.isPending || !agreed ? 0.6 : 1,
+              }}
+            >
+              {createRegistration.isPending
+                ? t("processing")
+                : t("pay", { amount: total })}
+              <Check size={18} />
+            </button>
+            {!agreed && (
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "var(--ink-3)",
+                  textAlign: "center",
+                  marginTop: 8,
+                }}
+              >
+                {t("agreeRequired")}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
@@ -1182,6 +1253,46 @@ const fieldControlStyle = (hasError: boolean): React.CSSProperties => ({
   color: "var(--ink)",
   fontFamily: "inherit",
 });
+
+const promoButtonStyle: React.CSSProperties = {
+  padding: "0 18px",
+  borderRadius: "var(--r-md)",
+  background: "var(--surface-2)",
+  border: "1.5px solid var(--line-strong)",
+  color: "var(--ink)",
+  fontWeight: 700,
+  fontSize: 14,
+  cursor: "pointer",
+  whiteSpace: "nowrap",
+};
+
+/**
+ * A checkbox-agreement document link. Renders an anchor when the event provides
+ * the document URL, otherwise plain emphasized text (nothing to open yet).
+ */
+function DocLink({
+  url,
+  children,
+}: {
+  url?: string;
+  children: React.ReactNode;
+}) {
+  if (!url) return <strong>{children}</strong>;
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        color: "var(--brand-active)",
+        textDecoration: "underline",
+        fontWeight: 600,
+      }}
+    >
+      {children}
+    </a>
+  );
+}
 
 function PersonalField({
   label,

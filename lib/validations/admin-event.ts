@@ -205,6 +205,7 @@ export const adminEventFormSchema = z.object({
     })
     .optional(),
   regulationUrl: optionalUrl.optional(),
+  consentLetterUrl: optionalUrl.optional(),
   scheduleText: z.string().optional(),
   organizerInfo: z.string().optional(),
   organizerContactName: z.string().optional(),
@@ -288,6 +289,7 @@ export type AdminEventFormInput = {
   registrationEnd?: Date | string;
   socials?: { instagram?: string; facebook?: string; telegram?: string };
   regulationUrl?: string;
+  consentLetterUrl?: string;
   scheduleText?: string;
   organizerInfo?: string;
   organizerContactName?: string;
@@ -543,6 +545,7 @@ export function adminFormToCreatePayload(
     registrationEnd: data.registrationEnd,
     socials: data.socials,
     regulationUrl: data.regulationUrl?.trim() || undefined,
+    consentLetterUrl: data.consentLetterUrl?.trim() || undefined,
     scheduleText: data.scheduleText?.trim() || undefined,
     organizerInfo: data.organizerInfo?.trim() || undefined,
     organizerContactName: data.organizerContactName?.trim() || undefined,
@@ -561,9 +564,13 @@ export function adminFormToUpdatePayload(
   // we use `|| undefined` which is fine since there's nothing to clear.
   const regulationUrl: string | undefined =
     (data.regulationUrl?.trim() ?? "") === ""
-      ? ""  // explicit clear signal → backend will $unset
+      ? "" // explicit clear signal → backend will $unset
       : data.regulationUrl!.trim();
-  return { ...base, regulationUrl };
+  const consentLetterUrl: string | undefined =
+    (data.consentLetterUrl?.trim() ?? "") === ""
+      ? "" // explicit clear signal → backend will $unset
+      : data.consentLetterUrl!.trim();
+  return { ...base, regulationUrl, consentLetterUrl };
 }
 
 export function eventToAdminFormDefaults(event: {
@@ -615,6 +622,7 @@ export function eventToAdminFormDefaults(event: {
   registrationEnd?: Date | string;
   socials?: { instagram?: string; facebook?: string; telegram?: string };
   regulationUrl?: string;
+  consentLetterUrl?: string;
   scheduleText?: string;
   organizerInfo?: string;
   organizerContactName?: string;
@@ -738,6 +746,7 @@ export function eventToAdminFormDefaults(event: {
       : undefined,
     socials: event.socials ?? { instagram: "", facebook: "", telegram: "" },
     regulationUrl: event.regulationUrl ?? "",
+    consentLetterUrl: event.consentLetterUrl ?? "",
     scheduleText: event.scheduleText ?? "",
     organizerInfo: event.organizerInfo ?? "",
     organizerContactName: event.organizerContactName ?? "",
@@ -782,6 +791,7 @@ export function createEmptyAdminEventForm(): AdminEventFormInput {
     registrationEnd: undefined,
     socials: { instagram: "", facebook: "", telegram: "" },
     regulationUrl: "",
+    consentLetterUrl: "",
     scheduleText: "",
     organizerInfo: "",
     organizerContactName: "",

@@ -190,6 +190,7 @@ export interface Event {
   registrationEnd?: Date;
   socials?: { instagram?: string; facebook?: string; telegram?: string };
   regulationUrl?: string;
+  consentLetterUrl?: string;
   scheduleText?: string;
   organizerInfo?: string;
   organizerContactName?: string;
@@ -237,6 +238,7 @@ interface BaseEventPayload {
   registrationEnd?: Date;
   socials?: { instagram?: string; facebook?: string; telegram?: string };
   regulationUrl?: string;
+  consentLetterUrl?: string;
   scheduleText?: string;
   organizerInfo?: string;
   organizerContactName?: string;
