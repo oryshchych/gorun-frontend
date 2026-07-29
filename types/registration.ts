@@ -62,6 +62,14 @@ export interface CreateRegistrationResponse {
   paymentLink?: string;
 }
 
+/** Result of reconciling a registration's payment status with Monobank. */
+export interface SyncPaymentResult {
+  registration: Registration;
+  statusChanged: boolean;
+  previousStatus: string;
+  newStatus: string;
+}
+
 // ============================================================================
 // Admin-only types
 // ============================================================================

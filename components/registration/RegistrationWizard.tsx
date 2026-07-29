@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight, X, Check, Baby } from "lucide-react";
 import PhoneInput from "react-phone-number-input";
@@ -104,6 +104,45 @@ const personalFromUser = (user: User | null | undefined): PersonalInfo => ({
 const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 const AFU_OPTIONS = [0, 100, 250, 500, 1000];
 
+// --- Resume-from-payment helpers -------------------------------------------
+// The wizard stashes its state in the URL before redirecting to the payment
+// page, so browser-back can restore it. These parse it back.
+
+const parseResumeKids = (raw: string | null): KidPick[] => {
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .map((pair) => {
+      const [kidId, distId] = pair.split("~");
+      return { kidId: kidId ?? "", distId: distId ?? "" };
+    })
+    .filter((k) => k.kidId && k.distId);
+};
+
+const parseResumeDonate = (raw: string | null): number => {
+  const n = Number.parseInt(raw ?? "", 10);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+};
+
+const parseResumePromo = (
+  code: string | null,
+  type: string | null,
+  value: string | null,
+  eventId: string
+): PromoCodeValidationResponse | null => {
+  if (!code || (type !== "percentage" && type !== "fixed")) return null;
+  const val = Number.parseFloat(value ?? "");
+  if (!Number.isFinite(val)) return null;
+  return {
+    id: "",
+    code,
+    discountType: type,
+    discountValue: val,
+    eventId,
+    isActive: true,
+  };
+};
+
 export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
   const router = useRouter();
   const t = useTranslations("registration");
@@ -111,20 +150,48 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
   const { user, refreshUser } = useAuth();
   const createRegistration = useCreateRegistration();
 
-  const [step, setStep] = useState(0);
+  // When returning from the external payment page (browser back), the wizard
+  // remounts fresh. We stash the wizard state in the URL before redirecting,
+  // so we can resume it instead of restarting from step 1.
+  const searchParams = useSearchParams();
+  const resumeDist = searchParams.get("dist");
+  const validResumeDist =
+    resumeDist && event.distances?.some((d) => d.id === resumeDist)
+      ? resumeDist
+      : null;
+  const resumePromo = validResumeDist
+    ? parseResumePromo(
+        searchParams.get("promo"),
+        searchParams.get("promoType"),
+        searchParams.get("promoValue"),
+        event.id
+      )
+    : null;
+
+  const [step, setStep] = useState(() => {
+    if (!validResumeDist) return 0;
+    const parsed = Number.parseInt(searchParams.get("step") ?? "", 10);
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+  });
   const [pickedDistId, setPickedDistId] = useState(
-    event.distances?.[0]?.id ?? ""
+    validResumeDist ?? event.distances?.[0]?.id ?? ""
   );
-  const [pickedKids, setPickedKids] = useState<KidPick[]>([]);
+  const [pickedKids, setPickedKids] = useState<KidPick[]>(() =>
+    validResumeDist ? parseResumeKids(searchParams.get("kids")) : []
+  );
   const [shirt, setShirt] = useState("M");
   const [pace, setPace] = useState("5:30");
-  const [donate, setDonate] = useState(0);
+  const [donate, setDonate] = useState(() =>
+    validResumeDist ? parseResumeDonate(searchParams.get("donate")) : 0
+  );
   const [done, setDone] = useState(false);
   const [regBib, setRegBib] = useState<string | null>(null);
-  const [agreed, setAgreed] = useState(false);
-  const [promoInput, setPromoInput] = useState("");
+  const [agreed, setAgreed] = useState(
+    !!validResumeDist && searchParams.get("agreed") === "1"
+  );
+  const [promoInput, setPromoInput] = useState(resumePromo?.code ?? "");
   const [appliedPromo, setAppliedPromo] =
-    useState<PromoCodeValidationResponse | null>(null);
+    useState<PromoCodeValidationResponse | null>(resumePromo);
   const [promoError, setPromoError] = useState<string | null>(null);
   const [promoChecking, setPromoChecking] = useState(false);
   const [personal, setPersonal] = useState<PersonalInfo>(() =>
@@ -134,6 +201,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
     user?.id ?? null
   );
   const [showPersonalErrors, setShowPersonalErrors] = useState(false);
+  const [savingPersonal, setSavingPersonal] = useState(false);
 
   // Prefill the confirmation step once the profile arrives (or a different user
   // signs in). Adjusting state during render — rather than in an effect — is
@@ -189,7 +257,31 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
     setPromoError(null);
   };
 
-  const handleNext = () => {
+  // Persist the confirmed personal details back to the user's profile.
+  const savePersonal = async (): Promise<boolean> => {
+    setSavingPersonal(true);
+    try {
+      await updateProfile({
+        firstName: personal.firstName.trim(),
+        lastName: personal.lastName.trim(),
+        phone: personal.phone.trim(),
+        dateOfBirth: personal.dateOfBirth.trim() || null,
+        gender: personal.gender.trim() || null,
+        city: personal.city.trim() || null,
+        emergencyContactName: personal.emergencyContactName.trim() || null,
+        emergencyContactPhone: personal.emergencyContactPhone.trim() || null,
+      });
+      await refreshUser();
+      return true;
+    } catch (error) {
+      handleApiError(error, t("personal.saveFailed"), tApiCodes);
+      return false;
+    } finally {
+      setSavingPersonal(false);
+    }
+  };
+
+  const handleNext = async () => {
     // Before leaving the distance step, require auth
     if (currentKey === "steps.distance" && !user) {
       router.push(
@@ -197,10 +289,15 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
       );
       return;
     }
-    // The personal-details step must be complete before continuing.
-    if (currentKey === "steps.personal" && !personalComplete) {
-      setShowPersonalErrors(true);
-      return;
+    // The personal-details step must be complete and saved before continuing.
+    if (currentKey === "steps.personal") {
+      if (!personalComplete) {
+        setShowPersonalErrors(true);
+        return;
+      }
+      if (savingPersonal) return;
+      const saved = await savePersonal();
+      if (!saved) return;
     }
     if (step < steps.length - 1) {
       setStep((s) => s + 1);
@@ -233,24 +330,8 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
   const handlePay = async () => {
     if (!user || !selectedDist || !personalComplete || !agreed) return;
 
-    // Persist the confirmed personal details back to the user's profile.
-    try {
-      await updateProfile({
-        firstName: personal.firstName.trim(),
-        lastName: personal.lastName.trim(),
-        phone: personal.phone.trim(),
-        dateOfBirth: personal.dateOfBirth.trim() || null,
-        gender: personal.gender.trim() || null,
-        city: personal.city.trim() || null,
-        emergencyContactName: personal.emergencyContactName.trim() || null,
-        emergencyContactPhone: personal.emergencyContactPhone.trim() || null,
-      });
-      await refreshUser();
-    } catch (error) {
-      handleApiError(error, t("personal.saveFailed"), tApiCodes);
-      return;
-    }
-
+    // Personal details were already saved to the profile when leaving the
+    // "Your details" step, so here we only create the registration.
     try {
       const result = await createRegistration.mutateAsync({
         eventId: event.id,
@@ -269,6 +350,37 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
       });
 
       if (result.paymentLink) {
+        // Stash the full wizard state so browser-back from the payment page
+        // resumes the order step exactly as it was.
+        const resumeParams = new URLSearchParams(window.location.search);
+        resumeParams.set("step", String(step));
+        resumeParams.set("dist", selectedDist.id);
+        if (agreed) resumeParams.set("agreed", "1");
+        else resumeParams.delete("agreed");
+        if (donate > 0) resumeParams.set("donate", String(donate));
+        else resumeParams.delete("donate");
+        if (pickedKids.length > 0) {
+          resumeParams.set(
+            "kids",
+            pickedKids.map((k) => `${k.kidId}~${k.distId}`).join(",")
+          );
+        } else {
+          resumeParams.delete("kids");
+        }
+        if (appliedPromo) {
+          resumeParams.set("promo", appliedPromo.code);
+          resumeParams.set("promoType", appliedPromo.discountType);
+          resumeParams.set("promoValue", String(appliedPromo.discountValue));
+        } else {
+          resumeParams.delete("promo");
+          resumeParams.delete("promoType");
+          resumeParams.delete("promoValue");
+        }
+        window.history.replaceState(
+          null,
+          "",
+          `${window.location.pathname}?${resumeParams.toString()}`
+        );
         window.location.assign(result.paymentLink);
         return;
       }
@@ -1026,6 +1138,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
         {step < steps.length - 1 ? (
           <button
             onClick={handleNext}
+            disabled={savingPersonal}
             style={{
               width: "100%",
               height: 56,
@@ -1038,11 +1151,18 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               alignItems: "center",
               justifyContent: "center",
               gap: 8,
-              cursor: "pointer",
+              cursor: savingPersonal ? "not-allowed" : "pointer",
               border: 0,
+              opacity: savingPersonal ? 0.6 : 1,
             }}
           >
-            {t("continue")} <ArrowRight size={18} />
+            {savingPersonal ? (
+              t("processing")
+            ) : (
+              <>
+                {t("continue")} <ArrowRight size={18} />
+              </>
+            )}
           </button>
         ) : (
           <>

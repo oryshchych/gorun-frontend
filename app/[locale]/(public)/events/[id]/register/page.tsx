@@ -1,5 +1,6 @@
 "use server";
 
+import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
 import { Event } from "@/types/event";
 import { getLocalizedString } from "@/lib/utils";
@@ -56,5 +57,9 @@ export default async function RegisterPage({
     redirect(`/${locale}/events/${id}`);
   }
 
-  return <RegistrationWizard event={event} locale={locale} />;
+  return (
+    <Suspense fallback={null}>
+      <RegistrationWizard event={event} locale={locale} />
+    </Suspense>
+  );
 }

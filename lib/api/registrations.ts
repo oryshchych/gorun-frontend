@@ -3,6 +3,7 @@ import {
   Registration,
   CreateRegistrationRequest,
   Participant,
+  SyncPaymentResult,
 } from "@/types/registration";
 import {
   ApiResponse,
@@ -115,6 +116,19 @@ export const createRegistration = async (
     paymentLink: responseData.paymentLink,
     code: responseData.code,
   };
+};
+
+/**
+ * Reconcile a registration's payment status with Monobank (fallback used on
+ * return from the payment page, in case the webhook was delayed or missed).
+ */
+export const syncPayment = async (
+  registrationId: string
+): Promise<SyncPaymentResult> => {
+  const response = await apiClient.post<ApiSuccessResponse<SyncPaymentResult>>(
+    `/registrations/${registrationId}/sync-payment`
+  );
+  return response.data.data;
 };
 
 /**

@@ -1169,6 +1169,21 @@
       "backToEvents": "Back to events"
     }
   },
+  "paymentReturn": {
+    "checking": "Confirming your payment…",
+    "successTitle": "Payment confirmed!",
+    "successDesc": "Your registration is confirmed — we've emailed you the details.",
+    "pendingTitle": "Payment is processing",
+    "pendingDesc": "This can take a moment. We'll email you as soon as it's confirmed.",
+    "failedTitle": "Payment was not completed",
+    "failedDesc": "Your payment didn't go through. You can try again.",
+    "errorTitle": "Couldn't confirm payment",
+    "errorDesc": "We couldn't check your payment right now. If you were charged, we'll email you once it's confirmed.",
+    "missingId": "There's no registration to check.",
+    "retry": "Check again",
+    "myRegistrations": "My registrations",
+    "browseEvents": "Browse events"
+  },
   "runners": {
     "title": "Runners",
     "search": "Search by name or city",
