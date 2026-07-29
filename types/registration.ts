@@ -26,6 +26,16 @@ export interface Registration {
   distance?: string;
 }
 
+/** A child sign-up sent with a registration (kids' race). */
+export interface CreateKidRegistration {
+  kidId?: string;
+  name: string;
+  age: number;
+  distanceId: string;
+  distanceLabel: string;
+  shirtSize?: string;
+}
+
 export interface CreateRegistrationRequest {
   eventId: string;
   // Public registration fields (required for unauthenticated users)
@@ -36,6 +46,14 @@ export interface CreateRegistrationRequest {
   runningClub?: string;
   phone?: string;
   promoCode?: string;
+  // Selected race distance
+  distanceId?: string;
+  distanceLabel?: string;
+  // Optional race details
+  shirtSize?: string;
+  estimatedPace?: string;
+  afuDonation?: number;
+  kidsRegistrations?: CreateKidRegistration[];
 }
 
 export interface CreateRegistrationResponse {

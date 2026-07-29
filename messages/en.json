@@ -1085,6 +1085,7 @@
     "steps": {
       "distance": "Distance",
       "kids": "Kids",
+      "personal": "Your details",
       "details": "Details",
       "pay": "Pay"
     },
@@ -1125,6 +1126,24 @@
     "pay": "Pay {amount} ₴",
     "processing": "Processing…",
     "continue": "Continue",
+    "personal": {
+      "heading": "Confirm your details",
+      "desc": "We pre-filled these from your profile. Please check everything is correct before you continue.",
+      "lastName": "Surname",
+      "firstName": "First name",
+      "dateOfBirth": "Date of birth",
+      "gender": "Gender",
+      "genderPlaceholder": "Select",
+      "genderFemale": "Female",
+      "genderMale": "Male",
+      "phone": "Phone number",
+      "city": "City",
+      "emergencyContactName": "Emergency contact name",
+      "emergencyContactPhone": "Emergency contact phone",
+      "required": "This field is required",
+      "fixErrors": "Please fill in all fields to continue",
+      "saveFailed": "Could not save your details"
+    },
     "success": {
       "title": "You're in.",
       "bib": "Bib <value>#{bib}</value>",

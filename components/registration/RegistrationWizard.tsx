@@ -4,8 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight, X, Check, Baby } from "lucide-react";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 import { Event, Distance } from "@/types/event";
+import { User } from "@/types/auth";
+import { CreateKidRegistration } from "@/types/registration";
 import { resolveDistancePrice } from "@/lib/distance-price";
+import { updateProfile } from "@/lib/api/auth";
+import { handleApiError } from "@/lib/error-handler";
 import { useAuth } from "@/hooks/useAuth";
 import { useCreateRegistration } from "@/hooks/useRegistrations";
 
@@ -24,9 +30,64 @@ interface KidPick {
 const STEP_KEYS = [
   "steps.distance",
   "steps.kids",
+  "steps.personal",
   "steps.details",
   "steps.pay",
 ] as const;
+
+type StepKey = (typeof STEP_KEYS)[number];
+
+/**
+ * Steps temporarily removed from the flow. The "Details" step (shirt / pace /
+ * donation) is hidden for now — its JSX is kept below so it can be restored by
+ * dropping the key from this set.
+ */
+const HIDDEN_STEPS: ReadonlySet<StepKey> = new Set(["steps.details"]);
+
+/** Personal info collected on the confirmation step; all fields required. */
+interface PersonalInfo {
+  lastName: string;
+  firstName: string;
+  dateOfBirth: string;
+  gender: string;
+  phone: string;
+  city: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+}
+
+const EMPTY_PERSONAL: PersonalInfo = {
+  lastName: "",
+  firstName: "",
+  dateOfBirth: "",
+  gender: "",
+  phone: "",
+  city: "",
+  emergencyContactName: "",
+  emergencyContactPhone: "",
+};
+
+const GENDER_OPTIONS = [
+  { value: "female", labelKey: "genderFemale" },
+  { value: "male", labelKey: "genderMale" },
+] as const;
+
+const isPersonalComplete = (p: PersonalInfo): boolean =>
+  (Object.keys(EMPTY_PERSONAL) as (keyof PersonalInfo)[]).every(
+    (k) => (p[k] ?? "").trim() !== ""
+  );
+
+/** Derive the confirmation-step defaults from the signed-in user's profile. */
+const personalFromUser = (user: User | null | undefined): PersonalInfo => ({
+  lastName: user?.lastName ?? "",
+  firstName: user?.firstName ?? "",
+  dateOfBirth: (user?.dateOfBirth ?? "").slice(0, 10),
+  gender: typeof user?.gender === "string" ? user.gender : "",
+  phone: user?.phone ?? "",
+  city: user?.city ?? "",
+  emergencyContactName: user?.emergencyContactName ?? "",
+  emergencyContactPhone: user?.emergencyContactPhone ?? "",
+});
 const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 const AFU_OPTIONS = [0, 100, 250, 500, 1000];
 const PAY_METHODS: { id: PayMethod; icon: string; labelKey: string }[] = [
@@ -39,7 +100,8 @@ const PAY_METHODS: { id: PayMethod; icon: string; labelKey: string }[] = [
 export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
   const router = useRouter();
   const t = useTranslations("registration");
-  const { user } = useAuth();
+  const tApiCodes = useTranslations("apiCodes");
+  const { user, refreshUser } = useAuth();
   const createRegistration = useCreateRegistration();
 
   const [step, setStep] = useState(0);
@@ -53,24 +115,57 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
   const [payMethod, setPayMethod] = useState<PayMethod>("card");
   const [done, setDone] = useState(false);
   const [regBib, setRegBib] = useState<string | null>(null);
+  const [personal, setPersonal] = useState<PersonalInfo>(() =>
+    personalFromUser(user)
+  );
+  const [prefilledFor, setPrefilledFor] = useState<string | null>(
+    user?.id ?? null
+  );
+  const [showPersonalErrors, setShowPersonalErrors] = useState(false);
+
+  // Prefill the confirmation step once the profile arrives (or a different user
+  // signs in). Adjusting state during render — rather than in an effect — is
+  // React's sanctioned pattern for "reset state when a prop changes".
+  if (user && prefilledFor !== user.id) {
+    setPrefilledFor(user.id);
+    setPersonal(personalFromUser(user));
+  }
 
   const selectedDist = event.distances?.find((d) => d.id === pickedDistId);
-  const kidFee = pickedKids.reduce((sum, k) => {
-    const d = event.kidsDistances?.find((x) => x.id === k.distId);
-    return sum + (d ? resolveDistancePrice(d) : 0);
-  }, 0);
+  // The "Kids" step is only part of the flow when the distance chosen on
+  // step 1 is a kids' race; otherwise it is skipped entirely.
+  const showKidsStep = !!selectedDist?.isKids;
+  const steps = STEP_KEYS.filter((k) => {
+    if (HIDDEN_STEPS.has(k)) return false;
+    if (k === "steps.kids") return showKidsStep;
+    return true;
+  });
+  const currentKey = steps[step] ?? "steps.pay";
+  const personalComplete = isPersonalComplete(personal);
+
+  const kidFee = showKidsStep
+    ? pickedKids.reduce((sum, k) => {
+        const d = event.kidsDistances?.find((x) => x.id === k.distId);
+        return sum + (d ? resolveDistancePrice(d) : 0);
+      }, 0)
+    : 0;
   const total =
     (selectedDist ? resolveDistancePrice(selectedDist) : 0) + kidFee + donate;
 
   const handleNext = () => {
-    // Before step 1 (distance → kids), require auth
-    if (step === 0 && !user) {
+    // Before leaving the distance step, require auth
+    if (currentKey === "steps.distance" && !user) {
       router.push(
         `/${locale}/login?redirect=/${locale}/events/${event.id}/register`
       );
       return;
     }
-    if (step < STEP_KEYS.length - 1) {
+    // The personal-details step must be complete before continuing.
+    if (currentKey === "steps.personal" && !personalComplete) {
+      setShowPersonalErrors(true);
+      return;
+    }
+    if (step < steps.length - 1) {
       setStep((s) => s + 1);
     }
   };
@@ -83,16 +178,61 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
     }
   };
 
+  const kidsRegistrations: CreateKidRegistration[] = showKidsStep
+    ? pickedKids.map((k) => {
+        const kid = user?.kids?.find((x) => x.id === k.kidId);
+        const kd = event.kidsDistances?.find((x) => x.id === k.distId);
+        return {
+          kidId: k.kidId,
+          name: kid?.name ?? "",
+          age: kid?.age ?? 0,
+          distanceId: k.distId,
+          distanceLabel: kd?.label ?? "",
+          ...(kid?.shirt ? { shirtSize: kid.shirt } : {}),
+        };
+      })
+    : [];
+
   const handlePay = async () => {
-    if (!selectedDist) return;
+    if (!user || !selectedDist || !personalComplete) return;
+
+    // Persist the confirmed personal details back to the user's profile.
+    try {
+      await updateProfile({
+        firstName: personal.firstName.trim(),
+        lastName: personal.lastName.trim(),
+        phone: personal.phone.trim(),
+        dateOfBirth: personal.dateOfBirth.trim() || null,
+        gender: personal.gender.trim() || null,
+        city: personal.city.trim() || null,
+        emergencyContactName: personal.emergencyContactName.trim() || null,
+        emergencyContactPhone: personal.emergencyContactPhone.trim() || null,
+      });
+      await refreshUser();
+    } catch (error) {
+      handleApiError(error, t("personal.saveFailed"), tApiCodes);
+      return;
+    }
+
     try {
       const result = await createRegistration.mutateAsync({
         eventId: event.id,
+        distanceId: selectedDist.id,
+        distanceLabel: selectedDist.label,
+        name: personal.firstName.trim(),
+        surname: personal.lastName.trim(),
+        phone: personal.phone.trim(),
+        city: personal.city.trim(),
+        // e-mail is required by the backend and taken from the signed-in
+        // account (the wizard is auth-gated, so it is always present).
+        email: user.email,
+        ...(donate > 0 ? { afuDonation: donate } : {}),
+        ...(kidsRegistrations.length > 0 ? { kidsRegistrations } : {}),
         promoCode: undefined,
       });
 
       if (result.paymentLink) {
-        window.location.href = result.paymentLink;
+        window.location.assign(result.paymentLink);
         return;
       }
 
@@ -173,8 +313,8 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               className="gr-display"
               style={{ fontSize: 18, fontWeight: 800 }}
             >
-              {t("step", { current: step + 1, total: STEP_KEYS.length })} ·{" "}
-              {t(STEP_KEYS[step])}
+              {t("step", { current: step + 1, total: steps.length })} ·{" "}
+              {t(currentKey)}
             </div>
           </div>
           <button
@@ -192,7 +332,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
 
         {/* Progress bar */}
         <div style={{ display: "flex", gap: 4, marginTop: 12 }}>
-          {STEP_KEYS.map((_, i) => (
+          {steps.map((_, i) => (
             <div
               key={i}
               style={{
@@ -215,8 +355,8 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
           padding: "12px 18px 220px",
         }}
       >
-        {/* Step 1: Distance */}
-        {step === 0 && (
+        {/* Step: Distance */}
+        {currentKey === "steps.distance" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <div
               style={{
@@ -298,8 +438,8 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
           </div>
         )}
 
-        {/* Step 2: Kids */}
-        {step === 1 && (
+        {/* Step: Kids (only when a kids' distance is selected) */}
+        {currentKey === "steps.kids" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div>
               <div style={{ fontSize: 14, color: "var(--ink-3)" }}>
@@ -472,8 +612,17 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
           </div>
         )}
 
-        {/* Step 3: Details */}
-        {step === 2 && (
+        {/* Step: Personal info confirmation */}
+        {currentKey === "steps.personal" && (
+          <PersonalStep
+            value={personal}
+            onChange={setPersonal}
+            showErrors={showPersonalErrors}
+          />
+        )}
+
+        {/* Step: Details (temporarily hidden — see HIDDEN_STEPS) */}
+        {currentKey === "steps.details" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {user && (
               <div
@@ -642,8 +791,8 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
           </div>
         )}
 
-        {/* Step 4: Pay */}
-        {step === 3 && (
+        {/* Step: Pay */}
+        {currentKey === "steps.pay" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {/* Summary */}
             <div
@@ -668,18 +817,21 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                   })}
                 />
               )}
-              {pickedKids.map((k) => {
-                const d = event.kidsDistances?.find((x) => x.id === k.distId);
-                if (!d) return null;
-                const fee = resolveDistancePrice(d);
-                return (
-                  <SummaryRow
-                    key={k.kidId}
-                    label={t("kidDist", { dist: d.label })}
-                    value={fee === 0 ? t("free") : t("price", { amount: fee })}
-                  />
-                );
-              })}
+              {showKidsStep &&
+                pickedKids.map((k) => {
+                  const d = event.kidsDistances?.find((x) => x.id === k.distId);
+                  if (!d) return null;
+                  const fee = resolveDistancePrice(d);
+                  return (
+                    <SummaryRow
+                      key={k.kidId}
+                      label={t("kidDist", { dist: d.label })}
+                      value={
+                        fee === 0 ? t("free") : t("price", { amount: fee })
+                      }
+                    />
+                  );
+                })}
               {donate > 0 && (
                 <SummaryRow
                   label={t("donationLine")}
@@ -817,7 +969,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
           </div>
         </div>
 
-        {step < STEP_KEYS.length - 1 ? (
+        {step < steps.length - 1 ? (
           <button
             onClick={handleNext}
             style={{
@@ -891,6 +1043,212 @@ function SummaryRow({
       <div>{label}</div>
       <div>{value}</div>
     </div>
+  );
+}
+
+function PersonalStep({
+  value,
+  onChange,
+  showErrors,
+}: {
+  value: PersonalInfo;
+  onChange: (next: PersonalInfo) => void;
+  showErrors: boolean;
+}) {
+  const t = useTranslations("registration.personal");
+  const tAuth = useTranslations("auth");
+  const set = (key: keyof PersonalInfo) => (v: string) =>
+    onChange({ ...value, [key]: v });
+  const errorFor = (key: keyof PersonalInfo) =>
+    showErrors && !(value[key] ?? "").trim() ? t("required") : undefined;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <div>
+        <div style={{ fontSize: 14, color: "var(--ink-3)" }}>
+          {t("heading")}
+        </div>
+        <div style={{ fontSize: 12, color: "var(--ink-4)", marginTop: 4 }}>
+          {t("desc")}
+        </div>
+      </div>
+
+      <PersonalField
+        label={t("lastName")}
+        value={value.lastName}
+        onChange={set("lastName")}
+        error={errorFor("lastName")}
+        autoComplete="family-name"
+      />
+      <PersonalField
+        label={t("firstName")}
+        value={value.firstName}
+        onChange={set("firstName")}
+        error={errorFor("firstName")}
+        autoComplete="given-name"
+      />
+      <PersonalField
+        label={t("dateOfBirth")}
+        type="date"
+        value={value.dateOfBirth}
+        onChange={set("dateOfBirth")}
+        error={errorFor("dateOfBirth")}
+        autoComplete="bday"
+      />
+
+      <label style={{ display: "block" }}>
+        <div style={fieldLabelStyle}>{t("gender")}</div>
+        <select
+          value={value.gender ?? ""}
+          onChange={(e) => set("gender")(e.target.value)}
+          aria-invalid={errorFor("gender") ? true : undefined}
+          style={fieldControlStyle(!!errorFor("gender"))}
+        >
+          <option value="" disabled>
+            {t("genderPlaceholder")}
+          </option>
+          {GENDER_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>
+              {t(o.labelKey)}
+            </option>
+          ))}
+        </select>
+        {errorFor("gender") && (
+          <div role="alert" style={fieldErrorStyle}>
+            {errorFor("gender")}
+          </div>
+        )}
+      </label>
+
+      <PersonalPhoneField
+        label={t("phone")}
+        value={value.phone}
+        onChange={set("phone")}
+        error={errorFor("phone")}
+        placeholder={tAuth("phonePlaceholder")}
+      />
+      <PersonalField
+        label={t("city")}
+        value={value.city}
+        onChange={set("city")}
+        error={errorFor("city")}
+        autoComplete="address-level2"
+      />
+      <PersonalField
+        label={t("emergencyContactName")}
+        value={value.emergencyContactName}
+        onChange={set("emergencyContactName")}
+        error={errorFor("emergencyContactName")}
+      />
+      <PersonalPhoneField
+        label={t("emergencyContactPhone")}
+        value={value.emergencyContactPhone}
+        onChange={set("emergencyContactPhone")}
+        error={errorFor("emergencyContactPhone")}
+        placeholder={tAuth("phonePlaceholder")}
+      />
+
+      {showErrors && !isPersonalComplete(value) && (
+        <div role="alert" style={{ fontSize: 12, color: "var(--danger)" }}>
+          {t("fixErrors")}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const fieldLabelStyle: React.CSSProperties = {
+  fontSize: 12,
+  fontWeight: 600,
+  color: "var(--ink-3)",
+  textTransform: "uppercase",
+  letterSpacing: "0.06em",
+  marginBottom: 8,
+};
+
+const fieldErrorStyle: React.CSSProperties = {
+  fontSize: 12,
+  color: "var(--danger)",
+  marginTop: 6,
+};
+
+const fieldControlStyle = (hasError: boolean): React.CSSProperties => ({
+  width: "100%",
+  padding: "14px 16px",
+  borderRadius: "var(--r-md)",
+  background: "var(--surface)",
+  border: `1.5px solid ${hasError ? "var(--danger)" : "var(--line-strong)"}`,
+  fontSize: 16,
+  color: "var(--ink)",
+  fontFamily: "inherit",
+});
+
+function PersonalField({
+  label,
+  value,
+  onChange,
+  error,
+  type = "text",
+  autoComplete,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  error?: string;
+  type?: string;
+  autoComplete?: string;
+}) {
+  return (
+    <label style={{ display: "block" }}>
+      <div style={fieldLabelStyle}>{label}</div>
+      <input
+        type={type}
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value)}
+        autoComplete={autoComplete}
+        aria-invalid={error ? true : undefined}
+        style={fieldControlStyle(!!error)}
+      />
+      {error && (
+        <div role="alert" style={fieldErrorStyle}>
+          {error}
+        </div>
+      )}
+    </label>
+  );
+}
+
+function PersonalPhoneField({
+  label,
+  value,
+  onChange,
+  error,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  error?: string;
+  placeholder?: string;
+}) {
+  return (
+    <label style={{ display: "block" }}>
+      <div style={fieldLabelStyle}>{label}</div>
+      <PhoneInput
+        international
+        defaultCountry="UA"
+        placeholder={placeholder}
+        value={value || undefined}
+        onChange={(v) => onChange(v ?? "")}
+        className={error ? "phone-error" : ""}
+        aria-invalid={error ? true : undefined}
+      />
+      {error && (
+        <div role="alert" style={fieldErrorStyle}>
+          {error}
+        </div>
+      )}
+    </label>
   );
 }
 

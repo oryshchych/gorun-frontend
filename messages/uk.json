@@ -1085,6 +1085,7 @@
     "steps": {
       "distance": "Дистанція",
       "kids": "Діти",
+      "personal": "Ваші дані",
       "details": "Деталі",
       "pay": "Оплата"
     },
@@ -1125,6 +1126,24 @@
     "pay": "Сплатити {amount} ₴",
     "processing": "Обробляємо…",
     "continue": "Далі",
+    "personal": {
+      "heading": "Підтвердьте свої дані",
+      "desc": "Ми заповнили їх із вашого профілю. Перевірте, що все правильно, перш ніж продовжити.",
+      "lastName": "Прізвище",
+      "firstName": "Ім'я",
+      "dateOfBirth": "Дата народження",
+      "gender": "Стать",
+      "genderPlaceholder": "Оберіть",
+      "genderFemale": "Жінка",
+      "genderMale": "Чоловік",
+      "phone": "Номер телефону",
+      "city": "Місто",
+      "emergencyContactName": "Ім'я контактної особи",
+      "emergencyContactPhone": "Телефон контактної особи",
+      "required": "Це поле обов'язкове",
+      "fixErrors": "Заповніть усі поля, щоб продовжити",
+      "saveFailed": "Не вдалося зберегти ваші дані"
+    },
     "success": {
       "title": "Ви в грі.",
       "bib": "Номер <value>#{bib}</value>",
