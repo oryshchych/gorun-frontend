@@ -5,6 +5,12 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RegisterForm } from "../RegisterForm";
 
+const mocks = vi.hoisted(() => ({
+  push: vi.fn(),
+  getParam: vi.fn((_key: string): string | null => null),
+  register: vi.fn(async () => {}),
+}));
+
 vi.mock("react-phone-number-input", async (importOriginal) => {
   const actual =
     await importOriginal<typeof import("react-phone-number-input")>();
@@ -39,9 +45,8 @@ vi.mock("react-phone-number-input", async (importOriginal) => {
 });
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({
-    push: vi.fn(),
-  }),
+  useRouter: () => ({ push: mocks.push }),
+  useSearchParams: () => ({ get: mocks.getParam }),
 }));
 
 vi.mock("next-intl", () => ({
@@ -87,9 +92,7 @@ vi.mock("next-intl", () => ({
 }));
 
 vi.mock("@/hooks/useAuth", () => ({
-  useAuth: () => ({
-    register: vi.fn(),
-  }),
+  useAuth: () => ({ register: mocks.register }),
 }));
 
 vi.mock("@/lib/error-handler", () => ({
@@ -105,9 +108,19 @@ vi.mock("@/components/auth/GoogleOAuthButton", () => ({
   ),
 }));
 
+async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
+  await user.type(screen.getByLabelText(/^first name$/i), "John");
+  await user.type(screen.getByLabelText(/^last name$/i), "Doe");
+  await user.type(screen.getByLabelText(/^phone$/i), "+380501112233");
+  await user.type(screen.getByLabelText(/^email$/i), "john@example.com");
+  await user.type(screen.getByLabelText(/^password$/i), "password123");
+  await user.type(screen.getByLabelText(/confirm password/i), "password123");
+}
+
 describe("RegisterForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.getParam.mockReturnValue(null);
   });
 
   it("should render registration fields", () => {
@@ -151,5 +164,31 @@ describe("RegisterForm", () => {
     await waitFor(() => {
       expect(screen.getByText(/passwords don't match/i)).toBeInTheDocument();
     });
+  });
+
+  it("redirects to the preserved target after a successful sign-up", async () => {
+    const target = "/en/events/evt-1/register?dist=d1&step=1";
+    mocks.getParam.mockImplementation((key) =>
+      key === "redirect" ? target : null
+    );
+    const user = userEvent.setup();
+    render(<RegisterForm />);
+
+    await fillValidForm(user);
+    await user.click(screen.getByRole("button", { name: /create account/i }));
+
+    await waitFor(() => expect(mocks.register).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mocks.push).toHaveBeenCalledWith(target));
+  });
+
+  it("redirects home when there is no redirect param", async () => {
+    const user = userEvent.setup();
+    render(<RegisterForm />);
+
+    await fillValidForm(user);
+    await user.click(screen.getByRole("button", { name: /create account/i }));
+
+    await waitFor(() => expect(mocks.register).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mocks.push).toHaveBeenCalledWith("/en"));
   });
 });

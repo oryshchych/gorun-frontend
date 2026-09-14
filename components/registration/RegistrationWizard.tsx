@@ -282,11 +282,15 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
   };
 
   const handleNext = async () => {
-    // Before leaving the distance step, require auth
+    // Before leaving the distance step, require auth — but carry the current
+    // selection in the redirect so login/sign-up returns to the same step
+    // (the wizard's URL-resume initializers pick these back up on remount).
     if (currentKey === "steps.distance" && !user) {
-      router.push(
-        `/${locale}/login?redirect=/${locale}/events/${event.id}/register`
-      );
+      const resumeParams = new URLSearchParams();
+      if (pickedDistId) resumeParams.set("dist", pickedDistId);
+      resumeParams.set("step", String(Math.min(step + 1, steps.length - 1)));
+      const target = `/${locale}/events/${event.id}/register?${resumeParams.toString()}`;
+      router.push(`/${locale}/login?redirect=${encodeURIComponent(target)}`);
       return;
     }
     // The personal-details step must be complete and saved before continuing.

@@ -1,11 +1,23 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { LoginForm } from "@/components/auth/LoginForm";
-import { useLocale, useTranslations } from "next-intl";
 
-export default function LoginPage() {
-  const locale = useLocale();
-  const t = useTranslations("auth");
+export default async function LoginPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ redirect?: string | string[] }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "auth" });
+  const sp = await searchParams;
+  const redirect = typeof sp.redirect === "string" ? sp.redirect : undefined;
+  // Preserve the post-auth redirect target when bouncing to sign-up.
+  const registerHref = redirect
+    ? `/${locale}/register?redirect=${encodeURIComponent(redirect)}`
+    : `/${locale}/register`;
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
@@ -36,7 +48,7 @@ export default function LoginPage() {
               {t("dontHaveAccount")}{" "}
             </span>
             <Link
-              href={`/${locale}/register`}
+              href={registerHref}
               className="font-bold text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded"
               aria-label="Sign up for a new account"
             >

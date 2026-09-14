@@ -95,6 +95,12 @@ describe("Events API Service", () => {
   describe("createEvent", () => {
     it("should create new event", async () => {
       const eventData = {
+        translations: {
+          title: { en: "New Event", uk: "Нова подія" },
+          description: { en: "Event description", uk: "Опис події" },
+          location: { en: "Kyiv", uk: "Київ" },
+          date: { en: "Dec 31, 2024", uk: "31 грудня 2024" },
+        },
         title: "New Event",
         description: "Event description",
         date: new Date("2024-12-31"),

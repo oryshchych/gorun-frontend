@@ -40,7 +40,9 @@ describe("Promo Codes API Service", () => {
   });
 
   it("should reject invalid payload length", async () => {
-    await expect(validatePromoCode({ code: "" })).rejects.toMatchObject({
+    await expect(
+      validatePromoCode({ code: "", eventId: "507f1f77bcf86cd799439011" })
+    ).rejects.toMatchObject({
       message: "Validation error",
       statusCode: 400,
     });
@@ -61,7 +63,12 @@ describe("Promo Codes API Service", () => {
       errors: { promoCode: ["Promo code usage limit reached"] },
     });
 
-    await expect(validatePromoCode({ code: "LIMIT10" })).rejects.toMatchObject({
+    await expect(
+      validatePromoCode({
+        code: "LIMIT10",
+        eventId: "507f1f77bcf86cd799439011",
+      })
+    ).rejects.toMatchObject({
       message: "Validation error",
       statusCode: 422,
     });
@@ -72,7 +79,9 @@ describe("Promo Codes API Service", () => {
       message: "Too many requests",
     });
 
-    await expect(validatePromoCode({ code: "FAST10" })).rejects.toMatchObject({
+    await expect(
+      validatePromoCode({ code: "FAST10", eventId: "507f1f77bcf86cd799439011" })
+    ).rejects.toMatchObject({
       message: "Too many requests",
       statusCode: 429,
     });

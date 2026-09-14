@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
+import { safePostAuthRedirectPath } from "@/lib/auth-redirect";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useAuth } from "@/hooks/useAuth";
@@ -28,12 +29,29 @@ import { GoogleOAuthButton } from "@/components/auth/GoogleOAuthButton";
 
 export function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const locale = useLocale();
   const { register } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations("auth");
   const tValidation = useTranslations("validation");
   const tApiCodes = useTranslations("apiCodes");
+
+  // Mirror the post-auth redirect target into sessionStorage so a Google OAuth
+  // sign-up (which round-trips through the provider) returns to the same place.
+  useEffect(() => {
+    const redirect = searchParams.get("redirect");
+    const target = safePostAuthRedirectPath(redirect, locale);
+    try {
+      if (redirect && target !== `/${locale}`) {
+        sessionStorage.setItem("postAuthRedirect", target);
+      } else {
+        sessionStorage.removeItem("postAuthRedirect");
+      }
+    } catch {
+      /* ignore quota / private mode */
+    }
+  }, [searchParams, locale]);
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(createRegisterSchema(tValidation)),
@@ -62,7 +80,9 @@ export function RegisterForm() {
         t("registrationSuccessful"),
         tApiCodes
       );
-      router.push(`/${locale}`);
+      router.push(
+        safePostAuthRedirectPath(searchParams.get("redirect"), locale)
+      );
     } catch (error: unknown) {
       handleApiError(error, t("registrationFailed"), tApiCodes);
     } finally {
