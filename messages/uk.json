@@ -412,6 +412,7 @@
     "upcoming": "Майбутні"
   },
   "footer": {
+    "homeAriaLabel": "GoRun — на головну",
     "allRightsReserved": "Всі права захищені",
     "madeWith": "Зроблено з",
     "by": "від",

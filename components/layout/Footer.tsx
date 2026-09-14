@@ -58,48 +58,26 @@ export default function Footer() {
 
   return (
     // className="dark" forces dark-mode token values always — footer is permanently dark
-    <footer
-      className="dark"
-      role="contentinfo"
-      style={{
-        background: "var(--bg)",
-        color: "var(--ink)",
-        padding: "48px 32px 0",
-        marginTop: 64,
-      }}
-    >
-      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+    <footer className="dark mt-16 bg-bg px-8 pt-12 text-ink" role="contentinfo">
+      <div className="mx-auto max-w-7xl">
         {/* Main grid — 2-col on mobile, 4-col on md+ */}
         <div className="grid grid-cols-2 gap-8 pb-10 md:grid-cols-[2fr_1fr_1fr_1fr] md:gap-10">
           {/* Brand column — full width on mobile */}
           <div className="col-span-2 md:col-span-1">
             <Link
               href={`/${locale}`}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 10,
-                marginBottom: 14,
-              }}
-              aria-label="GoRun home"
+              className="mb-3.5 inline-flex items-center gap-2.5"
+              aria-label={t("homeAriaLabel")}
             >
               <Image
                 src="/images/logos/logo.png"
                 alt="GoRun"
                 width={56}
                 height={18}
-                style={{ height: "auto" }}
+                className="h-auto"
               />
             </Link>
-            <p
-              style={{
-                fontSize: 13,
-                lineHeight: 1.6,
-                opacity: 0.7,
-                maxWidth: 300,
-                margin: 0,
-              }}
-            >
+            <p className="m-0 max-w-75 text-[13px] leading-[1.6] opacity-70">
               {t("tagline")}
             </p>
           </div>
@@ -107,21 +85,10 @@ export default function Footer() {
           {/* Nav columns */}
           {navColumns.map((col) => (
             <div key={col.heading}>
-              <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: "0.08em",
-                  color: "var(--brand)",
-                  marginBottom: 14,
-                  textTransform: "uppercase",
-                }}
-              >
+              <div className="mb-3.5 text-[11px] font-bold uppercase tracking-[0.08em] text-brand">
                 {col.heading}
               </div>
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 10 }}
-              >
+              <div className="flex flex-col gap-2.5">
                 {col.links.map((link) => (
                   <Link
                     key={link.label}
@@ -129,12 +96,7 @@ export default function Footer() {
                     {...(link.external
                       ? { target: "_blank", rel: "noopener noreferrer" }
                       : {})}
-                    style={{
-                      fontSize: 13,
-                      color: "var(--ink)",
-                      opacity: 0.8,
-                      textDecoration: "none",
-                    }}
+                    className="text-[13px] text-ink no-underline opacity-80 transition-opacity hover:opacity-100"
                   >
                     {link.label}
                   </Link>
@@ -145,19 +107,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "20px 0",
-            borderTop: "1px solid rgba(255,255,255,0.1)",
-            fontSize: 12,
-            opacity: 0.6,
-            flexWrap: "wrap",
-            gap: 8,
-          }}
-        >
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line py-5 text-xs opacity-60">
           <span suppressHydrationWarning>
             © {new Date().getFullYear()} GoRun · Lviv, Ukraine
           </span>
