@@ -1191,6 +1191,8 @@
     "browseEvents": "До подій"
   },
   "runners": {
+    "loading": "Завантаження учасників…",
+    "searchAriaLabel": "Пошук учасників",
     "backToEvent": "До заходу",
     "registered": "{count} зареєстровано",
     "title": "Учасники",

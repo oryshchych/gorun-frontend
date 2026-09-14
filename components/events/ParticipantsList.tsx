@@ -5,6 +5,7 @@ import { Search } from "lucide-react";
 import { Participant } from "@/types/registration";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
 
 /**
  * Optional fields the backend may include on a participant but that are not
@@ -24,6 +25,14 @@ interface ParticipantsListProps {
   /** Available distances to filter by */
   distances?: string[];
 }
+
+/** Pill chrome shared by the distance filter buttons. */
+const filterPill =
+  "cursor-pointer whitespace-nowrap rounded-(--r-pill) border-0 px-4 py-2 text-[13px] font-semibold transition-colors";
+
+/** Small uppercase tag chrome, used for the "you" badge and distance tags. */
+const tagClasses =
+  "rounded-(--r-pill) font-semibold uppercase tracking-[0.04em]";
 
 export function ParticipantsList({
   participants,
@@ -60,75 +69,40 @@ export function ParticipantsList({
   }, [participants, query, distFilter]);
 
   if (isLoading) {
-    return (
-      <div style={{ padding: "24px 0", color: "var(--ink-3)", fontSize: 14 }}>
-        Loading runners…
-      </div>
-    );
+    return <div className="py-6 text-sm text-ink-3">{t("loading")}</div>;
   }
 
   return (
     <div>
       {/* Search */}
-      <div style={{ position: "relative", marginBottom: 12 }}>
+      <div className="relative mb-3">
         <Search
           size={16}
-          style={{
-            position: "absolute",
-            left: 14,
-            top: "50%",
-            transform: "translateY(-50%)",
-            color: "var(--ink-3)",
-            pointerEvents: "none",
-          }}
+          className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-3"
         />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t("search")}
-          style={{
-            width: "100%",
-            padding: "12px 16px 12px 42px",
-            borderRadius: 999,
-            background: "var(--surface)",
-            border: "1.5px solid var(--line-strong)",
-            fontSize: 16,
-            color: "var(--ink)",
-            fontFamily: "inherit",
-          }}
-          aria-label="Search runners"
+          className="w-full rounded-(--r-pill) border-[1.5px] border-line-strong bg-surface py-3 pl-10.5 pr-4 text-base text-ink focus:border-brand focus:shadow-[0_0_0_4px_var(--brand-glow)] focus:outline-none"
+          aria-label={t("searchAriaLabel")}
         />
       </div>
 
       {/* Distance filter — pill segment */}
       {distanceOptions.length > 0 && (
-        <div
-          style={{
-            display: "flex",
-            gap: 4,
-            padding: 4,
-            background: "var(--surface-2)",
-            borderRadius: 999,
-            overflowX: "auto",
-            marginBottom: 12,
-          }}
-        >
+        <div className="mb-3 flex gap-1 overflow-x-auto rounded-(--r-pill) bg-surface-2 p-1">
           {["all", ...distanceOptions].map((d) => (
             <button
               key={d}
+              type="button"
               onClick={() => setDistFilter(d)}
-              style={{
-                padding: "8px 16px",
-                borderRadius: 999,
-                fontSize: 13,
-                fontWeight: 600,
-                background: distFilter === d ? "var(--ink)" : "transparent",
-                color: distFilter === d ? "var(--bg)" : "var(--ink-2)",
-                border: 0,
-                whiteSpace: "nowrap",
-                cursor: "pointer",
-                transition: "background 150ms, color 150ms",
-              }}
+              className={cn(
+                filterPill,
+                distFilter === d
+                  ? "bg-ink text-bg"
+                  : "bg-transparent text-ink-2 hover:text-ink"
+              )}
             >
               {d === "all" ? t("allDistances") : d}
             </button>
@@ -137,23 +111,9 @@ export function ParticipantsList({
       )}
 
       {/* Table */}
-      <div
-        style={{
-          background: "var(--surface)",
-          borderRadius: "var(--r-lg)",
-          border: "1px solid var(--line)",
-          overflow: "hidden",
-        }}
-      >
+      <div className="overflow-hidden rounded-lg border border-line bg-surface">
         {filtered.length === 0 ? (
-          <div
-            style={{
-              padding: 32,
-              textAlign: "center",
-              color: "var(--ink-3)",
-              fontSize: 13,
-            }}
-          >
+          <div className="p-8 text-center text-[13px] text-ink-3">
             {t("noMatch")}
           </div>
         ) : (
@@ -176,81 +136,44 @@ export function ParticipantsList({
               return (
                 <div
                   key={p.id}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    padding: "12px 16px",
-                    borderBottom:
-                      i < filtered.length - 1
-                        ? "1px solid var(--line)"
-                        : "none",
-                    background: isMe ? "var(--brand-tint)" : "transparent",
-                  }}
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-3",
+                    i < filtered.length - 1 && "border-b border-line",
+                    isMe ? "bg-brand-tint" : "bg-transparent"
+                  )}
                 >
                   {/* Bib */}
-                  <div
-                    className="gr-mono"
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 700,
-                      minWidth: 40,
-                      color: "var(--ink-3)",
-                    }}
-                  >
+                  <div className="gr-mono min-w-10 text-[11px] font-bold text-ink-3">
                     {bib ? `#${String(bib).padStart(3, "0")}` : "—"}
                   </div>
 
                   {/* Name + city */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 700,
-                        color: "var(--ink)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 6,
-                      }}
-                    >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 text-sm font-bold text-ink">
                       {fullName}
                       {isMe && (
                         <span
-                          style={{
-                            background: "var(--brand-tint)",
-                            color: "var(--brand-active)",
-                            borderRadius: 999,
-                            padding: "2px 6px",
-                            fontSize: 9,
-                            fontWeight: 700,
-                            textTransform: "uppercase",
-                            letterSpacing: "0.04em",
-                          }}
+                          className={cn(
+                            tagClasses,
+                            "bg-brand-tint px-1.5 py-0.5 text-[9px] text-brand-active"
+                          )}
                         >
                           {t("you")}
                         </span>
                       )}
                     </div>
                     {p.city && (
-                      <div style={{ fontSize: 12, color: "var(--ink-3)" }}>
-                        {p.city}
-                      </div>
+                      <div className="text-xs text-ink-3">{p.city}</div>
                     )}
                   </div>
 
                   {/* Distance tag */}
                   {dist && (
                     <span
-                      style={{
-                        background: "var(--surface-2)",
-                        color: "var(--ink-2)",
-                        borderRadius: 999,
-                        padding: "4px 10px",
-                        fontSize: 11,
-                        fontWeight: 600,
-                        textTransform: "uppercase",
-                        letterSpacing: "0.04em",
-                      }}
+                      className={cn(
+                        tagClasses,
+                        "bg-surface-2 px-2.5 py-1 text-[11px] text-ink-2"
+                      )}
                     >
                       {dist}
                     </span>
@@ -261,14 +184,7 @@ export function ParticipantsList({
         )}
       </div>
 
-      <div
-        style={{
-          marginTop: 8,
-          fontSize: 12,
-          color: "var(--ink-4)",
-          textAlign: "center",
-        }}
-      >
+      <div className="mt-2 text-center text-xs text-ink-4">
         {t("count", { filtered: filtered.length, total: participants.length })}
       </div>
     </div>

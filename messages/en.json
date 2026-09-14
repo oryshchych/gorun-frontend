@@ -1191,6 +1191,8 @@
     "browseEvents": "Browse events"
   },
   "runners": {
+    "loading": "Loading runners…",
+    "searchAriaLabel": "Search runners",
     "backToEvent": "Back to event",
     "registered": "{count} registered",
     "title": "Runners",
