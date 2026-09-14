@@ -10,108 +10,45 @@ interface EventsHubProps {
   pastEvents?: PastEvent[];
 }
 
+/** Section headings shared by the upcoming list and the past-events rail. */
+const sectionHeading = "gr-display text-lg font-bold text-ink";
+
 export function EventsHub({ events, pastEvents = [] }: EventsHubProps) {
   const locale = useLocale();
   const t = useTranslations("hub");
 
   return (
-    <div
-      style={{
-        background: "var(--bg)",
-        minHeight: "100vh",
-        color: "var(--ink)",
-        fontFamily: "var(--font-body, Inter, system-ui, sans-serif)",
-      }}
-    >
+    <div className="min-h-screen bg-bg font-sans text-ink">
       {/* ── Hero copy ── */}
-      <div
-        style={{
-          padding: "18px 18px 6px",
-          maxWidth: 1280,
-          margin: "0 auto",
-        }}
-      >
-        <div
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            color: "var(--brand-active)",
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-          }}
-        >
+      <div className="mx-auto max-w-7xl px-4.5 pb-1.5 pt-4.5">
+        <div className="text-xs font-bold uppercase tracking-[0.08em] text-brand-active">
           {t("seasonLabel")}
         </div>
-        <h1
-          className="gr-display"
-          style={{
-            fontSize: "clamp(28px, 6vw, 56px)",
-            fontWeight: 800,
-            lineHeight: 1.05,
-            color: "var(--ink)",
-            marginTop: 4,
-            textWrap: "balance",
-            whiteSpace: "pre-line",
-          }}
-        >
+        <h1 className="gr-display mt-1 whitespace-pre-line text-[28px] font-extrabold leading-[1.05] text-ink text-balance sm:text-4xl md:text-5xl lg:text-[56px]">
           {t("heroHeadline")}
         </h1>
-        <p
-          style={{
-            fontSize: 14,
-            color: "var(--ink-3)",
-            marginTop: 8,
-            lineHeight: 1.5,
-            maxWidth: 560,
-          }}
-        >
+        <p className="mt-2 max-w-140 text-sm leading-[1.5] text-ink-3">
           {t("heroSub")}
         </p>
       </div>
 
       {/* ── Upcoming events ── */}
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 18px" }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "baseline",
-            padding: "18px 0 12px",
-          }}
-        >
-          <div
-            className="gr-display"
-            style={{ fontSize: 18, fontWeight: 700, color: "var(--ink)" }}
-          >
-            {t("upcoming")}
-          </div>
-          <div style={{ fontSize: 12, color: "var(--ink-3)", fontWeight: 600 }}>
+      <div className="mx-auto max-w-7xl px-4.5">
+        <div className="flex items-baseline justify-between pb-3 pt-4.5">
+          <div className={sectionHeading}>{t("upcoming")}</div>
+          <div className="text-xs font-semibold text-ink-3">
             {t("racesCount", { count: events.length })}
           </div>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fill, minmax(min(100%, 420px), 1fr))",
-            gap: 16,
-          }}
-        >
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,420px),1fr))] gap-4">
           {events.map((ev) => (
             <EventCard key={ev.id} event={ev} />
           ))}
         </div>
 
         {events.length === 0 && (
-          <div
-            style={{
-              padding: "48px 0",
-              textAlign: "center",
-              color: "var(--ink-3)",
-              fontSize: 14,
-            }}
-          >
+          <div className="py-12 text-center text-sm text-ink-3">
             {t("noUpcoming")}
           </div>
         )}
@@ -119,79 +56,32 @@ export function EventsHub({ events, pastEvents = [] }: EventsHubProps) {
 
       {/* ── Past events rail ── */}
       {pastEvents.length > 0 && (
-        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-          <div style={{ padding: "28px 18px 10px" }}>
-            <div
-              className="gr-display"
-              style={{ fontSize: 18, fontWeight: 700, color: "var(--ink)" }}
-            >
-              {t("past")}
-            </div>
+        <div className="mx-auto max-w-7xl">
+          <div className="px-4.5 pb-2.5 pt-7">
+            <div className={sectionHeading}>{t("past")}</div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              gap: 12,
-              overflowX: "auto",
-              padding: "0 18px 24px",
-              scrollSnapType: "x mandatory",
-            }}
-          >
+          <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4.5 pb-6">
             {pastEvents.map((p) => (
               <Link
                 key={p.id}
                 href={`/${locale}/events/${p.id}`}
-                style={{
-                  minWidth: 200,
-                  scrollSnapAlign: "start",
-                  background: "var(--surface)",
-                  borderRadius: "var(--r-lg)",
-                  overflow: "hidden",
-                  border: "1px solid var(--line)",
-                  flexShrink: 0,
-                  textDecoration: "none",
-                  color: "inherit",
-                  display: "block",
-                }}
+                className="block min-w-50 shrink-0 snap-start overflow-hidden rounded-lg border border-line bg-surface text-inherit no-underline transition-colors hover:bg-surface-2"
               >
                 {p.cover && (
                   <div
-                    style={{
-                      height: 90,
-                      backgroundImage: `url(${p.cover})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                    }}
+                    className="h-22.5 bg-cover bg-center"
+                    style={{ backgroundImage: `url(${p.cover})` }}
                   />
                 )}
-                <div style={{ padding: 12 }}>
-                  <div
-                    style={{
-                      fontSize: 11,
-                      color: "var(--ink-3)",
-                      fontWeight: 600,
-                    }}
-                  >
+                <div className="p-3">
+                  <div className="text-[11px] font-semibold text-ink-3">
                     {p.dateLabel}
                   </div>
-                  <div
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: "var(--ink)",
-                      marginTop: 2,
-                    }}
-                  >
+                  <div className="mt-0.5 text-sm font-bold text-ink">
                     {p.name}
                   </div>
                   {(p.distance || p.result) && (
-                    <div
-                      style={{
-                        fontSize: 12,
-                        color: "var(--ink-3)",
-                        marginTop: 4,
-                      }}
-                    >
+                    <div className="mt-1 text-xs text-ink-3">
                       {[p.distance, p.result].filter(Boolean).join(" · ")}
                     </div>
                   )}
