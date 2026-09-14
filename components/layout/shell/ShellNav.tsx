@@ -11,8 +11,8 @@ function navLinkClass(active: boolean, collapsed: boolean) {
     "shell-nav-link flex items-center rounded-md text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring",
     collapsed ? "justify-center px-2 py-2.5" : "gap-2 px-3 py-2",
     active
-      ? "shell-nav-link--active border-l-[3px] border-l-[var(--brand)] bg-white font-semibold text-[var(--ink)] shadow-sm dark:bg-[var(--surface-2)]"
-      : "border-l-[3px] border-l-transparent text-muted-foreground hover:bg-white/80 hover:text-[var(--ink)] dark:hover:bg-[var(--surface-2)]/80"
+      ? "shell-nav-link--active border-l-[3px] border-l-(--brand) bg-white font-semibold text-(--ink) shadow-sm dark:bg-(--surface-2)"
+      : "border-l-[3px] border-l-transparent text-muted-foreground hover:bg-white/80 hover:text-(--ink) dark:hover:bg-(--surface-2)/80"
   );
 }
 
@@ -57,10 +57,7 @@ export function ShellNav({
               title={collapsed ? label : undefined}
             >
               <Icon
-                className={cn(
-                  "size-4 shrink-0",
-                  active && "text-[var(--brand)]"
-                )}
+                className={cn("size-4 shrink-0", active && "text-(--brand)")}
                 aria-hidden
               />
               {!collapsed ? <span>{label}</span> : null}
@@ -80,7 +77,7 @@ export function ShellNav({
             href={footer.href}
             onClick={onNavigate}
             className={cn(
-              "flex items-center text-sm text-muted-foreground transition-colors hover:bg-white/80 hover:text-[var(--ink)]",
+              "flex items-center text-sm text-muted-foreground transition-colors hover:bg-white/80 hover:text-(--ink)",
               collapsed ? "justify-center p-2" : "gap-2 px-3 py-2"
             )}
             title={collapsed ? footer.label : undefined}

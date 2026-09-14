@@ -21,7 +21,8 @@ Do not reintroduce the old `--gr-*` system, `hsl(var(--...))` shadcn tuples, `.g
 - Green is for action/accent only: CTAs, logo mark, focus rings, progress fills, selected states, and positive-status pills. Never use brand green for body text, link text, or large neutral surfaces.
 - Never put white text on bright brand green. Use `text-on-brand` on `bg-brand`; use `bg-brand-strong text-white` only when white text is truly required.
 - Stop at four ink levels: `ink`, `ink-2`, `ink-3`, `ink-4`.
-- Use only `rounded-sm`, `rounded-md`, `rounded-lg`, `rounded-xl`, and `rounded-[var(--r-pill)]` for pill buttons.
+- Use only `rounded-sm`, `rounded-md`, `rounded-lg`, `rounded-xl`, and `rounded-(--r-pill)` for pill buttons.
+- Reference a token in a utility with Tailwind v4's CSS-variable shorthand — `rounded-(--r-pill)`, `shadow-(--shadow-md)` — not the older `rounded-[var(--r-pill)]` bracket form. Keep brackets only for composite values like `shadow-[0_0_0_4px_var(--brand-glow)]`.
 - Color is never the only signal. Status UI must include a label and/or icon.
 - Inputs must be at least 16px (`text-base`). Every interactive element must show the `box-shadow: 0 0 0 4px var(--brand-glow)` focus ring.
 
@@ -33,7 +34,7 @@ Do not reintroduce the old `--gr-*` system, `hsl(var(--...))` shadcn tuples, `.g
 - Text: `ink`, `ink-2`, `ink-3`, `ink-4`
 - Status: `danger`, `danger-bg`, `warn`, `warn-bg`, `info`, `info-bg`, `success`, `success-bg`
 - Ukraine accent: `afu-blue`, `afu-yellow`
-- Elevation: `shadow-[var(--shadow-sm)]`, `shadow-[var(--shadow-md)]`, `shadow-[var(--shadow-lg)]`
+- Elevation: `shadow-(--shadow-sm)`, `shadow-(--shadow-md)`, `shadow-(--shadow-lg)`
 - Radius: `r-sm`, `r-md`, `r-lg`, `r-xl`, `r-pill`
 - Type: `font-display`, `font-sans`, `font-mono`
 
@@ -49,8 +50,8 @@ const fooVariants = cva("base classes", {
     variant: { brand: "…", primary: "…", soft: "…" },
     size: {
       sm: "h-9 px-3.5 text-sm",
-      md: "h-12 px-[18px] text-[15px]",
-      lg: "h-14 px-[22px] text-base",
+      md: "h-12 px-4.5 text-[15px]",
+      lg: "h-14 px-5.5 text-base",
     },
   },
   defaultVariants: { variant: "brand", size: "md" },
@@ -64,13 +65,13 @@ const fooVariants = cva("base classes", {
 ## Component Patterns
 
 ```tsx
-<button className="min-h-11 rounded-[var(--r-pill)] bg-brand px-5 py-3 font-semibold text-on-brand shadow-[var(--shadow-sm)] hover:bg-brand-hover active:bg-brand-active focus-visible:shadow-[0_0_0_4px_var(--brand-glow)] focus-visible:outline-none">
+<button className="min-h-11 rounded-(--r-pill) bg-brand px-5 py-3 font-semibold text-on-brand shadow-(--shadow-sm) hover:bg-brand-hover active:bg-brand-active focus-visible:shadow-[0_0_0_4px_var(--brand-glow)] focus-visible:outline-none">
   Register now
 </button>
 
 <input className="w-full rounded-md border border-line-strong bg-surface px-3.5 py-3 text-base text-ink placeholder:text-ink-4 focus:border-brand focus:shadow-[0_0_0_4px_var(--brand-glow)] focus:outline-none" />
 
-<span className="rounded-[var(--r-pill)] bg-warn-bg px-2.5 py-1 text-sm font-semibold text-warn">
+<span className="rounded-(--r-pill) bg-warn-bg px-2.5 py-1 text-sm font-semibold text-warn">
   Waitlist
 </span>
 ```

@@ -21,7 +21,6 @@ const noStaticInlineStyles = {
  */
 const inlineStyleLegacyFiles = [
   "app/\\[locale\\]/layout.tsx",
-  "app/\\[locale\\]/(public)/events/\\[id\\]/results/page.tsx",
   "app/\\[locale\\]/(public)/events/\\[id\\]/runners/page.tsx",
   "components/events/EventDescription.tsx",
   "components/events/EventsHub.tsx",
@@ -30,7 +29,6 @@ const inlineStyleLegacyFiles = [
   "components/layout/BottomNav.tsx",
   "components/layout/Footer.tsx",
   "components/layout/Header.tsx",
-  "components/profile/ProfileClient.tsx",
   "components/profile/ProfileForm.tsx",
   "components/registration/PaymentReturn.tsx",
   "components/registration/RegistrationWizard.tsx",

@@ -11,12 +11,12 @@ const buttonVariants = cva(
       variant: {
         /* GoRun design-system variants (pill shape, use these for new UI) */
         brand:
-          "rounded-[var(--r-pill)] bg-brand text-on-brand hover:bg-brand-hover active:scale-[0.97] active:bg-brand-active shadow-none",
+          "rounded-(--r-pill) bg-brand text-on-brand hover:bg-brand-hover active:scale-[0.97] active:bg-brand-active shadow-none",
         primary:
-          "rounded-[var(--r-pill)] bg-ink text-bg hover:opacity-90 active:scale-[0.97]",
-        soft: "rounded-[var(--r-pill)] bg-surface-2 text-ink border border-line hover:bg-line",
+          "rounded-(--r-pill) bg-ink text-bg hover:opacity-90 active:scale-[0.97]",
+        soft: "rounded-(--r-pill) bg-surface-2 text-ink border border-line hover:bg-line",
         "ghost-gr":
-          "rounded-[var(--r-pill)] bg-transparent text-ink border border-line-strong hover:bg-surface-2",
+          "rounded-(--r-pill) bg-transparent text-ink border border-line-strong hover:bg-surface-2",
         /* Legacy shadcn variants (keep for existing components) */
         default:
           "rounded-md bg-brand text-on-brand hover:bg-brand-hover active:scale-[0.98] shadow-sm",
@@ -33,8 +33,8 @@ const buttonVariants = cva(
       size: {
         /* GoRun sizes: sm=h-9 md=h-12 lg=h-14 */
         sm: "h-9 px-3.5 text-sm",
-        md: "h-12 px-[18px] text-[15px]",
-        lg: "h-14 px-[22px] text-base",
+        md: "h-12 px-4.5 text-[15px]",
+        lg: "h-14 px-5.5 text-base",
         /* Legacy shadcn sizes */
         default: "h-9 px-4 py-2 text-sm",
         icon: "size-9",

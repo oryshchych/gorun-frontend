@@ -21,7 +21,7 @@ const coverChipClasses =
   "bg-surface/95 px-2.5 py-1 text-[11px] font-bold text-ink";
 
 /** Distance / kids pills in the card body. */
-const pillClasses = "rounded-[var(--r-pill)] px-2.5 py-1.25 text-xs font-bold";
+const pillClasses = "rounded-(--r-pill) px-2.5 py-1.25 text-xs font-bold";
 
 export function EventCard({ event }: EventCardProps) {
   const t = useTranslations("hub");
@@ -81,7 +81,7 @@ export function EventCard({ event }: EventCardProps) {
         whileHover={{ y: -4, transition: { duration: 0.18, ease: "easeOut" } }}
         whileTap={{ scale: 0.98 }}
       >
-        <article className="overflow-hidden rounded-xl border border-line bg-surface shadow-[var(--shadow-md)]">
+        <article className="overflow-hidden rounded-xl border border-line bg-surface shadow-(--shadow-md)">
           {/* Cover */}
           <div
             className={cn(
@@ -101,7 +101,7 @@ export function EventCard({ event }: EventCardProps) {
               <span
                 className={cn(
                   coverChipClasses,
-                  "rounded-[var(--r-pill)] tracking-[0.04em]"
+                  "rounded-(--r-pill) tracking-[0.04em]"
                 )}
               >
                 {dateLabel}

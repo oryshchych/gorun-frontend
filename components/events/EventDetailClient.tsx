@@ -41,11 +41,11 @@ type TabId = "overview" | "schedule" | "distances" | "runners";
 
 /** Shared chrome for the round overlay controls in the hero nav row. */
 const heroControlClasses =
-  "grid size-10 cursor-pointer place-items-center rounded-[var(--r-pill)] border border-line bg-surface text-ink transition-colors hover:bg-surface-2";
+  "grid size-10 cursor-pointer place-items-center rounded-(--r-pill) border border-line bg-surface text-ink transition-colors hover:bg-surface-2";
 
 /** Shared chrome for the primary pill CTA (sidebar + mobile sticky bar). */
 const ctaClasses =
-  "flex w-full items-center justify-center gap-2 rounded-[var(--r-pill)] bg-brand px-5.5 py-4 text-base font-bold text-on-brand no-underline shadow-[0_8px_28px_var(--brand-glow)] transition-colors hover:bg-brand-hover active:bg-brand-active focus-visible:shadow-[0_0_0_4px_var(--brand-glow)] focus-visible:outline-none";
+  "flex w-full items-center justify-center gap-2 rounded-(--r-pill) bg-brand px-5.5 py-4 text-base font-bold text-on-brand no-underline shadow-[0_8px_28px_var(--brand-glow)] transition-colors hover:bg-brand-hover active:bg-brand-active focus-visible:shadow-[0_0_0_4px_var(--brand-glow)] focus-visible:outline-none";
 
 /** Shared chrome for the fixed mobile CTA bar. */
 const mobileCtaBarClasses =
@@ -291,7 +291,7 @@ export function EventDetailClient({
                 {event.afu && (
                   <div className="rounded-lg bg-ink p-4.5 text-bg">
                     <div className="mb-2 flex items-center gap-2.5">
-                      <div className="size-2 shrink-0 rounded-[var(--r-pill)] bg-afu-yellow" />
+                      <div className="size-2 shrink-0 rounded-(--r-pill) bg-afu-yellow" />
                       <div className="text-[11px] font-bold tracking-[0.08em] text-afu-yellow">
                         {t("afuSupport")}
                       </div>
@@ -445,7 +445,7 @@ export function EventDetailClient({
                     </Link>
                     <Link
                       href={`/${locale}/events/${event.id}/runners`}
-                      className="mt-2.5 flex w-full items-center justify-center rounded-[var(--r-pill)] border border-line-strong bg-bg px-5 py-3.5 text-[15px] font-semibold text-ink no-underline transition-colors hover:bg-surface-2"
+                      className="mt-2.5 flex w-full items-center justify-center rounded-(--r-pill) border border-line-strong bg-bg px-5 py-3.5 text-[15px] font-semibold text-ink no-underline transition-colors hover:bg-surface-2"
                     >
                       {t("past.viewRunners")}
                     </Link>
@@ -488,7 +488,7 @@ export function EventDetailClient({
               {event.afu && (
                 <div className="rounded-lg bg-ink p-5.5 text-bg">
                   <div className="mb-2.5 flex items-center gap-2.5">
-                    <div className="size-2 shrink-0 rounded-[var(--r-pill)] bg-afu-yellow" />
+                    <div className="size-2 shrink-0 rounded-(--r-pill) bg-afu-yellow" />
                     <div className="text-[11px] font-bold tracking-[0.08em] text-afu-yellow">
                       {t("afuSupport")}
                     </div>

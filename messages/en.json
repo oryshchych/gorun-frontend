@@ -1230,6 +1230,18 @@
     "browseEvents": "Browse upcoming events",
     "browseEventsSub": "Find your next race",
     "addChild": "Add a child",
+    "eventFallback": "Event",
+    "completed": "Completed",
+    "kidAge": "Age {age}",
+    "kidShirt": "Shirt {size}",
+    "racePass": {
+      "upcoming": "UPCOMING",
+      "qr": "QR",
+      "bib": "BIB",
+      "dist": "DIST",
+      "status": "STATUS",
+      "pay": "PAY"
+    },
     "prompt": {
       "headline": "Your runner profile, in one place.",
       "sub": "Sign in to see your race pass, register your kids, track results, and pick up where you left off.",

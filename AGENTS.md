@@ -197,7 +197,8 @@ The sidebar item for audit logs is **visible only to `super_admin` users** (chec
 - Brand green is for actions and small accents only: CTAs, logo mark, focus rings, progress fills, selected states, and positive-status pills. Do not use brand green for body text, link text, or large neutral surfaces.
 - Never put white text on bright brand green. On `bg-brand`, use `text-on-brand`. Use `bg-brand-strong text-white` only when white text on green is truly required.
 - Text hierarchy stops at `ink`, `ink-2`, `ink-3`, `ink-4`. Do not add intermediate grays.
-- Use the radius scale only: `rounded-sm`, `rounded-md`, `rounded-lg`, `rounded-xl`, and `rounded-[var(--r-pill)]` for pill buttons. No arbitrary radii.
+- Use the radius scale only: `rounded-sm`, `rounded-md`, `rounded-lg`, `rounded-xl`, and `rounded-(--r-pill)` for pill buttons. No arbitrary radii.
+- Reference a token in a utility with Tailwind v4's CSS-variable shorthand — `rounded-(--r-pill)`, `shadow-(--shadow-md)` — not the older `rounded-[var(--r-pill)]` bracket form. Keep brackets only for composite values like `shadow-[0_0_0_4px_var(--brand-glow)]`.
 - Color is never the only signal. Status UI must include a label and/or icon, e.g. `Waitlist`, not just amber.
 - Accessibility is a gate: target WCAG 2.2 AA, keep inputs at `text-base`/16px or larger, and make every interactive element show the `box-shadow: 0 0 0 4px var(--brand-glow)` focus ring.
 - Preferred tokens: `brand`, `brand-hover`, `brand-active`, `brand-strong`, `brand-tint`, `on-brand`, `brand-glow`; `bg`, `surface`, `surface-2`; `line`, `line-strong`; `ink`, `ink-2`, `ink-3`, `ink-4`; `danger`, `danger-bg`, `warn`, `warn-bg`, `info`, `info-bg`, `success`, `success-bg`; `afu-blue`, `afu-yellow`; `shadow-sm/md/lg`; `r-sm/md/lg/xl/pill`.

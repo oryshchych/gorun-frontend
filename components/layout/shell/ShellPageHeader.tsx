@@ -20,7 +20,7 @@ export function ShellPageHeader({
       )}
     >
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-[var(--shell-ink)]">
+        <h1 className="text-2xl font-semibold tracking-tight text-(--shell-ink)">
           {title}
         </h1>
         {description ? (

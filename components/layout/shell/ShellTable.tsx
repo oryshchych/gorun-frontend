@@ -37,7 +37,7 @@ export function ShellTableHeadRow({
   return (
     <tr
       className={cn(
-        "border-b bg-brand-tint/40 text-left dark:bg-[var(--surface-2)]",
+        "border-b bg-brand-tint/40 text-left dark:bg-(--surface-2)",
         className
       )}
       {...props}

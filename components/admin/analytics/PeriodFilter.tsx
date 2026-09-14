@@ -30,14 +30,14 @@ export function PeriodFilter({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <div className="flex flex-wrap items-center gap-1 rounded-[var(--r-pill)] border border-line bg-surface p-1">
+      <div className="flex flex-wrap items-center gap-1 rounded-(--r-pill) border border-line bg-surface p-1">
         {PRESETS.map((p) => (
           <button
             key={p.value}
             type="button"
             onClick={() => onPresetChange(p.value)}
             className={cn(
-              "rounded-[var(--r-pill)] px-3 py-1.5 text-sm font-medium transition-colors",
+              "rounded-(--r-pill) px-3 py-1.5 text-sm font-medium transition-colors",
               preset === p.value
                 ? "bg-brand text-on-brand"
                 : "text-ink-2 hover:bg-surface-2"
