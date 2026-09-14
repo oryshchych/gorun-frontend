@@ -4,6 +4,7 @@ import {
   CreateRegistrationRequest,
   Participant,
   SyncPaymentResult,
+  CheckRegistrationResult,
 } from "@/types/registration";
 import {
   ApiResponse,
@@ -153,13 +154,19 @@ export const cancelRegistration = async (id: string): Promise<void> => {
 /**
  * Check if user is registered for an event
  */
-export const checkRegistration = async (eventId: string): Promise<boolean> => {
+export const checkRegistration = async (
+  eventId: string
+): Promise<CheckRegistrationResult> => {
   try {
     const response = await apiClient.get<
-      ApiSuccessResponse<{ isRegistered: boolean }>
+      ApiSuccessResponse<CheckRegistrationResult>
     >(`/events/${eventId}/check-registration`);
-    return response.data.data.isRegistered;
-  } catch (error) {
-    return false;
+    const data = response.data.data;
+    return {
+      isRegistered: !!data.isRegistered,
+      distanceIds: Array.isArray(data.distanceIds) ? data.distanceIds : [],
+    };
+  } catch {
+    return { isRegistered: false, distanceIds: [] };
   }
 };

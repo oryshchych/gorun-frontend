@@ -84,7 +84,7 @@ describe("Registrations API Service", () => {
 
       const result = await createRegistration(registrationData);
 
-      expect(result).toEqual(mockResponse.data);
+      expect(result.registration).toEqual(mockResponse.data);
     });
 
     it("should handle event full error", async () => {
@@ -130,32 +130,42 @@ describe("Registrations API Service", () => {
   });
 
   describe("checkRegistration", () => {
-    it("should return true when user is registered", async () => {
+    it("returns isRegistered + registered distanceIds when registered", async () => {
+      mock
+        .onGet("/events/event-1/check-registration")
+        .reply(200, { data: { isRegistered: true, distanceIds: ["d1"] } });
+
+      const result = await checkRegistration("event-1");
+
+      expect(result).toEqual({ isRegistered: true, distanceIds: ["d1"] });
+    });
+
+    it("returns empty distanceIds when not registered", async () => {
+      mock
+        .onGet("/events/event-1/check-registration")
+        .reply(200, { data: { isRegistered: false, distanceIds: [] } });
+
+      const result = await checkRegistration("event-1");
+
+      expect(result).toEqual({ isRegistered: false, distanceIds: [] });
+    });
+
+    it("tolerates a missing distanceIds field", async () => {
       mock
         .onGet("/events/event-1/check-registration")
         .reply(200, { data: { isRegistered: true } });
 
       const result = await checkRegistration("event-1");
 
-      expect(result).toBe(true);
+      expect(result).toEqual({ isRegistered: true, distanceIds: [] });
     });
 
-    it("should return false when user is not registered", async () => {
-      mock
-        .onGet("/events/event-1/check-registration")
-        .reply(200, { data: { isRegistered: false } });
-
-      const result = await checkRegistration("event-1");
-
-      expect(result).toBe(false);
-    });
-
-    it("should return false on error", async () => {
+    it("returns a safe default on error", async () => {
       mock.onGet("/events/event-1/check-registration").reply(500);
 
       const result = await checkRegistration("event-1");
 
-      expect(result).toBe(false);
+      expect(result).toEqual({ isRegistered: false, distanceIds: [] });
     });
   });
 });

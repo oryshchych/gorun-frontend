@@ -14,7 +14,11 @@ import {
   checkRegistration,
   GetRegistrationsParams,
 } from "@/lib/api/registrations";
-import { Registration, CreateRegistrationRequest } from "@/types/registration";
+import {
+  Registration,
+  CreateRegistrationRequest,
+  CheckRegistrationResult,
+} from "@/types/registration";
 import { PaginatedResponse } from "@/types/api";
 import { Event } from "@/types/event";
 import {
@@ -88,7 +92,7 @@ export const useMyRegistrations = (params: GetRegistrationsParams = {}) => {
  * Hook to check if user is registered for an event
  */
 export const useCheckRegistration = (eventId: string) => {
-  return useQuery<boolean, Error>({
+  return useQuery<CheckRegistrationResult, Error>({
     queryKey: registrationKeys.check(eventId),
     queryFn: () => checkRegistration(eventId),
     enabled: !!eventId,

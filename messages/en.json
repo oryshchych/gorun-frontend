@@ -1098,6 +1098,7 @@
     "free": "Free",
     "pickDistance": "Pick your distance",
     "spotsLeft": "{count} spots left",
+    "alreadyRegistered": "You're already registered",
     "distancesEmpty": "Distance info coming soon.",
     "bringKids": "Bring your kids? (optional)",
     "kidsDesc": "Pick a distance for each child you'd like to register.",

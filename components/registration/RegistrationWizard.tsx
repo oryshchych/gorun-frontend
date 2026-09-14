@@ -15,7 +15,10 @@ import { updateProfile } from "@/lib/api/auth";
 import { validatePromoCode } from "@/lib/api/promo-codes";
 import { handleApiError } from "@/lib/error-handler";
 import { useAuth } from "@/hooks/useAuth";
-import { useCreateRegistration } from "@/hooks/useRegistrations";
+import {
+  useCreateRegistration,
+  useCheckRegistration,
+} from "@/hooks/useRegistrations";
 
 interface RegistrationWizardProps {
   event: Event;
@@ -149,6 +152,12 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
   const tApiCodes = useTranslations("apiCodes");
   const { user, refreshUser } = useAuth();
   const createRegistration = useCreateRegistration();
+  // Distances the user is already registered for (matched by account/e-mail);
+  // only queried once signed in, since the endpoint requires auth.
+  const { data: registrationCheck } = useCheckRegistration(
+    user ? event.id : ""
+  );
+  const registeredDistanceIds = registrationCheck?.distanceIds ?? [];
 
   // When returning from the external payment page (browser back), the wizard
   // remounts fresh. We stash the wizard state in the URL before redirecting,
@@ -211,7 +220,21 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
     setPersonal(personalFromUser(user));
   }
 
+  // If the pre-selected distance is one the user is already registered for,
+  // move the selection to the first still-available distance (render-phase
+  // adjust, once the registration check resolves).
+  if (pickedDistId && registeredDistanceIds.includes(pickedDistId)) {
+    const firstAvailable = event.distances?.find(
+      (d) => !registeredDistanceIds.includes(d.id)
+    );
+    if (firstAvailable && firstAvailable.id !== pickedDistId) {
+      setPickedDistId(firstAvailable.id);
+    }
+  }
+
   const selectedDist = event.distances?.find((d) => d.id === pickedDistId);
+  const selectedDistRegistered =
+    !!selectedDist && registeredDistanceIds.includes(selectedDist.id);
   // The "Kids" step is only part of the flow when the distance chosen on
   // step 1 is a kids' race; otherwise it is skipped entirely.
   const showKidsStep = !!selectedDist?.isKids;
@@ -291,6 +314,10 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
       resumeParams.set("step", String(Math.min(step + 1, steps.length - 1)));
       const target = `/${locale}/events/${event.id}/register?${resumeParams.toString()}`;
       router.push(`/${locale}/login?redirect=${encodeURIComponent(target)}`);
+      return;
+    }
+    // Can't continue with a distance the user is already registered for.
+    if (currentKey === "steps.distance" && selectedDistRegistered) {
       return;
     }
     // The personal-details step must be complete and saved before continuing.
@@ -524,10 +551,13 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
             </div>
             {event.distances?.map((d) => {
               const sel = pickedDistId === d.id;
+              const isRegistered = registeredDistanceIds.includes(d.id);
               return (
                 <button
                   key={d.id}
-                  onClick={() => setPickedDistId(d.id)}
+                  onClick={() => !isRegistered && setPickedDistId(d.id)}
+                  disabled={isRegistered}
+                  aria-disabled={isRegistered}
                   style={{
                     padding: 16,
                     borderRadius: "var(--r-lg)",
@@ -536,8 +566,9 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     display: "flex",
                     gap: 14,
                     alignItems: "center",
-                    cursor: "pointer",
+                    cursor: isRegistered ? "not-allowed" : "pointer",
                     textAlign: "left",
+                    opacity: isRegistered ? 0.55 : 1,
                   }}
                 >
                   <div
@@ -568,12 +599,18 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                         marginTop: 2,
                       }}
                     >
-                      {d.elevation || d.laps}
-                      {d.spots
-                        ? ` · ${t("spotsLeft", {
-                            count: d.spots.total - d.spots.taken,
-                          })}`
-                        : ""}
+                      {isRegistered
+                        ? t("alreadyRegistered")
+                        : [
+                            d.elevation || d.laps,
+                            d.spots
+                              ? t("spotsLeft", {
+                                  count: d.spots.total - d.spots.taken,
+                                })
+                              : null,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}
                     </div>
                   </div>
                   <div
@@ -1144,7 +1181,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
         {step < steps.length - 1 ? (
           <button
             onClick={handleNext}
-            disabled={savingPersonal}
+            disabled={savingPersonal || selectedDistRegistered}
             style={{
               width: "100%",
               height: 56,
@@ -1157,9 +1194,12 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               alignItems: "center",
               justifyContent: "center",
               gap: 8,
-              cursor: savingPersonal ? "not-allowed" : "pointer",
+              cursor:
+                savingPersonal || selectedDistRegistered
+                  ? "not-allowed"
+                  : "pointer",
               border: 0,
-              opacity: savingPersonal ? 0.6 : 1,
+              opacity: savingPersonal || selectedDistRegistered ? 0.6 : 1,
             }}
           >
             {savingPersonal ? (

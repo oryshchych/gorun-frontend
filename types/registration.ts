@@ -26,6 +26,13 @@ export interface Registration {
   distance?: string;
 }
 
+/** Whether the current user is already registered for an event, and for which distances. */
+export interface CheckRegistrationResult {
+  isRegistered: boolean;
+  /** Distance ids the user already has a confirmed registration for. */
+  distanceIds: string[];
+}
+
 /** A child sign-up sent with a registration (kids' race). */
 export interface CreateKidRegistration {
   kidId?: string;
