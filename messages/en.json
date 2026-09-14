@@ -1049,6 +1049,8 @@
   },
   "eventDetail": {
     "backToEvents": "Back to events",
+    "saveEvent": "Save event",
+    "shareEvent": "Share event",
     "tabs": {
       "overview": "Overview",
       "schedule": "Schedule",

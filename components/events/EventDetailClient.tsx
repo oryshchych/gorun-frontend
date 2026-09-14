@@ -22,7 +22,7 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { Tag } from "@/components/ui/tag";
 import { ParticipantsList } from "@/components/events/ParticipantsList";
 import { PastEventRecap } from "@/components/events/PastEventRecap";
-import { getLocalizedString } from "@/lib/utils";
+import { cn, getLocalizedString } from "@/lib/utils";
 import {
   isPastEventExperience,
   isRegistrationClosed,
@@ -38,6 +38,24 @@ interface EventDetailClientProps {
 }
 
 type TabId = "overview" | "schedule" | "distances" | "runners";
+
+/** Shared chrome for the round overlay controls in the hero nav row. */
+const heroControlClasses =
+  "grid size-10 cursor-pointer place-items-center rounded-[var(--r-pill)] border border-line bg-surface text-ink transition-colors hover:bg-surface-2";
+
+/** Shared chrome for the primary pill CTA (sidebar + mobile sticky bar). */
+const ctaClasses =
+  "flex w-full items-center justify-center gap-2 rounded-[var(--r-pill)] bg-brand px-5.5 py-4 text-base font-bold text-on-brand no-underline shadow-[0_8px_28px_var(--brand-glow)] transition-colors hover:bg-brand-hover active:bg-brand-active focus-visible:shadow-[0_0_0_4px_var(--brand-glow)] focus-visible:outline-none";
+
+/** Shared chrome for the fixed mobile CTA bar. */
+const mobileCtaBarClasses =
+  "fixed bottom-0 left-0 right-0 z-20 bg-[linear-gradient(180deg,transparent,var(--bg)_30%)] px-4.5 pb-6 pt-3 lg:hidden";
+
+/** Shared chrome for the quick-fact tiles under the hero. */
+const quickFactClasses = "rounded-md border border-line bg-surface p-2.5";
+
+/** Shared chrome for the sidebar / distance panels. */
+const panelClasses = "rounded-lg border border-line bg-surface";
 
 export function EventDetailClient({
   event,
@@ -97,88 +115,43 @@ export function EventDetailClient({
     { id: "distances", label: t("tabs.distances") },
     { id: "runners", label: t("tabs.runners") },
   ];
+  console.log(event);
 
   return (
     <div
-      style={{
-        background: "var(--bg)",
-        color: "var(--ink)",
-        minHeight: "100vh",
-        paddingBottom: showMobileSticky ? 120 : 40,
-      }}
+      className={cn(
+        "min-h-screen bg-bg text-ink",
+        showMobileSticky ? "pb-30" : "pb-10"
+      )}
     >
       {/* ── Hero (image only) ── */}
       <div
-        style={{
-          position: "relative",
-          minHeight: 460,
-          backgroundImage: coverImage ? `url(${coverImage})` : undefined,
-          backgroundColor: "var(--surface-2)",
-          backgroundSize: "contain",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
+        className="relative min-h-115 bg-surface-2 bg-contain bg-center bg-no-repeat"
+        style={
+          coverImage ? { backgroundImage: `url(${coverImage})` } : undefined
+        }
       >
         {/* ── Nav row (overlay) ── */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            display: "flex",
-            justifyContent: "space-between",
-            padding: "14px 18px",
-            maxWidth: 1280,
-            margin: "0 auto",
-          }}
-        >
+        <div className="absolute left-0 right-0 top-0 mx-auto flex max-w-7xl justify-between px-4.5 py-3.5">
           <Link
             href={`/${locale}`}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 999,
-              background: "var(--surface)",
-              border: "1px solid var(--line)",
-              color: "var(--ink)",
-              display: "grid",
-              placeItems: "center",
-            }}
+            className={cn(heroControlClasses, "no-underline")}
             aria-label={t("backToEvents")}
           >
             <ArrowLeft size={18} />
           </Link>
-          <div style={{ display: "flex", gap: 8 }}>
+          <div className="flex gap-2">
             <button
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 999,
-                background: "var(--surface)",
-                color: "var(--ink)",
-                display: "grid",
-                placeItems: "center",
-                border: "1px solid var(--line)",
-                cursor: "pointer",
-              }}
-              aria-label="Save event"
+              type="button"
+              className={heroControlClasses}
+              aria-label={t("saveEvent")}
             >
               <Heart size={18} />
             </button>
             <button
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 999,
-                background: "var(--surface)",
-                color: "var(--ink)",
-                display: "grid",
-                placeItems: "center",
-                border: "1px solid var(--line)",
-                cursor: "pointer",
-              }}
-              aria-label="Share event"
+              type="button"
+              className={heroControlClasses}
+              aria-label={t("shareEvent")}
             >
               <Share2 size={18} />
             </button>
@@ -187,152 +160,59 @@ export function EventDetailClient({
       </div>
 
       {/* ── Event info ── */}
-      <div
-        style={{
-          padding: "20px 18px 20px",
-          maxWidth: 1280,
-          margin: "0 auto",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 8,
-            alignItems: "center",
-          }}
-        >
-          <Tag style={{ textTransform: "none" }}>{dateLabel}</Tag>
+      <div className="mx-auto max-w-7xl px-4.5 py-5">
+        <div className="flex flex-wrap items-center gap-2">
+          <Tag className="normal-case">{dateLabel}</Tag>
           {pastExperience && (
-            <Tag tone="dark" style={{ textTransform: "none" }}>
+            <Tag tone="dark" className="normal-case">
               {t("past.badge")}
             </Tag>
           )}
         </div>
-        <h1
-          className="gr-display"
-          style={{
-            fontSize: "clamp(28px, 5vw, 64px)",
-            fontWeight: 800,
-            lineHeight: 1.05,
-            marginTop: 10,
-            textWrap: "balance",
-            color: "var(--ink)",
-          }}
-        >
+        <h1 className="gr-display mt-2.5 text-[28px] font-extrabold leading-[1.05] text-ink text-balance sm:text-4xl md:text-5xl lg:text-6xl xl:text-[64px]">
           {title}
         </h1>
-        <div
-          style={{
-            fontSize: 13,
-            color: "var(--ink-3)",
-            marginTop: 8,
-            display: "flex",
-            alignItems: "center",
-            gap: 4,
-          }}
-        >
+        <div className="mt-2 flex items-center gap-1 text-[13px] text-ink-3">
           <MapPin size={14} />
           {event.venue || location}
         </div>
       </div>
 
       {/* ── Quick facts ── */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr 1fr",
-          gap: 8,
-          padding: "14px 18px",
-          maxWidth: 1280,
-          margin: "0 auto",
-        }}
-      >
+      <div className="mx-auto grid max-w-7xl grid-cols-3 gap-2 px-4.5 py-3.5">
         {pastExperience
           ? [
-              <div
-                key="d"
-                style={{
-                  background: "var(--surface)",
-                  border: "1px solid var(--line)",
-                  borderRadius: "var(--r-md)",
-                  padding: 10,
-                }}
-              >
+              <div key="d" className={quickFactClasses}>
                 <Calendar size={16} color="var(--brand-active)" />
-                <div
-                  className="gr-display"
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 800,
-                    color: "var(--ink)",
-                    marginTop: 4,
-                  }}
-                >
+                <div className="gr-display mt-1 text-base font-extrabold text-ink">
                   {dateLabel.split(",")[1]?.trim() ?? dateLabel}
                 </div>
-                <div style={{ fontSize: 11, color: "var(--ink-3)" }}>
+                <div className="text-[11px] text-ink-3">
                   {event.timeLabel ?? ""}
                 </div>
               </div>,
-              <div
-                key="r"
-                style={{
-                  background: "var(--surface)",
-                  border: "1px solid var(--line)",
-                  borderRadius: "var(--r-md)",
-                  padding: 10,
-                }}
-              >
+              <div key="r" className={quickFactClasses}>
                 <Users size={16} color="var(--brand-active)" />
-                <div
-                  className="gr-display"
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 800,
-                    color: "var(--ink)",
-                    marginTop: 4,
-                  }}
-                >
+                <div className="gr-display mt-1 text-base font-extrabold text-ink">
                   {String(spotsTaken)}
                 </div>
-                <div style={{ fontSize: 11, color: "var(--ink-3)" }}>
+                <div className="text-[11px] text-ink-3">
                   {t("past.runnersOnRecord")}
                 </div>
               </div>,
               <Link
                 key="res"
                 href={`/${locale}/events/${event.id}/results`}
-                style={{
-                  background: "var(--surface)",
-                  border: "1px solid var(--line)",
-                  borderRadius: "var(--r-md)",
-                  padding: 10,
-                  textDecoration: "none",
-                  color: "inherit",
-                  display: "block",
-                  transition: "border-color 150ms, background 150ms",
-                }}
+                className={cn(
+                  quickFactClasses,
+                  "block text-inherit no-underline transition-colors hover:border-line-strong hover:bg-surface-2"
+                )}
               >
                 <Trophy size={16} color="var(--brand-active)" />
-                <div
-                  className="gr-display"
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 800,
-                    color: "var(--ink)",
-                    marginTop: 4,
-                  }}
-                >
+                <div className="gr-display mt-1 text-base font-extrabold text-ink">
                   {t("past.viewResults")}
                 </div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    color: "var(--brand-active)",
-                    fontWeight: 600,
-                  }}
-                >
+                <div className="text-[11px] font-semibold text-brand-active">
                   →
                 </div>
               </Link>,
@@ -354,71 +234,32 @@ export function EventDetailClient({
                 bot: t("entryFrom"),
               },
             ].map(({ Icon, top, bot }, i) => (
-              <div
-                key={i}
-                style={{
-                  background: "var(--surface)",
-                  border: "1px solid var(--line)",
-                  borderRadius: "var(--r-md)",
-                  padding: 10,
-                }}
-              >
+              <div key={i} className={quickFactClasses}>
                 <Icon size={16} color="var(--brand-active)" />
-                <div
-                  className="gr-display"
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 800,
-                    color: "var(--ink)",
-                    marginTop: 4,
-                  }}
-                >
+                <div className="gr-display mt-1 text-base font-extrabold text-ink">
                   {top}
                 </div>
-                <div style={{ fontSize: 11, color: "var(--ink-3)" }}>{bot}</div>
+                <div className="text-[11px] text-ink-3">{bot}</div>
               </div>
             ))}
       </div>
 
       {/* ── Tab bar ── */}
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          background: "var(--bg)",
-          zIndex: 10,
-          borderBottom: "1px solid var(--line)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            padding: "0 12px",
-            maxWidth: 1280,
-            margin: "0 auto",
-          }}
-        >
+      <div className="sticky top-0 z-10 border-b border-line bg-bg">
+        <div className="mx-auto flex max-w-7xl px-3">
           {tabs.map((tab) => {
             const active = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
+                type="button"
                 onClick={() => setActiveTab(tab.id)}
-                style={{
-                  padding: "14px 12px",
-                  fontSize: 14,
-                  fontWeight: 700,
-                  color: active ? "var(--ink)" : "var(--ink-3)",
-                  borderBottom: `2px solid ${active ? "var(--brand)" : "transparent"}`,
-                  marginBottom: -1,
-                  background: "transparent",
-                  transition: "color 150ms",
-                  border: "none",
-                  borderBottomStyle: "solid",
-                  borderBottomWidth: 2,
-                  borderBottomColor: active ? "var(--brand)" : "transparent",
-                  cursor: "pointer",
-                }}
+                className={cn(
+                  "-mb-px cursor-pointer border-b-2 bg-transparent px-3 py-3.5 text-sm font-bold transition-colors",
+                  active
+                    ? "border-brand text-ink"
+                    : "border-transparent text-ink-3 hover:text-ink"
+                )}
               >
                 {tab.label}
               </button>
@@ -428,29 +269,19 @@ export function EventDetailClient({
       </div>
 
       {/* ── Tab body ── */}
-      <div style={{ padding: "20px 18px", maxWidth: 1280, margin: "0 auto" }}>
+      <div className="mx-auto max-w-7xl px-4.5 py-5">
         <div
-          style={{
-            display: activeTab === "overview" ? "grid" : "block",
-            gridTemplateColumns: "1fr 380px",
-            gap: 40,
-            alignItems: "flex-start",
-          }}
+          className={cn(
+            "block",
+            activeTab === "overview" &&
+              "lg:grid lg:grid-cols-[1fr_380px] lg:items-start lg:gap-10"
+          )}
         >
           {/* Main content column */}
           <div>
             {activeTab === "overview" && (
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 20 }}
-              >
-                <p
-                  style={{
-                    fontSize: 15,
-                    lineHeight: 1.6,
-                    color: "var(--ink-2)",
-                    margin: 0,
-                  }}
-                >
+              <div className="flex flex-col gap-5">
+                <p className="m-0 text-[15px] leading-[1.6] text-ink-2">
                   {description}
                 </p>
 
@@ -458,81 +289,28 @@ export function EventDetailClient({
 
                 {/* AFU card — body comes from API `event.afu` field */}
                 {event.afu && (
-                  <div
-                    style={{
-                      background: "var(--ink)",
-                      color: "var(--bg)",
-                      borderRadius: "var(--r-lg)",
-                      padding: 18,
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
-                        marginBottom: 8,
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: 999,
-                          background: "var(--afu-yellow)",
-                        }}
-                      />
-                      <div
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          letterSpacing: "0.08em",
-                          color: "var(--afu-yellow)",
-                        }}
-                      >
+                  <div className="rounded-lg bg-ink p-4.5 text-bg">
+                    <div className="mb-2 flex items-center gap-2.5">
+                      <div className="size-2 shrink-0 rounded-[var(--r-pill)] bg-afu-yellow" />
+                      <div className="text-[11px] font-bold tracking-[0.08em] text-afu-yellow">
                         {t("afuSupport")}
                       </div>
                     </div>
-                    <div style={{ fontSize: 14, lineHeight: 1.5 }}>
-                      {event.afu}
-                    </div>
+                    <div className="text-sm leading-normal">{event.afu}</div>
                   </div>
                 )}
 
                 {/* Perks — come from API `event.perks[]` */}
                 {event.perks && event.perks.length > 0 && (
                   <div>
-                    <div
-                      className="gr-display"
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 700,
-                        marginBottom: 10,
-                      }}
-                    >
+                    <div className="gr-display mb-2.5 text-base font-bold">
                       {t("included")}
                     </div>
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns:
-                          "repeat(auto-fill, minmax(180px, 1fr))",
-                        gap: 8,
-                      }}
-                    >
+                    <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2">
                       {event.perks.map((perk) => (
                         <div
                           key={perk}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 8,
-                            padding: "10px 12px",
-                            background: "var(--surface)",
-                            borderRadius: "var(--r-md)",
-                            border: "1px solid var(--line)",
-                            fontSize: 13,
-                          }}
+                          className="flex items-center gap-2 rounded-md border border-line bg-surface px-3 py-2.5 text-[13px]"
                         >
                           <Check size={15} color="var(--brand-active)" />
                           {perk}
@@ -548,15 +326,7 @@ export function EventDetailClient({
                       href={event.regulationUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 6,
-                        fontSize: 14,
-                        color: "var(--brand-active)",
-                        textDecoration: "underline",
-                        textUnderlineOffset: 3,
-                      }}
+                      className="inline-flex items-center gap-1.5 rounded-sm text-sm text-brand-active underline underline-offset-3 transition-colors hover:text-brand"
                     >
                       {t("regulation")}
                     </a>
@@ -566,91 +336,44 @@ export function EventDetailClient({
             )}
 
             {activeTab === "schedule" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div className="flex flex-col gap-2">
                 {/* `event.scheduleText` is free-form, multi-line text */}
                 {event.scheduleText ? (
-                  <p
-                    style={{
-                      fontSize: 15,
-                      lineHeight: 1.6,
-                      color: "var(--ink-2)",
-                      whiteSpace: "pre-wrap",
-                      margin: 0,
-                    }}
-                  >
+                  <p className="m-0 whitespace-pre-wrap text-[15px] leading-[1.6] text-ink-2">
                     {event.scheduleText}
                   </p>
                 ) : (
-                  <p style={{ color: "var(--ink-3)", fontSize: 14 }}>
-                    {t("scheduleEmpty")}
-                  </p>
+                  <p className="text-sm text-ink-3">{t("scheduleEmpty")}</p>
                 )}
               </div>
             )}
 
             {activeTab === "distances" && (
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 12 }}
-              >
+              <div className="flex flex-col gap-3">
                 {/* Adult distances from API `event.distances[]` */}
                 {event.distances?.map((d) => (
-                  <div
-                    key={d.id}
-                    style={{
-                      background: "var(--surface)",
-                      borderRadius: "var(--r-lg)",
-                      border: "1px solid var(--line)",
-                      padding: 16,
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "flex-start",
-                      }}
-                    >
+                  <div key={d.id} className={cn(panelClasses, "p-4")}>
+                    <div className="flex items-start justify-between">
                       <div>
-                        <div
-                          className="gr-display"
-                          style={{
-                            fontSize: 28,
-                            fontWeight: 800,
-                            color: "var(--ink)",
-                            lineHeight: 1,
-                          }}
-                        >
+                        <div className="gr-display text-[28px] font-extrabold leading-none text-ink">
                           {d.label}
                         </div>
-                        <div
-                          style={{
-                            fontSize: 13,
-                            color: "var(--ink-3)",
-                            marginTop: 2,
-                          }}
-                        >
+                        <div className="mt-0.5 text-[13px] text-ink-3">
                           {d.name}
                         </div>
                       </div>
-                      <div style={{ textAlign: "right" }}>
-                        <div
-                          className="gr-display"
-                          style={{
-                            fontSize: 18,
-                            fontWeight: 800,
-                            color: "var(--brand-active)",
-                          }}
-                        >
+                      <div className="text-right">
+                        <div className="gr-display text-lg font-extrabold text-brand-active">
                           {resolveDistancePrice(d)} ₴
                         </div>
                         {(d.elevation || d.laps) && (
-                          <div style={{ fontSize: 11, color: "var(--ink-3)" }}>
+                          <div className="text-[11px] text-ink-3">
                             {d.elevation || d.laps}
                           </div>
                         )}
                       </div>
                     </div>
-                    <div style={{ marginTop: 12 }}>
+                    <div className="mt-3">
                       <ProgressBar
                         taken={d.spots?.taken ?? 0}
                         total={d.spots?.total ?? d.participantLimit ?? 0}
@@ -661,66 +384,23 @@ export function EventDetailClient({
 
                 {/* Kids distances from API `event.kidsDistances[]` */}
                 {event.kidsDistances && event.kidsDistances.length > 0 && (
-                  <div style={{ marginTop: 8 }}>
-                    <div
-                      className="gr-display"
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 700,
-                        marginBottom: 10,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                      }}
-                    >
+                  <div className="mt-2">
+                    <div className="gr-display mb-2.5 flex items-center gap-2 text-base font-bold">
                       <Baby size={18} /> {t("kidsRaces")}
                     </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: 8,
-                        flexWrap: "wrap",
-                        padding: 16,
-                        background: "var(--brand-tint)",
-                        borderRadius: "var(--r-lg)",
-                      }}
-                    >
+                    <div className="flex flex-wrap gap-2 rounded-lg bg-brand-tint p-4">
                       {event.kidsDistances.map((d) => (
                         <div
                           key={d.id}
-                          style={{
-                            padding: "12px 14px",
-                            background: "rgba(255,255,255,0.6)",
-                            borderRadius: "var(--r-md)",
-                            flex: "1 1 100px",
-                          }}
+                          className="flex-[1_1_100px] rounded-md bg-surface/60 px-3.5 py-3"
                         >
-                          <div
-                            className="gr-display"
-                            style={{
-                              fontSize: 18,
-                              fontWeight: 800,
-                              color: "var(--brand-active)",
-                            }}
-                          >
+                          <div className="text-lg font-extrabold text-brand-active">
                             {d.label}
                           </div>
-                          <div
-                            style={{
-                              fontSize: 11,
-                              color: "var(--ink-3)",
-                              fontWeight: 600,
-                            }}
-                          >
+                          <div className="text-[11px] font-semibold text-ink-3">
                             {t("age", { range: d.age })}
                           </div>
-                          <div
-                            style={{
-                              fontSize: 11,
-                              color: "var(--ink-3)",
-                              marginTop: 2,
-                            }}
-                          >
+                          <div className="mt-0.5 text-[11px] text-ink-3">
                             {resolveDistancePrice(d) === 0
                               ? t("free")
                               : `${resolveDistancePrice(d)} ₴`}
@@ -732,9 +412,7 @@ export function EventDetailClient({
                 )}
 
                 {!event.distances?.length && !event.kidsDistances?.length && (
-                  <p style={{ color: "var(--ink-3)", fontSize: 14 }}>
-                    {t("distancesEmpty")}
-                  </p>
+                  <p className="text-sm text-ink-3">{t("distancesEmpty")}</p>
                 )}
               </div>
             )}
@@ -746,175 +424,61 @@ export function EventDetailClient({
 
           {/* Desktop sticky sidebar */}
           {activeTab === "overview" && (
-            <div
-              style={{
-                position: "sticky",
-                top: 90,
-                display: "flex",
-                flexDirection: "column",
-                gap: 14,
-              }}
-              className="hidden lg:flex"
-            >
+            <div className="sticky top-22.5 hidden flex-col gap-3.5 lg:flex">
               {registrationClosed ? (
                 pastExperience ? (
-                  <div
-                    style={{
-                      background: "var(--surface)",
-                      borderRadius: "var(--r-lg)",
-                      border: "1px solid var(--line)",
-                      padding: 24,
-                    }}
-                  >
-                    <div
-                      className="gr-display"
-                      style={{
-                        fontSize: 22,
-                        fontWeight: 800,
-                        color: "var(--ink)",
-                        lineHeight: 1.2,
-                      }}
-                    >
+                  <div className={cn(panelClasses, "p-6")}>
+                    <div className="gr-display text-[22px] font-extrabold leading-[1.2] text-ink">
                       {t("past.sidebarTitle")}
                     </div>
-                    <p
-                      style={{
-                        fontSize: 14,
-                        color: "var(--ink-2)",
-                        marginTop: 10,
-                        lineHeight: 1.5,
-                      }}
-                    >
+                    <p className="mt-2.5 text-sm leading-normal text-ink-2">
                       {t("past.sidebarSub")}
                     </p>
-                    <div style={{ marginTop: 16 }}>
+                    <div className="mt-4">
                       <ProgressBar taken={spotsTaken} total={spotsTotal} />
                     </div>
                     <Link
                       href={`/${locale}/events/${event.id}/results`}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: 8,
-                        width: "100%",
-                        marginTop: 18,
-                        padding: "16px 22px",
-                        borderRadius: 999,
-                        background: "var(--brand)",
-                        color: "var(--on-brand)",
-                        fontWeight: 700,
-                        fontSize: 16,
-                        textDecoration: "none",
-                        boxShadow: "0 8px 28px var(--brand-glow)",
-                      }}
+                      className={cn(ctaClasses, "mt-4.5")}
                     >
                       {t("past.viewResults")}
                     </Link>
                     <Link
                       href={`/${locale}/events/${event.id}/runners`}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: "100%",
-                        marginTop: 10,
-                        padding: "14px 20px",
-                        borderRadius: 999,
-                        border: "1px solid var(--line-strong)",
-                        color: "var(--ink)",
-                        fontWeight: 600,
-                        fontSize: 15,
-                        textDecoration: "none",
-                        background: "var(--bg)",
-                      }}
+                      className="mt-2.5 flex w-full items-center justify-center rounded-[var(--r-pill)] border border-line-strong bg-bg px-5 py-3.5 text-[15px] font-semibold text-ink no-underline transition-colors hover:bg-surface-2"
                     >
                       {t("past.viewRunners")}
                     </Link>
                   </div>
                 ) : (
-                  <div
-                    style={{
-                      background: "var(--surface)",
-                      borderRadius: "var(--r-lg)",
-                      border: "1px solid var(--line)",
-                      padding: 24,
-                    }}
-                  >
-                    <p
-                      style={{
-                        fontSize: 15,
-                        color: "var(--ink-2)",
-                        lineHeight: 1.55,
-                        margin: 0,
-                      }}
-                    >
+                  <div className={cn(panelClasses, "p-6")}>
+                    <p className="m-0 text-[15px] leading-[1.55] text-ink-2">
                       {event.status === "CANCELLED"
                         ? t("past.cancelled")
                         : t("past.registrationClosed")}
                     </p>
                     <Link
                       href={`/${locale}`}
-                      style={{
-                        display: "inline-flex",
-                        marginTop: 16,
-                        fontWeight: 700,
-                        fontSize: 14,
-                        color: "var(--brand-active)",
-                        textDecoration: "none",
-                      }}
+                      className="mt-4 inline-flex rounded-sm text-sm font-bold text-brand-active no-underline transition-colors hover:text-brand"
                     >
                       {t("backToEvents")}
                     </Link>
                   </div>
                 )
               ) : (
-                <div
-                  style={{
-                    background: "var(--surface)",
-                    borderRadius: "var(--r-lg)",
-                    border: "1px solid var(--line)",
-                    padding: 24,
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 12,
-                      color: "var(--ink-3)",
-                      fontWeight: 600,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.06em",
-                    }}
-                  >
+                <div className={cn(panelClasses, "p-6")}>
+                  <div className="text-xs font-semibold uppercase tracking-[0.06em] text-ink-3">
                     {t("entryFrom")}
                   </div>
-                  <div
-                    className="gr-display"
-                    style={{ fontSize: 36, fontWeight: 800, marginTop: 4 }}
-                  >
+                  <div className="gr-display mt-1 text-4xl font-extrabold">
                     {feeLabel || "—"}
                   </div>
-                  <div style={{ marginTop: 16 }}>
+                  <div className="mt-4">
                     <ProgressBar taken={spotsTaken} total={spotsTotal} />
                   </div>
                   <Link
                     href={`/${locale}/events/${event.id}/register`}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 8,
-                      width: "100%",
-                      marginTop: 18,
-                      padding: "16px 22px",
-                      borderRadius: 999,
-                      background: "var(--brand)",
-                      color: "var(--on-brand)",
-                      fontWeight: 700,
-                      fontSize: 16,
-                      textDecoration: "none",
-                      boxShadow: "0 8px 28px var(--brand-glow)",
-                    }}
+                    className={cn(ctaClasses, "mt-4.5")}
                   >
                     {t("register")}
                   </Link>
@@ -922,44 +486,14 @@ export function EventDetailClient({
               )}
 
               {event.afu && (
-                <div
-                  style={{
-                    background: "var(--ink)",
-                    color: "var(--bg)",
-                    borderRadius: "var(--r-lg)",
-                    padding: 22,
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 10,
-                      marginBottom: 10,
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: 999,
-                        background: "var(--afu-yellow)",
-                      }}
-                    />
-                    <div
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        letterSpacing: "0.08em",
-                        color: "var(--afu-yellow)",
-                      }}
-                    >
+                <div className="rounded-lg bg-ink p-5.5 text-bg">
+                  <div className="mb-2.5 flex items-center gap-2.5">
+                    <div className="size-2 shrink-0 rounded-[var(--r-pill)] bg-afu-yellow" />
+                    <div className="text-[11px] font-bold tracking-[0.08em] text-afu-yellow">
                       {t("afuSupport")}
                     </div>
                   </div>
-                  <div style={{ fontSize: 13, lineHeight: 1.55 }}>
-                    {event.afu}
-                  </div>
+                  <div className="text-[13px] leading-[1.55]">{event.afu}</div>
                 </div>
               )}
             </div>
@@ -969,70 +503,20 @@ export function EventDetailClient({
 
       {/* ── Sticky CTA (mobile) ── */}
       {!registrationClosed && (
-        <div
-          style={{
-            position: "fixed",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            padding: "12px 18px 24px",
-            background: "linear-gradient(180deg, transparent, var(--bg) 30%)",
-            zIndex: 20,
-          }}
-          className="lg:hidden"
-        >
+        <div className={mobileCtaBarClasses}>
           <Link
             href={`/${locale}/events/${event.id}/register`}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              width: "100%",
-              padding: "16px 22px",
-              borderRadius: 999,
-              background: "var(--brand)",
-              color: "var(--on-brand)",
-              fontWeight: 700,
-              fontSize: 16,
-              textDecoration: "none",
-              boxShadow: "0 8px 28px var(--brand-glow)",
-            }}
+            className={ctaClasses}
           >
             {feeLabel ? `${t("register")} · ${feeLabel}` : t("register")}
           </Link>
         </div>
       )}
       {registrationClosed && pastExperience && (
-        <div
-          style={{
-            position: "fixed",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            padding: "12px 18px 24px",
-            background: "linear-gradient(180deg, transparent, var(--bg) 30%)",
-            zIndex: 20,
-          }}
-          className="lg:hidden"
-        >
+        <div className={mobileCtaBarClasses}>
           <Link
             href={`/${locale}/events/${event.id}/results`}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              width: "100%",
-              padding: "16px 22px",
-              borderRadius: 999,
-              background: "var(--brand)",
-              color: "var(--on-brand)",
-              fontWeight: 700,
-              fontSize: 16,
-              textDecoration: "none",
-              boxShadow: "0 8px 28px var(--brand-glow)",
-            }}
+            className={ctaClasses}
           >
             {t("past.viewResults")}
           </Link>

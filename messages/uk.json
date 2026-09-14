@@ -1049,6 +1049,8 @@
   },
   "eventDetail": {
     "backToEvents": "Назад до заходів",
+    "saveEvent": "Зберегти захід",
+    "shareEvent": "Поділитися заходом",
     "tabs": {
       "overview": "Огляд",
       "schedule": "Програма",
