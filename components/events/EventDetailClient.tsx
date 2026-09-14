@@ -189,7 +189,7 @@ export function EventDetailClient({
       {/* ── Event info ── */}
       <div
         style={{
-          padding: "0 18px 20px",
+          padding: "20px 18px 20px",
           maxWidth: 1280,
           margin: "0 auto",
         }}
