@@ -50,7 +50,7 @@ export default function Header() {
               alt="GoRun Events Platform"
               width={60}
               height={20}
-              style={{ height: "auto" }}
+              className="h-auto"
               priority
             />
           </Link>

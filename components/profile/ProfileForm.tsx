@@ -266,12 +266,7 @@ export function ProfileForm() {
                         <SelectValue placeholder={t("genderPlaceholder")} />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent
-                      style={{
-                        backgroundColor: "var(--surface)",
-                        color: "var(--ink)",
-                      }}
-                    >
+                    <SelectContent className="bg-surface text-ink">
                       <SelectItem value="unspecified">
                         {t("genderPlaceholder")}
                       </SelectItem>

@@ -96,10 +96,7 @@ export default async function LocaleLayout({
       suppressHydrationWarning
       className={`${bricolage.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
-      <body
-        suppressHydrationWarning
-        style={{ fontFamily: "var(--font-body, Inter, system-ui, sans-serif)" }}
-      >
+      <body suppressHydrationWarning className="font-sans">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
