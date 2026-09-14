@@ -15,14 +15,6 @@ const noStaticInlineStyles = {
     "No static inline styles — use Tailwind token utilities (bg-surface, text-ink, rounded-md) instead. Inline style is only for genuinely dynamic values.",
 };
 
-/**
- * Files that predate the rule and still carry ported prototype styles.
- * Shrink this list — never add to it. Tracked in AGENTS.md § Styling.
- */
-const inlineStyleLegacyFiles = [
-  "components/registration/RegistrationWizard.tsx",
-];
-
 const config = [
   ...nextCoreWebVitals,
   eslintConfigPrettier,
@@ -33,12 +25,6 @@ const config = [
     rules: {
       "@typescript-eslint/no-explicit-any": "error",
       "no-restricted-syntax": ["error", noStaticInlineStyles],
-    },
-  },
-  {
-    files: inlineStyleLegacyFiles,
-    rules: {
-      "no-restricted-syntax": "off",
     },
   },
 ];

@@ -15,6 +15,7 @@ import { updateProfile } from "@/lib/api/auth";
 import { validatePromoCode } from "@/lib/api/promo-codes";
 import { handleApiError } from "@/lib/error-handler";
 import { useAuth } from "@/hooks/useAuth";
+import { cn } from "@/lib/utils";
 import {
   useCreateRegistration,
   useCheckRegistration,
@@ -106,6 +107,34 @@ const personalFromUser = (user: User | null | undefined): PersonalInfo => ({
 });
 const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 const AFU_OPTIONS = [0, 100, 250, 500, 1000];
+
+// --- Shared class chrome ----------------------------------------------------
+
+/** Uppercase caption above every form control. */
+const fieldLabel =
+  "mb-2 text-xs font-semibold uppercase tracking-[0.06em] text-ink-3";
+
+/** Inline validation message below a control. */
+const fieldErrorClasses = "mt-1.5 text-xs text-danger";
+
+/** Text input / select chrome; reddens its border when the field is invalid. */
+const fieldControl = (hasError: boolean): string =>
+  cn(
+    "w-full rounded-md border-[1.5px] bg-surface px-4 py-3.5 text-base text-ink focus:border-brand focus:shadow-[0_0_0_4px_var(--brand-glow)] focus:outline-none",
+    hasError ? "border-danger" : "border-line-strong"
+  );
+
+/** Apply / remove button beside the promo-code input. */
+const promoButton =
+  "cursor-pointer whitespace-nowrap rounded-md border-[1.5px] border-line-strong bg-surface-2 px-4.5 text-sm font-bold text-ink transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-60";
+
+/** Full-width pill CTA in the sticky footer and on the success screen. */
+const primaryCta =
+  "flex h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-(--r-pill) border-0 bg-brand text-base font-bold text-on-brand transition-colors hover:bg-brand-hover active:bg-brand-active focus-visible:shadow-[0_0_0_4px_var(--brand-glow)] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60";
+
+/** Dashed placeholder box used for the empty-kids state and the add-child CTA. */
+const dashedBox =
+  "rounded-md border-[1.5px] border-dashed border-line-strong text-[13px] text-ink-3";
 
 // --- Resume-from-payment helpers -------------------------------------------
 // The wizard stashes its state in the URL before redirecting to the payment
@@ -446,66 +475,31 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
     "";
 
   return (
-    <div
-      style={{
-        background: "var(--bg)",
-        color: "var(--ink)",
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        maxWidth: 640,
-        margin: "0 auto",
-      }}
-    >
+    <div className="mx-auto flex min-h-screen max-w-160 flex-col bg-bg text-ink">
       {/* Header */}
-      <div style={{ padding: "14px 18px 8px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div className="px-4.5 pb-2 pt-3.5">
+        <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={handleBack}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 999,
-              background: "var(--surface)",
-              border: "1px solid var(--line)",
-              display: "grid",
-              placeItems: "center",
-              cursor: "pointer",
-            }}
+            className="grid size-10 cursor-pointer place-items-center rounded-(--r-pill) border border-line bg-surface transition-colors hover:bg-surface-2"
             aria-label={t("goBack")}
           >
             <ArrowLeft size={18} />
           </button>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                fontSize: 11,
-                color: "var(--ink-3)",
-                fontWeight: 700,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[11px] font-bold uppercase tracking-[0.08em] text-ink-3">
               {t("registering")} · {eventTitle}
             </div>
-            <div
-              className="gr-display"
-              style={{ fontSize: 18, fontWeight: 800 }}
-            >
+            <div className="gr-display text-lg font-extrabold">
               {t("step", { current: step + 1, total: steps.length })} ·{" "}
               {t(currentKey)}
             </div>
           </div>
           <button
+            type="button"
             onClick={() => router.push(`/${locale}/events/${event.id}`)}
-            style={{
-              color: "var(--ink-3)",
-              display: "grid",
-              placeItems: "center",
-            }}
+            className="grid cursor-pointer place-items-center text-ink-3 transition-colors hover:text-ink"
             aria-label={t("close")}
           >
             <X size={22} />
@@ -513,92 +507,56 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
         </div>
 
         {/* Progress bar */}
-        <div style={{ display: "flex", gap: 4, marginTop: 12 }}>
+        <div className="mt-3 flex gap-1">
           {steps.map((_, i) => (
             <div
               key={i}
-              style={{
-                flex: 1,
-                height: 4,
-                borderRadius: 2,
-                background: i <= step ? "var(--brand)" : "var(--line-strong)",
-                transition: "background 300ms",
-              }}
+              className={cn(
+                "h-1 flex-1 rounded-full transition-colors duration-300",
+                i <= step ? "bg-brand" : "bg-line-strong"
+              )}
             />
           ))}
         </div>
       </div>
 
       {/* Step body */}
-      <div
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          padding: "12px 18px 220px",
-        }}
-      >
+      <div className="flex-1 overflow-y-auto px-4.5 pb-55 pt-3">
         {/* Step: Distance */}
         {currentKey === "steps.distance" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <div
-              style={{
-                fontSize: 14,
-                color: "var(--ink-3)",
-                marginBottom: 4,
-              }}
-            >
-              {t("pickDistance")}
-            </div>
+          <div className="flex flex-col gap-2.5">
+            <div className="mb-1 text-sm text-ink-3">{t("pickDistance")}</div>
             {event.distances?.map((d) => {
               const sel = pickedDistId === d.id;
               const isRegistered = registeredDistanceIds.includes(d.id);
               return (
                 <button
+                  type="button"
                   key={d.id}
                   onClick={() => !isRegistered && setPickedDistId(d.id)}
                   disabled={isRegistered}
                   aria-disabled={isRegistered}
-                  style={{
-                    padding: 16,
-                    borderRadius: "var(--r-lg)",
-                    background: sel ? "var(--brand-tint)" : "var(--surface)",
-                    border: `2px solid ${sel ? "var(--brand)" : "var(--line)"}`,
-                    display: "flex",
-                    gap: 14,
-                    alignItems: "center",
-                    cursor: isRegistered ? "not-allowed" : "pointer",
-                    textAlign: "left",
-                    opacity: isRegistered ? 0.55 : 1,
-                  }}
+                  className={cn(
+                    "flex items-center gap-3.5 rounded-lg border-2 p-4 text-left",
+                    sel
+                      ? "border-brand bg-brand-tint"
+                      : "border-line bg-surface",
+                    isRegistered
+                      ? "cursor-not-allowed opacity-55"
+                      : "cursor-pointer"
+                  )}
                 >
                   <div
-                    className="gr-display"
-                    style={{
-                      fontSize: 28,
-                      fontWeight: 800,
-                      color: sel ? "var(--brand-active)" : "var(--ink)",
-                      minWidth: 70,
-                    }}
+                    className={cn(
+                      "gr-display min-w-17.5 text-[28px] font-extrabold",
+                      sel ? "text-brand-active" : "text-ink"
+                    )}
                   >
                     {d.label}
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <div
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 700,
-                        color: "var(--ink)",
-                      }}
-                    >
-                      {d.name}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        color: "var(--ink-3)",
-                        marginTop: 2,
-                      }}
-                    >
+                  <div className="flex-1">
+                    <div className="text-sm font-bold text-ink">{d.name}</div>
+                    <div className="mt-0.5 text-xs text-ink-3">
                       {isRegistered
                         ? t("alreadyRegistered")
                         : [
@@ -613,35 +571,24 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                             .join(" · ")}
                     </div>
                   </div>
-                  <div
-                    className="gr-display"
-                    style={{ fontWeight: 800, fontSize: 16 }}
-                  >
+                  <div className="gr-display text-base font-extrabold">
                     {t("price", { amount: resolveDistancePrice(d) })}
                   </div>
                 </button>
               );
             })}
             {!event.distances?.length && (
-              <p style={{ color: "var(--ink-3)", fontSize: 14 }}>
-                {t("distancesEmpty")}
-              </p>
+              <p className="text-sm text-ink-3">{t("distancesEmpty")}</p>
             )}
           </div>
         )}
 
         {/* Step: Kids (only when a kids' distance is selected) */}
         {currentKey === "steps.kids" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div className="flex flex-col gap-3.5">
             <div>
-              <div style={{ fontSize: 14, color: "var(--ink-3)" }}>
-                {t("bringKids")}
-              </div>
-              <div
-                style={{ fontSize: 12, color: "var(--ink-4)", marginTop: 4 }}
-              >
-                {t("kidsDesc")}
-              </div>
+              <div className="text-sm text-ink-3">{t("bringKids")}</div>
+              <div className="mt-1 text-xs text-ink-4">{t("kidsDesc")}</div>
             </div>
 
             {user?.kids?.map((kid) => {
@@ -649,38 +596,20 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               return (
                 <div
                   key={kid.id}
-                  style={{
-                    background: "var(--surface)",
-                    borderRadius: "var(--r-lg)",
-                    border: "1px solid var(--line)",
-                    padding: 16,
-                  }}
+                  className="rounded-lg border border-line bg-surface p-4"
                 >
                   <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 10,
-                      marginBottom: reg ? 12 : 0,
-                    }}
+                    className={cn(
+                      "flex items-center gap-2.5",
+                      reg ? "mb-3" : "mb-0"
+                    )}
                   >
-                    <div
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 999,
-                        background: "var(--brand-tint)",
-                        display: "grid",
-                        placeItems: "center",
-                      }}
-                    >
+                    <div className="grid size-10 place-items-center rounded-(--r-pill) bg-brand-tint">
                       <Baby size={20} color="var(--brand-active)" />
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 15, fontWeight: 700 }}>
-                        {kid.name}
-                      </div>
-                      <div style={{ fontSize: 12, color: "var(--ink-3)" }}>
+                    <div className="flex-1">
+                      <div className="text-[15px] font-bold">{kid.name}</div>
+                      <div className="text-xs text-ink-3">
                         {t("kidAge", { age: kid.age })}
                         {kid.shirt
                           ? ` · ${t("kidShirt", { size: kid.shirt })}`
@@ -688,6 +617,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                       </div>
                     </div>
                     <button
+                      type="button"
                       onClick={() => {
                         if (reg) {
                           setPickedKids(
@@ -703,26 +633,24 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                           ]);
                         }
                       }}
-                      style={{
-                        padding: "8px 14px",
-                        borderRadius: 999,
-                        fontSize: 12,
-                        fontWeight: 700,
-                        background: reg ? "var(--ink)" : "var(--brand-tint)",
-                        color: reg ? "var(--bg)" : "var(--brand-active)",
-                        cursor: "pointer",
-                      }}
+                      className={cn(
+                        "cursor-pointer rounded-(--r-pill) px-3.5 py-2 text-xs font-bold",
+                        reg
+                          ? "bg-ink text-bg"
+                          : "bg-brand-tint text-brand-active"
+                      )}
                     >
                       {reg ? t("removeKid") : `+ ${t("addKid")}`}
                     </button>
                   </div>
                   {reg && event.kidsDistances && (
-                    <div style={{ display: "flex", gap: 6 }}>
+                    <div className="flex gap-1.5">
                       {event.kidsDistances.map((d) => {
                         const sel = reg.distId === d.id;
                         const fee = resolveDistancePrice(d);
                         return (
                           <button
+                            type="button"
                             key={d.id}
                             onClick={() =>
                               setPickedKids(
@@ -733,27 +661,15 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                                 )
                               )
                             }
-                            style={{
-                              flex: 1,
-                              padding: "10px 8px",
-                              borderRadius: "var(--r-md)",
-                              background: sel
-                                ? "var(--brand)"
-                                : "var(--surface-2)",
-                              color: sel ? "var(--on-brand)" : "var(--ink-2)",
-                              fontWeight: 700,
-                              fontSize: 13,
-                              cursor: "pointer",
-                            }}
+                            className={cn(
+                              "flex-1 cursor-pointer rounded-md px-2 py-2.5 text-[13px] font-bold",
+                              sel
+                                ? "bg-brand text-on-brand"
+                                : "bg-surface-2 text-ink-2"
+                            )}
                           >
                             <div>{d.label}</div>
-                            <div
-                              style={{
-                                fontSize: 10,
-                                fontWeight: 600,
-                                marginTop: 2,
-                              }}
-                            >
+                            <div className="mt-0.5 text-[10px] font-semibold">
                               {fee === 0
                                 ? t("free")
                                 : t("price", { amount: fee })}
@@ -768,35 +684,17 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
             })}
 
             {!user?.kids?.length && (
-              <div
-                style={{
-                  padding: 18,
-                  borderRadius: "var(--r-md)",
-                  border: "1.5px dashed var(--line-strong)",
-                  color: "var(--ink-3)",
-                  fontSize: 13,
-                  textAlign: "center",
-                }}
-              >
+              <div className={cn(dashedBox, "p-4.5 text-center")}>
                 {t("noKidsSaved")}
               </div>
             )}
 
             <button
-              style={{
-                padding: 14,
-                border: "1.5px dashed var(--line-strong)",
-                borderRadius: "var(--r-md)",
-                color: "var(--ink-3)",
-                fontWeight: 600,
-                fontSize: 13,
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 6,
-                cursor: "pointer",
-                background: "transparent",
-              }}
+              type="button"
+              className={cn(
+                dashedBox,
+                "inline-flex cursor-pointer items-center justify-center gap-1.5 bg-transparent p-3.5 font-semibold transition-colors hover:text-ink"
+              )}
               onClick={() => router.push(`/${locale}/profile`)}
             >
               + {t("addChildInProfile")}
@@ -815,31 +713,11 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
 
         {/* Step: Details (temporarily hidden — see HIDDEN_STEPS) */}
         {currentKey === "steps.details" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div className="flex flex-col gap-3.5">
             {user && (
-              <div
-                style={{
-                  background: "var(--surface)",
-                  borderRadius: "var(--r-lg)",
-                  border: "1px solid var(--line)",
-                  padding: 16,
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div
-                    style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 999,
-                      background:
-                        "linear-gradient(135deg, var(--brand), var(--brand-active))",
-                      color: "var(--surface)",
-                      display: "grid",
-                      placeItems: "center",
-                      fontWeight: 700,
-                      fontSize: 14,
-                    }}
-                  >
+              <div className="rounded-lg border border-line bg-surface p-4">
+                <div className="flex items-center gap-3">
+                  <div className="grid size-11 place-items-center rounded-(--r-pill) bg-[linear-gradient(135deg,var(--brand),var(--brand-active))] text-sm font-bold text-on-brand">
                     {user.name
                       ?.split(" ")
                       .map((w) => w[0])
@@ -847,47 +725,26 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                       .toUpperCase()
                       .slice(0, 2)}
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700 }}>
-                      {user.name}
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--ink-3)" }}>
-                      {user.email}
-                    </div>
+                  <div className="flex-1">
+                    <div className="text-[15px] font-bold">{user.name}</div>
+                    <div className="text-xs text-ink-3">{user.email}</div>
                   </div>
                 </div>
               </div>
             )}
 
             <div>
-              <div
-                style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: "var(--ink-3)",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  marginBottom: 8,
-                }}
-              >
-                {t("shirtSize")}
-              </div>
-              <div style={{ display: "flex", gap: 6 }}>
+              <div className={fieldLabel}>{t("shirtSize")}</div>
+              <div className="flex gap-1.5">
                 {SHIRT_SIZES.map((s) => (
                   <button
+                    type="button"
                     key={s}
                     onClick={() => setShirt(s)}
-                    style={{
-                      flex: 1,
-                      padding: "12px 0",
-                      borderRadius: "var(--r-md)",
-                      fontWeight: 700,
-                      fontSize: 13,
-                      background: shirt === s ? "var(--ink)" : "var(--surface)",
-                      color: shirt === s ? "var(--bg)" : "var(--ink-2)",
-                      border: "1px solid var(--line)",
-                      cursor: "pointer",
-                    }}
+                    className={cn(
+                      "flex-1 cursor-pointer rounded-md border border-line py-3 text-[13px] font-bold",
+                      shirt === s ? "bg-ink text-bg" : "bg-surface text-ink-2"
+                    )}
                   >
                     {s}
                   </button>
@@ -897,76 +754,31 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
 
             <div>
               <label>
-                <div
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: "var(--ink-3)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                    marginBottom: 8,
-                  }}
-                >
-                  {t("pace")}
-                </div>
+                <div className={fieldLabel}>{t("pace")}</div>
                 <input
                   value={pace}
                   onChange={(e) => setPace(e.target.value)}
                   placeholder="5:30"
-                  style={{
-                    width: "100%",
-                    padding: "14px 16px",
-                    borderRadius: "var(--r-md)",
-                    background: "var(--surface)",
-                    border: "1.5px solid var(--line-strong)",
-                    fontSize: 16,
-                    color: "var(--ink)",
-                    fontFamily: "inherit",
-                  }}
+                  className={fieldControl(false)}
                 />
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: "var(--ink-4)",
-                    marginTop: 6,
-                  }}
-                >
-                  {t("paceHint")}
-                </div>
+                <div className="mt-1.5 text-xs text-ink-4">{t("paceHint")}</div>
               </label>
             </div>
 
             <div>
-              <div
-                style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: "var(--ink-3)",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  marginBottom: 8,
-                }}
-              >
-                {t("donation")}
-              </div>
-              <div style={{ display: "flex", gap: 6 }}>
+              <div className={fieldLabel}>{t("donation")}</div>
+              <div className="flex gap-1.5">
                 {AFU_OPTIONS.map((v) => (
                   <button
+                    type="button"
                     key={v}
                     onClick={() => setDonate(v)}
-                    style={{
-                      flex: 1,
-                      padding: "12px 0",
-                      borderRadius: "var(--r-md)",
-                      fontWeight: 700,
-                      fontSize: 12,
-                      background:
-                        donate === v ? "var(--ink)" : "var(--surface)",
-                      color:
-                        donate === v ? "var(--afu-yellow)" : "var(--ink-2)",
-                      border: "1px solid var(--line)",
-                      cursor: "pointer",
-                    }}
+                    className={cn(
+                      "flex-1 cursor-pointer rounded-md border border-line py-3 text-xs font-bold",
+                      donate === v
+                        ? "bg-ink text-afu-yellow"
+                        : "bg-surface text-ink-2"
+                    )}
                   >
                     {v === 0
                       ? t("noDonation")
@@ -974,9 +786,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                   </button>
                 ))}
               </div>
-              <div
-                style={{ fontSize: 12, color: "var(--ink-4)", marginTop: 6 }}
-              >
+              <div className="mt-1.5 text-xs text-ink-4">
                 {t("donationHint")}
               </div>
             </div>
@@ -985,25 +795,13 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
 
         {/* Step: Pay */}
         {currentKey === "steps.pay" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div className="flex flex-col gap-3.5">
             {/* Order summary */}
-            <div
-              style={{
-                background: "var(--surface)",
-                borderRadius: "var(--r-lg)",
-                border: "1px solid var(--line)",
-                padding: 16,
-              }}
-            >
-              <div
-                className="gr-display"
-                style={{ fontSize: 14, fontWeight: 700, marginBottom: 10 }}
-              >
+            <div className="rounded-lg border border-line bg-surface p-4">
+              <div className="gr-display mb-2.5 text-sm font-bold">
                 {t("summary")}
               </div>
-              <div
-                style={{ fontSize: 12, color: "var(--ink-3)", marginBottom: 8 }}
-              >
+              <div className="mb-2 text-xs text-ink-3">
                 {t("orderItemLabel", { event: eventTitle })}
               </div>
               {selectedDist && (
@@ -1041,17 +839,11 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                   value={`− ${t("price", { amount: promoDiscount })}`}
                 />
               )}
-              <div
-                style={{
-                  height: 1,
-                  background: "var(--line)",
-                  margin: "12px 0",
-                }}
-              />
+              <div className="my-3 h-px bg-line" />
               <SummaryRow
                 label={<strong>{t("total")}</strong>}
                 value={
-                  <strong className="gr-display" style={{ fontSize: 20 }}>
+                  <strong className="gr-display text-xl">
                     {t("price", { amount: total })}
                   </strong>
                 }
@@ -1059,28 +851,12 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
             </div>
 
             {/* Agreement */}
-            <label
-              style={{
-                display: "flex",
-                gap: 12,
-                alignItems: "flex-start",
-                cursor: "pointer",
-                fontSize: 13,
-                lineHeight: 1.5,
-                color: "var(--ink-2)",
-              }}
-            >
+            <label className="flex cursor-pointer items-start gap-3 text-[13px] leading-[1.5] text-ink-2">
               <input
                 type="checkbox"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
-                style={{
-                  width: 22,
-                  height: 22,
-                  flexShrink: 0,
-                  accentColor: "var(--brand)",
-                  cursor: "pointer",
-                }}
+                className="size-5.5 shrink-0 cursor-pointer accent-brand"
               />
               <span>
                 {t.rich("agree", {
@@ -1096,19 +872,19 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
 
             {/* Promo code */}
             <div>
-              <div style={{ display: "flex", gap: 8 }}>
+              <div className="flex gap-2">
                 <input
                   value={promoInput}
                   onChange={(e) => setPromoInput(e.target.value)}
                   placeholder={t("promoPlaceholder")}
                   disabled={!!appliedPromo || promoChecking}
-                  style={{ ...fieldControlStyle(false), flex: 1 }}
+                  className={cn(fieldControl(false), "flex-1")}
                 />
                 {appliedPromo ? (
                   <button
                     type="button"
                     onClick={clearPromo}
-                    style={promoButtonStyle}
+                    className={promoButton}
                   >
                     {t("removePromo")}
                   </button>
@@ -1117,10 +893,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
                     type="button"
                     onClick={applyPromo}
                     disabled={promoChecking || !promoInput.trim()}
-                    style={{
-                      ...promoButtonStyle,
-                      opacity: promoChecking || !promoInput.trim() ? 0.6 : 1,
-                    }}
+                    className={promoButton}
                   >
                     {t("applyPromo")}
                   </button>
@@ -1129,15 +902,14 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               <div
                 role="status"
                 aria-live="polite"
-                style={{
-                  fontSize: 12,
-                  marginTop: 6,
-                  color: appliedPromo
-                    ? "var(--success)"
+                className={cn(
+                  "mt-1.5 text-xs",
+                  appliedPromo
+                    ? "text-success"
                     : promoError
-                      ? "var(--danger)"
-                      : "var(--ink-4)",
-                }}
+                      ? "text-danger"
+                      : "text-ink-4"
+                )}
               >
                 {appliedPromo
                   ? t("promoApplied")
@@ -1149,58 +921,20 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
       </div>
 
       {/* Sticky footer */}
-      <div
-        style={{
-          position: "fixed",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          padding: "14px 18px 32px",
-          background: "linear-gradient(180deg, transparent, var(--bg) 25%)",
-          zIndex: 20,
-          maxWidth: 640,
-          margin: "0 auto",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 10,
-          }}
-        >
-          <div style={{ fontSize: 12, color: "var(--ink-3)", fontWeight: 600 }}>
-            {t("total")}
-          </div>
-          <div className="gr-display" style={{ fontSize: 22, fontWeight: 800 }}>
+      <div className="fixed bottom-0 left-0 right-0 z-20 mx-auto max-w-160 bg-[linear-gradient(180deg,transparent,var(--bg)_25%)] px-4.5 pb-8 pt-3.5">
+        <div className="mb-2.5 flex items-center justify-between">
+          <div className="text-xs font-semibold text-ink-3">{t("total")}</div>
+          <div className="gr-display text-[22px] font-extrabold">
             {t("price", { amount: total })}
           </div>
         </div>
 
         {step < steps.length - 1 ? (
           <button
+            type="button"
             onClick={handleNext}
             disabled={savingPersonal || selectedDistRegistered}
-            style={{
-              width: "100%",
-              height: 56,
-              borderRadius: 999,
-              background: "var(--brand)",
-              color: "var(--on-brand)",
-              fontWeight: 700,
-              fontSize: 16,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              cursor:
-                savingPersonal || selectedDistRegistered
-                  ? "not-allowed"
-                  : "pointer",
-              border: 0,
-              opacity: savingPersonal || selectedDistRegistered ? 0.6 : 1,
-            }}
+            className={primaryCta}
           >
             {savingPersonal ? (
               t("processing")
@@ -1213,28 +947,13 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
         ) : (
           <>
             <button
+              type="button"
               onClick={handlePay}
               disabled={createRegistration.isPending || !agreed}
-              style={{
-                width: "100%",
-                height: 56,
-                borderRadius: 999,
-                background: "var(--brand)",
-                color: "var(--on-brand)",
-                fontWeight: 700,
-                fontSize: 16,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                cursor:
-                  createRegistration.isPending || !agreed
-                    ? "not-allowed"
-                    : "pointer",
-                border: 0,
-                boxShadow: "0 8px 28px var(--brand-glow)",
-                opacity: createRegistration.isPending || !agreed ? 0.6 : 1,
-              }}
+              className={cn(
+                primaryCta,
+                "shadow-[0_8px_28px_var(--brand-glow)]"
+              )}
             >
               {createRegistration.isPending
                 ? t("processing")
@@ -1242,14 +961,7 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
               <Check size={18} />
             </button>
             {!agreed && (
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "var(--ink-3)",
-                  textAlign: "center",
-                  marginTop: 8,
-                }}
-              >
+              <div className="mt-2 text-center text-xs text-ink-3">
                 {t("agreeRequired")}
               </div>
             )}
@@ -1268,15 +980,7 @@ function SummaryRow({
   value: React.ReactNode;
 }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        padding: "6px 0",
-        fontSize: 13,
-        color: "var(--ink-2)",
-      }}
-    >
+    <div className="flex justify-between py-1.5 text-[13px] text-ink-2">
       <div>{label}</div>
       <div>{value}</div>
     </div>
@@ -1300,14 +1004,10 @@ function PersonalStep({
     showErrors && !(value[key] ?? "").trim() ? t("required") : undefined;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+    <div className="flex flex-col gap-3.5">
       <div>
-        <div style={{ fontSize: 14, color: "var(--ink-3)" }}>
-          {t("heading")}
-        </div>
-        <div style={{ fontSize: 12, color: "var(--ink-4)", marginTop: 4 }}>
-          {t("desc")}
-        </div>
+        <div className="text-sm text-ink-3">{t("heading")}</div>
+        <div className="mt-1 text-xs text-ink-4">{t("desc")}</div>
       </div>
 
       <PersonalField
@@ -1333,13 +1033,13 @@ function PersonalStep({
         autoComplete="bday"
       />
 
-      <label style={{ display: "block" }}>
-        <div style={fieldLabelStyle}>{t("gender")}</div>
+      <label className="block">
+        <div className={fieldLabel}>{t("gender")}</div>
         <select
           value={value.gender ?? ""}
           onChange={(e) => set("gender")(e.target.value)}
           aria-invalid={errorFor("gender") ? true : undefined}
-          style={fieldControlStyle(!!errorFor("gender"))}
+          className={fieldControl(!!errorFor("gender"))}
         >
           <option value="" disabled>
             {t("genderPlaceholder")}
@@ -1351,7 +1051,7 @@ function PersonalStep({
           ))}
         </select>
         {errorFor("gender") && (
-          <div role="alert" style={fieldErrorStyle}>
+          <div role="alert" className={fieldErrorClasses}>
             {errorFor("gender")}
           </div>
         )}
@@ -1386,51 +1086,13 @@ function PersonalStep({
       />
 
       {showErrors && !isPersonalComplete(value) && (
-        <div role="alert" style={{ fontSize: 12, color: "var(--danger)" }}>
+        <div role="alert" className="text-xs text-danger">
           {t("fixErrors")}
         </div>
       )}
     </div>
   );
 }
-
-const fieldLabelStyle: React.CSSProperties = {
-  fontSize: 12,
-  fontWeight: 600,
-  color: "var(--ink-3)",
-  textTransform: "uppercase",
-  letterSpacing: "0.06em",
-  marginBottom: 8,
-};
-
-const fieldErrorStyle: React.CSSProperties = {
-  fontSize: 12,
-  color: "var(--danger)",
-  marginTop: 6,
-};
-
-const fieldControlStyle = (hasError: boolean): React.CSSProperties => ({
-  width: "100%",
-  padding: "14px 16px",
-  borderRadius: "var(--r-md)",
-  background: "var(--surface)",
-  border: `1.5px solid ${hasError ? "var(--danger)" : "var(--line-strong)"}`,
-  fontSize: 16,
-  color: "var(--ink)",
-  fontFamily: "inherit",
-});
-
-const promoButtonStyle: React.CSSProperties = {
-  padding: "0 18px",
-  borderRadius: "var(--r-md)",
-  background: "var(--surface-2)",
-  border: "1.5px solid var(--line-strong)",
-  color: "var(--ink)",
-  fontWeight: 700,
-  fontSize: 14,
-  cursor: "pointer",
-  whiteSpace: "nowrap",
-};
 
 /**
  * A checkbox-agreement document link. Renders an anchor when the event provides
@@ -1449,11 +1111,7 @@ function DocLink({
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      style={{
-        color: "var(--brand-active)",
-        textDecoration: "underline",
-        fontWeight: 600,
-      }}
+      className="font-semibold text-brand-active underline transition-colors hover:text-brand"
     >
       {children}
     </a>
@@ -1476,18 +1134,18 @@ function PersonalField({
   autoComplete?: string;
 }) {
   return (
-    <label style={{ display: "block" }}>
-      <div style={fieldLabelStyle}>{label}</div>
+    <label className="block">
+      <div className={fieldLabel}>{label}</div>
       <input
         type={type}
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value)}
         autoComplete={autoComplete}
         aria-invalid={error ? true : undefined}
-        style={fieldControlStyle(!!error)}
+        className={fieldControl(!!error)}
       />
       {error && (
-        <div role="alert" style={fieldErrorStyle}>
+        <div role="alert" className={fieldErrorClasses}>
           {error}
         </div>
       )}
@@ -1509,8 +1167,8 @@ function PersonalPhoneField({
   placeholder?: string;
 }) {
   return (
-    <label style={{ display: "block" }}>
-      <div style={fieldLabelStyle}>{label}</div>
+    <label className="block">
+      <div className={fieldLabel}>{label}</div>
       <PhoneInput
         international
         defaultCountry="UA"
@@ -1521,7 +1179,7 @@ function PersonalPhoneField({
         aria-invalid={error ? true : undefined}
       />
       {error && (
-        <div role="alert" style={fieldErrorStyle}>
+        <div role="alert" className={fieldErrorClasses}>
           {error}
         </div>
       )}
@@ -1550,72 +1208,22 @@ function RegSuccess({
     "";
 
   return (
-    <div
-      className="gr-screen-enter"
-      style={{
-        background: "var(--bg)",
-        color: "var(--ink)",
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        padding: 24,
-        maxWidth: 640,
-        margin: "0 auto",
-      }}
-    >
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center",
-        }}
-      >
-        <div
-          className="gr-pulse"
-          style={{
-            width: 96,
-            height: 96,
-            borderRadius: 999,
-            background: "var(--brand)",
-            display: "grid",
-            placeItems: "center",
-            boxShadow: "0 12px 48px var(--brand-glow)",
-          }}
-        >
+    <div className="gr-screen-enter mx-auto flex min-h-screen max-w-160 flex-col bg-bg p-6 text-ink">
+      <div className="flex flex-1 flex-col items-center justify-center text-center">
+        <div className="gr-pulse grid size-24 place-items-center rounded-(--r-pill) bg-brand shadow-[0_12px_48px_var(--brand-glow)]">
           <Check size={48} color="var(--on-brand)" strokeWidth={3} />
         </div>
 
-        <h1
-          className="gr-display"
-          style={{
-            fontSize: 30,
-            fontWeight: 800,
-            marginTop: 24,
-            textWrap: "balance",
-          }}
-        >
+        <h1 className="gr-display mt-6 text-3xl font-extrabold text-balance">
           {t("success.title")}
         </h1>
-        <p
-          style={{
-            fontSize: 14,
-            color: "var(--ink-3)",
-            marginTop: 8,
-            lineHeight: 1.5,
-            maxWidth: 280,
-          }}
-        >
+        <p className="mt-2 max-w-70 text-sm leading-[1.5] text-ink-3">
           {bib && (
             <>
               {t.rich("success.bib", {
                 bib,
                 value: (chunks) => (
-                  <strong className="gr-mono" style={{ color: "var(--ink)" }}>
-                    {chunks}
-                  </strong>
+                  <strong className="gr-mono text-ink">{chunks}</strong>
                 ),
               })}
               {" · "}
@@ -1627,83 +1235,31 @@ function RegSuccess({
         </p>
 
         {/* Race pass card */}
-        <div
-          style={{
-            width: "100%",
-            marginTop: 28,
-            padding: 18,
-            background: "var(--ink)",
-            color: "var(--bg)",
-            borderRadius: "var(--r-xl)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 12,
-            }}
-          >
+        <div className="mt-7 w-full rounded-xl bg-ink p-4.5 text-bg">
+          <div className="mb-3 flex items-center justify-between">
             <div>
-              <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: "var(--brand)",
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                }}
-              >
+              <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-brand">
                 {t("success.racePass")}
               </div>
-              <div
-                className="gr-display"
-                style={{ fontSize: 18, fontWeight: 800 }}
-              >
+              <div className="gr-display text-lg font-extrabold">
                 {eventTitle}
               </div>
             </div>
-            <div
-              style={{
-                width: 60,
-                height: 60,
-                background: "var(--surface)",
-                borderRadius: 8,
-                display: "grid",
-                placeItems: "center",
-                fontSize: 10,
-                color: "var(--ink)",
-                fontWeight: 700,
-              }}
-            >
+            <div className="grid size-15 place-items-center rounded-sm bg-surface text-[10px] font-bold text-ink">
               {t("success.qrCode")}
             </div>
           </div>
-          <div style={{ display: "flex", gap: 18 }}>
+          <div className="flex gap-4.5">
             {[
               [t("success.passBib"), bib ? `#${bib}` : "—"],
               [t("success.passDistance"), selectedDist?.label ?? "—"],
               [t("success.passStart"), event.timeLabel ?? "—"],
             ].map(([k, v]) => (
               <div key={k}>
-                <div
-                  style={{
-                    fontSize: 10,
-                    opacity: 0.6,
-                    fontWeight: 700,
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                  }}
-                >
+                <div className="text-[10px] font-bold uppercase tracking-[0.08em] opacity-60">
                   {k}
                 </div>
-                <div
-                  className="gr-mono"
-                  style={{ fontSize: 18, fontWeight: 700 }}
-                >
-                  {v}
-                </div>
+                <div className="gr-mono text-lg font-bold">{v}</div>
               </div>
             ))}
           </div>
@@ -1711,18 +1267,9 @@ function RegSuccess({
       </div>
 
       <button
+        type="button"
         onClick={() => router.push(`/${locale}`)}
-        style={{
-          width: "100%",
-          height: 56,
-          borderRadius: 999,
-          background: "var(--brand)",
-          color: "var(--on-brand)",
-          fontWeight: 700,
-          fontSize: 16,
-          cursor: "pointer",
-          border: 0,
-        }}
+        className={primaryCta}
       >
         {t("success.backToEvents")}
       </button>
