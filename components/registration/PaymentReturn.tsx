@@ -12,6 +12,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { syncPayment } from "@/lib/api/registrations";
+import { cn } from "@/lib/utils";
 
 type ReturnStatus =
   | "checking"
@@ -25,6 +26,19 @@ const POLL_ATTEMPTS = 4;
 const POLL_INTERVAL_MS = 2000;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const actionButton =
+  "flex h-13 cursor-pointer items-center justify-center rounded-(--r-pill) text-[15px] no-underline transition-colors focus-visible:shadow-[0_0_0_4px_var(--brand-glow)] focus-visible:outline-none";
+
+const primaryBtn = cn(
+  actionButton,
+  "border-0 bg-brand font-bold text-on-brand hover:bg-brand-hover active:bg-brand-active"
+);
+
+const secondaryBtn = cn(
+  actionButton,
+  "border border-line bg-surface font-semibold text-ink hover:bg-surface-2"
+);
 
 export function PaymentReturn() {
   const t = useTranslations("paymentReturn");
@@ -80,81 +94,51 @@ export function PaymentReturn() {
     : `/${locale}/events`;
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "var(--bg)",
-        color: "var(--ink)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 24,
-        textAlign: "center",
-        maxWidth: 640,
-        margin: "0 auto",
-      }}
-    >
+    <div className="mx-auto flex min-h-screen max-w-160 flex-col items-center justify-center bg-bg p-6 text-center text-ink">
       <div
         aria-hidden="true"
-        style={{
-          width: 88,
-          height: 88,
-          borderRadius: 999,
-          display: "grid",
-          placeItems: "center",
-          background: view.tint,
-          marginBottom: 20,
-        }}
+        className={cn(
+          "mb-5 grid size-22 place-items-center rounded-(--r-pill)",
+          view.tintClass
+        )}
       >
         <view.Icon
           size={44}
-          color={view.color}
-          className={status === "checking" ? "animate-spin" : undefined}
+          className={cn(
+            view.iconClass,
+            status === "checking" && "animate-spin"
+          )}
         />
       </div>
 
       <h1
-        className="gr-display"
-        style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}
+        className="gr-display mb-2 text-2xl font-extrabold"
         role="status"
         aria-live="polite"
       >
         {t(view.title)}
       </h1>
-      <p
-        style={{
-          fontSize: 15,
-          color: "var(--ink-3)",
-          lineHeight: 1.5,
-          maxWidth: 440,
-        }}
-      >
+      <p className="max-w-110 text-[15px] leading-[1.5] text-ink-3">
         {t(view.desc)}
       </p>
 
       {status !== "checking" && (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 10,
-            marginTop: 28,
-            width: "100%",
-            maxWidth: 320,
-          }}
-        >
+        <div className="mt-7 flex w-full max-w-80 flex-col gap-2.5">
           {(status === "failed" || status === "error") && (
-            <button onClick={() => router.push(retryHref)} style={primaryBtn}>
+            <button
+              type="button"
+              onClick={() => router.push(retryHref)}
+              className={primaryBtn}
+            >
               {t("retry")}
             </button>
           )}
           {(status === "success" || status === "pending") && (
-            <Link href={`/${locale}/my-registrations`} style={primaryBtn}>
+            <Link href={`/${locale}/my-registrations`} className={primaryBtn}>
               {t("myRegistrations")}
             </Link>
           )}
-          <Link href={`/${locale}/events`} style={secondaryBtn}>
+          <Link href={`/${locale}/events`} className={secondaryBtn}>
             {t("browseEvents")}
           </Link>
         </div>
@@ -167,82 +151,52 @@ const VIEWS: Record<
   ReturnStatus,
   {
     Icon: typeof CheckCircle2;
-    color: string;
-    tint: string;
+    iconClass: string;
+    tintClass: string;
     title: string;
     desc: string;
   }
 > = {
   checking: {
     Icon: Loader2,
-    color: "var(--ink-3)",
-    tint: "var(--surface-2)",
+    iconClass: "text-ink-3",
+    tintClass: "bg-surface-2",
     title: "checking",
     desc: "checking",
   },
   success: {
     Icon: CheckCircle2,
-    color: "var(--brand-active)",
-    tint: "var(--brand-tint)",
+    iconClass: "text-brand-active",
+    tintClass: "bg-brand-tint",
     title: "successTitle",
     desc: "successDesc",
   },
   pending: {
     Icon: Clock,
-    color: "var(--warn)",
-    tint: "var(--warn-bg)",
+    iconClass: "text-warn",
+    tintClass: "bg-warn-bg",
     title: "pendingTitle",
     desc: "pendingDesc",
   },
   failed: {
     Icon: XCircle,
-    color: "var(--danger)",
-    tint: "var(--danger-bg)",
+    iconClass: "text-danger",
+    tintClass: "bg-danger-bg",
     title: "failedTitle",
     desc: "failedDesc",
   },
   error: {
     Icon: AlertTriangle,
-    color: "var(--warn)",
-    tint: "var(--warn-bg)",
+    iconClass: "text-warn",
+    tintClass: "bg-warn-bg",
     title: "errorTitle",
     desc: "errorDesc",
   },
   missing: {
     Icon: AlertTriangle,
-    color: "var(--ink-3)",
-    tint: "var(--surface-2)",
+    iconClass: "text-ink-3",
+    tintClass: "bg-surface-2",
     title: "errorTitle",
     desc: "missingId",
   },
-};
-
-const primaryBtn: React.CSSProperties = {
-  height: 52,
-  borderRadius: 999,
-  background: "var(--brand)",
-  color: "var(--on-brand)",
-  fontWeight: 700,
-  fontSize: 15,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  border: 0,
-  cursor: "pointer",
-  textDecoration: "none",
-};
-
-const secondaryBtn: React.CSSProperties = {
-  height: 52,
-  borderRadius: 999,
-  background: "var(--surface)",
-  color: "var(--ink)",
-  fontWeight: 600,
-  fontSize: 15,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  border: "1px solid var(--line)",
-  cursor: "pointer",
-  textDecoration: "none",
 };
