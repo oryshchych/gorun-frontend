@@ -1190,6 +1190,8 @@
     "browseEvents": "Browse events"
   },
   "runners": {
+    "backToEvent": "Back to event",
+    "registered": "{count} registered",
     "title": "Runners",
     "search": "Search by name or city",
     "allDistances": "All distances",

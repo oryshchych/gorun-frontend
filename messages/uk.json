@@ -1190,6 +1190,8 @@
     "browseEvents": "До подій"
   },
   "runners": {
+    "backToEvent": "До заходу",
+    "registered": "{count} зареєстровано",
     "title": "Учасники",
     "search": "Пошук за ім'ям або містом",
     "allDistances": "Усі дистанції",

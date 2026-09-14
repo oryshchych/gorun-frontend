@@ -1,6 +1,7 @@
 "use server";
 
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Participant } from "@/types/registration";
 import { Event } from "@/types/event";
 import { getLocalizedString } from "@/lib/utils";
@@ -45,7 +46,10 @@ export async function generateMetadata({
   params: Promise<{ locale: string; id: string }>;
 }): Promise<Metadata> {
   const { locale, id } = await params;
-  const event = await fetchEvent(id, locale);
+  const [event, t] = await Promise.all([
+    fetchEvent(id, locale),
+    getTranslations({ locale, namespace: "runners" }),
+  ]);
   const title = event
     ? getLocalizedString(
         event.translations?.title,
@@ -53,8 +57,8 @@ export async function generateMetadata({
         "en",
         event.title || ""
       )
-    : "Runners";
-  return { title: `Runners — ${title}` };
+    : "";
+  return { title: title ? `${t("title")} — ${title}` : t("title") };
 }
 
 export default async function PublicRunnersPage({
@@ -63,9 +67,10 @@ export default async function PublicRunnersPage({
   params: Promise<{ locale: string; id: string }>;
 }) {
   const { locale, id } = await params;
-  const [event, participants] = await Promise.all([
+  const [event, participants, t] = await Promise.all([
     fetchEvent(id, locale),
     fetchParticipants(id),
+    getTranslations({ locale, namespace: "runners" }),
   ]);
 
   if (!event) notFound();
@@ -87,41 +92,22 @@ export default async function PublicRunnersPage({
   );
 
   return (
-    <div
-      style={{
-        background: "var(--bg)",
-        color: "var(--ink)",
-        minHeight: "100vh",
-        paddingBottom: 100,
-      }}
-    >
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 18px" }}>
+    <div className="min-h-screen bg-bg pb-25 text-ink">
+      <div className="mx-auto max-w-7xl px-4.5 py-6">
         {/* Header */}
-        <div style={{ marginBottom: 24 }}>
+        <div className="mb-6">
           <Link
             href={`/${locale}/events/${id}`}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              fontSize: 13,
-              color: "var(--ink-3)",
-              fontWeight: 600,
-              textDecoration: "none",
-              marginBottom: 12,
-            }}
+            className="mb-3 inline-flex items-center gap-1.5 rounded-sm text-[13px] font-semibold text-ink-3 no-underline transition-colors hover:text-ink"
           >
             <ArrowLeft size={15} />
-            Back to event
+            {t("backToEvent")}
           </Link>
-          <h1
-            className="gr-display"
-            style={{ fontSize: 32, fontWeight: 800, margin: 0 }}
-          >
-            Runners
+          <h1 className="gr-display m-0 text-[32px] font-extrabold">
+            {t("title")}
           </h1>
-          <p style={{ fontSize: 14, color: "var(--ink-3)", marginTop: 4 }}>
-            {title} · {participants.length} registered
+          <p className="mt-1 text-sm text-ink-3">
+            {title} · {t("registered", { count: participants.length })}
           </p>
         </div>
 

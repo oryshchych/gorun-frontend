@@ -20,7 +20,6 @@ const noStaticInlineStyles = {
  * Shrink this list — never add to it. Tracked in AGENTS.md § Styling.
  */
 const inlineStyleLegacyFiles = [
-  "app/\\[locale\\]/(public)/events/\\[id\\]/runners/page.tsx",
   "components/events/EventsHub.tsx",
   "components/events/ParticipantsList.tsx",
   "components/events/PastEventRecap.tsx",
