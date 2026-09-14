@@ -4,16 +4,30 @@ import { render, screen } from "@testing-library/react";
 import { EventCard } from "../EventCard";
 import { Event } from "@/types/event";
 
-// Mock dependencies
+type TranslationValues = Record<string, string | number>;
+
+/**
+ * Minimal ICU-ish stand-in: looks the key up per namespace and substitutes
+ * `{placeholder}` tokens, so tests can assert on the rendered copy.
+ */
+const CATALOG: Record<string, string> = {
+  "hub.viewDetailsFor": "View details for {title}",
+  "hub.percentFull": "{percent}% full",
+  "hub.viewEvent": "View event →",
+  "hub.kidsLabel": "Kids",
+  "progressBar.runners": "{taken} / {total}",
+  "progressBar.spotsLeft": "{count} spots left",
+  "progressBar.waitlist": "Waitlist",
+};
+
 vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => {
-    const translations: Record<string, string> = {
-      eventFull: "Event Full",
-      availableSpots: "spots available",
-      organizer: "Organizer",
-    };
-    return translations[key] || key;
-  },
+  useTranslations:
+    (namespace: string) => (key: string, values?: TranslationValues) => {
+      const template = CATALOG[`${namespace}.${key}`] ?? key;
+      return template.replace(/\{(\w+)\}/g, (_match, name: string) =>
+        String(values?.[name] ?? "")
+      );
+    },
   useLocale: () => "en",
 }));
 
@@ -25,13 +39,6 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-vi.mock("next/image", () => ({
-  default: ({ src, alt, ...props }: ComponentProps<"img">) => {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt={alt} {...props} />;
-  },
-}));
-
 vi.mock("framer-motion", () => ({
   motion: {
     div: ({ children, ...props }: ComponentProps<"div">) => (
@@ -40,86 +47,119 @@ vi.mock("framer-motion", () => ({
   },
 }));
 
-describe("EventCard", () => {
-  const mockEvent: Event = {
-    id: "1",
-    title: "Tech Conference 2024",
-    description: "A great tech conference",
-    date: new Date("2024-12-31T10:00:00Z"),
-    location: "Kyiv, Ukraine",
-    capacity: 100,
-    registeredCount: 50,
-    organizerId: "org-1",
-    organizer: {
-      id: "org-1",
-      name: "John Doe",
-      email: "john@example.com",
-      provider: "credentials" as const,
-      createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-01"),
-    },
-    imageUrl: {
-      portrait: "https://example.com/image-portrait.jpg",
-      landscape: "https://example.com/image.jpg",
-    },
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-01-01"),
-  };
+const baseEvent: Event = {
+  id: "1",
+  title: "Tech Conference 2024",
+  date: new Date("2024-12-31T10:00:00Z"),
+  city: "Kyiv",
+  capacity: 100,
+  registeredCount: 50,
+  createdAt: new Date("2024-01-01"),
+  updatedAt: new Date("2024-01-01"),
+};
 
-  it("should render event card with all details", () => {
-    render(<EventCard event={mockEvent} />);
+const withCover: Event = {
+  ...baseEvent,
+  cover: "https://example.com/cover.jpg",
+  shortDesc: "A great tech conference",
+  dateLabel: "Tue, Dec 31 2024",
+  timeLabel: "10:00",
+  fee: "from 400 UAH",
+};
+
+describe("EventCard", () => {
+  it("renders the title, city and chips for an event with a cover", () => {
+    render(<EventCard event={withCover} />);
 
     expect(screen.getByText("Tech Conference 2024")).toBeInTheDocument();
-    expect(screen.getByText("Kyiv, Ukraine")).toBeInTheDocument();
-    expect(screen.getByText("50 / 100")).toBeInTheDocument();
-    expect(screen.getByText(/Organizer: John Doe/i)).toBeInTheDocument();
+    expect(screen.getByText("Kyiv")).toBeInTheDocument();
+    expect(screen.getByText("Tue, Dec 31 2024")).toBeInTheDocument();
+    expect(screen.getByText("from 400 UAH")).toBeInTheDocument();
+    expect(screen.getByText("A great tech conference")).toBeInTheDocument();
   });
 
-  it("should display available spots badge when event is not full", () => {
-    render(<EventCard event={mockEvent} />);
+  it("renders the title exactly once when a cover image is present", () => {
+    render(<EventCard event={withCover} />);
 
-    expect(screen.getByText("50 spots available")).toBeInTheDocument();
+    // The overlay carries the title; the body <h3> must not duplicate it.
+    expect(screen.getAllByText("Tech Conference 2024")).toHaveLength(1);
+    expect(
+      screen.queryByRole("heading", { name: "Tech Conference 2024" })
+    ).not.toBeInTheDocument();
   });
 
-  it('should display "Event Full" badge when capacity is reached', () => {
-    const fullEvent = { ...mockEvent, registeredCount: 100 };
-    render(<EventCard event={fullEvent} />);
+  it("falls back to a heading when there is no cover image", () => {
+    render(<EventCard event={baseEvent} />);
 
-    expect(screen.getByText("Event Full")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Tech Conference 2024" })
+    ).toBeInTheDocument();
   });
 
-  it("should display warning badge when almost full", () => {
-    const almostFullEvent = { ...mockEvent, registeredCount: 95 };
-    render(<EventCard event={almostFullEvent} />);
+  it("applies the cover image with a scrim behind it", () => {
+    const { container } = render(<EventCard event={withCover} />);
 
-    expect(screen.getByText("5 spots available")).toBeInTheDocument();
+    const cover = container.querySelector<HTMLElement>('[style*="url("]');
+    expect(cover).not.toBeNull();
+    expect(cover?.getAttribute("style")).toContain(
+      "https://example.com/cover.jpg"
+    );
+    expect(cover?.getAttribute("style")).toContain("linear-gradient");
   });
 
-  it("should render event image when imageUrl is provided", () => {
-    render(<EventCard event={mockEvent} />);
+  it("omits the fee chip when the event has no fee", () => {
+    render(<EventCard event={baseEvent} />);
 
-    const image = screen.getByAltText("Event image for Tech Conference 2024");
-    expect(image).toBeInTheDocument();
-    expect(image).toHaveAttribute("src", "https://example.com/image.jpg");
+    expect(screen.queryByText("from 400 UAH")).not.toBeInTheDocument();
   });
 
-  it("should render placeholder when no imageUrl is provided", () => {
-    const eventWithoutImage = { ...mockEvent, imageUrl: undefined };
-    render(<EventCard event={eventWithoutImage} />);
+  it("renders distance pills and the kids pill", () => {
+    render(
+      <EventCard
+        event={{
+          ...baseEvent,
+          distances: [
+            { id: "d1", label: "10K", name: "Ten K", km: 10 },
+            { id: "d2", label: "21K", name: "Half", km: 21 },
+          ],
+          kidsDistances: [
+            { id: "k1", label: "100m", name: "Tiny Sprint", age: "3–5" },
+          ],
+        }}
+      />
+    );
 
-    expect(screen.getByLabelText("No event image")).toBeInTheDocument();
+    expect(screen.getByText("10K")).toBeInTheDocument();
+    expect(screen.getByText("21K")).toBeInTheDocument();
+    expect(screen.getByText("Kids")).toBeInTheDocument();
   });
 
-  it("should have proper accessibility attributes", () => {
-    render(<EventCard event={mockEvent} />);
+  it("renders the fill percentage", () => {
+    render(<EventCard event={baseEvent} />);
+
+    expect(screen.getByText("50% full")).toBeInTheDocument();
+  });
+
+  it("reports 0% rather than NaN when capacity is zero", () => {
+    render(
+      <EventCard event={{ ...baseEvent, capacity: 0, registeredCount: 0 }} />
+    );
+
+    expect(screen.getByText("0% full")).toBeInTheDocument();
+  });
+
+  it("exposes a localized link to the event detail page", () => {
+    render(<EventCard event={baseEvent} />);
 
     const link = screen.getByRole("link", {
-      name: /view details for tech conference 2024/i,
+      name: "View details for Tech Conference 2024",
     });
-    expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute("href", "/en/events/1");
+  });
 
-    const article = screen.getByRole("article");
-    expect(article).toBeInTheDocument();
+  it("renders the card as an article", () => {
+    render(<EventCard event={baseEvent} />);
+
+    expect(screen.getByRole("article")).toBeInTheDocument();
   });
 });

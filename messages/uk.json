@@ -1045,7 +1045,9 @@
     "heroSub": "Реєструйся, бери дітей, дивись результати — кожна участь підтримує Збройні Сили України.",
     "racesCount": "{count} {count, plural, one {гонка} few {гонки} many {гонок} other {гонок}}",
     "viewEvent": "Переглянути →",
-    "kidsLabel": "Діти"
+    "kidsLabel": "Діти",
+    "percentFull": "{percent}% заповнено",
+    "viewDetailsFor": "Переглянути деталі: {title}"
   },
   "eventDetail": {
     "backToEvents": "Назад до заходів",

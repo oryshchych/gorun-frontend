@@ -23,7 +23,6 @@ const inlineStyleLegacyFiles = [
   "app/\\[locale\\]/layout.tsx",
   "app/\\[locale\\]/(public)/events/\\[id\\]/results/page.tsx",
   "app/\\[locale\\]/(public)/events/\\[id\\]/runners/page.tsx",
-  "components/events/EventCard.tsx",
   "components/events/EventDescription.tsx",
   "components/events/EventsHub.tsx",
   "components/events/ParticipantsList.tsx",

@@ -1045,7 +1045,9 @@
     "heroSub": "Register, bring your kids, see your results — every entry supports the Armed Forces of Ukraine.",
     "racesCount": "{count, plural, one {# race} other {# races}}",
     "viewEvent": "View event →",
-    "kidsLabel": "Kids"
+    "kidsLabel": "Kids",
+    "percentFull": "{percent}% full",
+    "viewDetailsFor": "View details for {title}"
   },
   "eventDetail": {
     "backToEvents": "Back to events",
