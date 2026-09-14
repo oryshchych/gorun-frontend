@@ -82,15 +82,6 @@ export default async function PublicRunnersPage({
     event.title || ""
   );
 
-  // Collect unique distances from participants
-  const distanceOptions = Array.from(
-    new Set(
-      participants
-        .map((p) => (p as Participant & { distance?: string }).distance)
-        .filter((distance): distance is string => Boolean(distance))
-    )
-  );
-
   return (
     <div className="min-h-screen bg-bg pb-25 text-ink">
       <div className="mx-auto max-w-7xl px-4.5 py-6">
@@ -113,7 +104,7 @@ export default async function PublicRunnersPage({
 
         <ParticipantsList
           participants={participants}
-          distances={distanceOptions}
+          distances={event?.distances}
         />
       </div>
     </div>

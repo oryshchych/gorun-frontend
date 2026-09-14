@@ -56,6 +56,10 @@ export interface CreateRegistrationRequest {
   // Selected race distance
   distanceId?: string;
   distanceLabel?: string;
+  // Registrant demographics (snapshotted onto the registration)
+  gender?: string;
+  /** ISO date-only YYYY-MM-DD */
+  dateOfBirth?: string;
   // Optional race details
   shirtSize?: string;
   estimatedPace?: string;
@@ -156,4 +160,12 @@ export interface Participant {
   city: string;
   runningClub?: string;
   registeredAt: Date;
+  /** Human-readable distance label, e.g. "21K". */
+  distance?: string;
+  /** Distance id, for grouping/counting per distance. */
+  distanceId?: string;
+  gender?: string;
+  /** Age in years, derived from the registrant's date of birth. */
+  age?: number;
+  bib?: number | string | null;
 }

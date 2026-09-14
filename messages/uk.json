@@ -1200,7 +1200,13 @@
     "allDistances": "Усі дистанції",
     "noMatch": "Нічого не знайдено.",
     "count": "{filtered} з {total} учасників",
-    "you": "Ви"
+    "you": "Ви",
+    "otherDistance": "Інше",
+    "ageYears": "{age} р.",
+    "genderFemale": "Жінка",
+    "genderMale": "Чоловік",
+    "genderOther": "Інше",
+    "genderPreferNot": "—"
   },
   "results": {
     "title": "Результати",

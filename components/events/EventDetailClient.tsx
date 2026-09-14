@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import {
@@ -15,7 +15,7 @@ import {
   Check,
   Trophy,
 } from "lucide-react";
-import { Event } from "@/types/event";
+import { Event, Distance } from "@/types/event";
 import { resolveDistancePrice } from "@/lib/distance-price";
 import { Participant } from "@/types/registration";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -98,6 +98,27 @@ export function EventDetailClient({
   const spotsTotal = event.spots?.total ?? event.capacity;
   const spotsTaken = event.spots?.taken ?? event.registeredCount;
 
+  // The backend does not populate per-distance spots.taken, so derive the count
+  // from the confirmed participants list (by distanceId, with a label fallback).
+  const participantCounts = useMemo(() => {
+    const byId = new Map<string, number>();
+    const byLabel = new Map<string, number>();
+    for (const p of participants) {
+      if (p.distanceId)
+        byId.set(p.distanceId, (byId.get(p.distanceId) ?? 0) + 1);
+      else if (p.distance)
+        byLabel.set(p.distance, (byLabel.get(p.distance) ?? 0) + 1);
+    }
+    return { byId, byLabel };
+  }, [participants]);
+
+  const distanceTaken = (d: Distance): number => {
+    const derived =
+      (d.id ? (participantCounts.byId.get(d.id) ?? 0) : 0) +
+      (d.label ? (participantCounts.byLabel.get(d.label) ?? 0) : 0);
+    return derived > 0 ? derived : (d.spots?.taken ?? 0);
+  };
+
   const dateLabel =
     event.dateLabel ||
     format(new Date(event.date), "EEE, MMM d yyyy", { locale: dateLocale });
@@ -115,7 +136,6 @@ export function EventDetailClient({
     { id: "distances", label: t("tabs.distances") },
     { id: "runners", label: t("tabs.runners") },
   ];
-  console.log(event);
 
   return (
     <div
@@ -375,8 +395,12 @@ export function EventDetailClient({
                     </div>
                     <div className="mt-3">
                       <ProgressBar
-                        taken={d.spots?.taken ?? 0}
-                        total={d.spots?.total ?? d.participantLimit ?? 0}
+                        taken={distanceTaken(d)}
+                        total={
+                          d.spots?.total ??
+                          d.participantLimit ??
+                          distanceTaken(d)
+                        }
                       />
                     </div>
                   </div>
@@ -418,7 +442,11 @@ export function EventDetailClient({
             )}
 
             {activeTab === "runners" && (
-              <ParticipantsList participants={participants} isLoading={false} />
+              <ParticipantsList
+                participants={participants}
+                distances={event.distances}
+                isLoading={false}
+              />
             )}
           </div>
 

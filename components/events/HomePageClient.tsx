@@ -180,6 +180,7 @@ export default function HomePageClient({
               <div className="max-w-4xl mx-auto">
                 <ParticipantsList
                   participants={participants}
+                  distances={event.distances}
                   isLoading={false}
                 />
               </div>

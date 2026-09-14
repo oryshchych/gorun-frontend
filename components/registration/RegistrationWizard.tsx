@@ -401,6 +401,11 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
         surname: personal.lastName.trim(),
         phone: personal.phone.trim(),
         city: personal.city.trim(),
+        // Snapshot demographics onto the registration (for the participants list).
+        ...(personal.gender.trim() ? { gender: personal.gender.trim() } : {}),
+        ...(personal.dateOfBirth.trim()
+          ? { dateOfBirth: personal.dateOfBirth.trim() }
+          : {}),
         // e-mail is required by the backend and taken from the signed-in
         // account (the wizard is auth-gated, so it is always present).
         email: user.email,

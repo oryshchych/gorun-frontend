@@ -1200,7 +1200,13 @@
     "allDistances": "All distances",
     "noMatch": "No runners match your search.",
     "count": "{filtered} of {total} runners",
-    "you": "You"
+    "you": "You",
+    "otherDistance": "Other",
+    "ageYears": "{age} y.o.",
+    "genderFemale": "Female",
+    "genderMale": "Male",
+    "genderOther": "Other",
+    "genderPreferNot": "—"
   },
   "results": {
     "title": "Results",
