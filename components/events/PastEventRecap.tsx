@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { getLocalizedString } from "@/lib/utils";
+import { cn, getLocalizedString } from "@/lib/utils";
 import type { Event } from "@/types/event";
 
 interface PastEventRecapProps {
@@ -28,38 +28,18 @@ export function PastEventRecap({ event }: PastEventRecapProps) {
   if (!hasCopy && !hasPhotos) return null;
 
   return (
-    <section
-      style={{
-        background: "var(--surface)",
-        border: "1px solid var(--line)",
-        borderRadius: "var(--r-lg)",
-        padding: 20,
-        display: "flex",
-        flexDirection: "column",
-        gap: 16,
-      }}
-    >
+    <section className="flex flex-col gap-4 rounded-lg border border-line bg-surface p-5">
       <div>
         <div
-          className="gr-display"
-          style={{
-            fontSize: 18,
-            fontWeight: 800,
-            color: "var(--ink)",
-            marginBottom: hasCopy ? 10 : 0,
-          }}
+          className={cn(
+            "gr-display text-lg font-extrabold text-ink",
+            hasCopy && "mb-2.5"
+          )}
         >
           {t("howItWas")}
         </div>
         {hasCopy && (
-          <p
-            style={{
-              fontSize: 15,
-              lineHeight: 1.65,
-              color: "var(--ink-2)",
-              margin: 0,
-            }}
-          >
+          <p className="m-0 text-[15px] leading-[1.65] text-ink-2">
             {pastText}
           </p>
         )}
@@ -67,48 +47,21 @@ export function PastEventRecap({ event }: PastEventRecapProps) {
 
       {hasPhotos && (
         <div>
-          <div
-            className="gr-display"
-            style={{
-              fontSize: 13,
-              fontWeight: 700,
-              color: "var(--ink-3)",
-              textTransform: "uppercase",
-              letterSpacing: "0.06em",
-              marginBottom: 10,
-            }}
-          >
+          <div className="gr-display mb-2.5 text-[13px] font-bold uppercase tracking-[0.06em] text-ink-3">
             {t("photos")}
           </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-              gap: 8,
-            }}
-          >
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-2">
             {photos.map((src, i) => (
               <div
                 key={`${src}-${i}`}
-                style={{
-                  aspectRatio: "4/3",
-                  borderRadius: "var(--r-md)",
-                  overflow: "hidden",
-                  border: "1px solid var(--line)",
-                  background: "var(--surface-2)",
-                }}
+                className="aspect-[4/3] max-w-full overflow-hidden rounded-md border border-line bg-surface-2"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- gallery URLs from API (mixed http/https hosts) */}
                 <img
                   src={src}
                   alt={t("photoAlt", { n: i + 1 })}
                   loading="lazy"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
+                  className="block size-full object-cover"
                 />
               </div>
             ))}
