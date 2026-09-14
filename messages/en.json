@@ -1256,6 +1256,7 @@
     }
   },
   "bottomNav": {
+    "label": "Main navigation",
     "events": "Events",
     "runners": "Runners",
     "results": "Results",

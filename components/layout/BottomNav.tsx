@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Home, Users, Trophy, User } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // Routes that exist in the app
 const NAV_ITEMS = [
@@ -53,24 +54,8 @@ export function BottomNav() {
 
   return (
     <nav
-      aria-label={t("events")}
-      style={{
-        position: "fixed",
-        left: 12,
-        right: 12,
-        bottom: 16,
-        background: "var(--surface)",
-        borderRadius: 999,
-        boxShadow: "var(--shadow-lg)",
-        border: "1px solid var(--line)",
-        display: "grid",
-        gridTemplateColumns: "repeat(4, 1fr)",
-        padding: 6,
-        zIndex: 40,
-        maxWidth: 460,
-        margin: "0 auto",
-      }}
-      className="md:hidden"
+      aria-label={t("label")}
+      className="fixed bottom-4 left-3 right-3 z-40 mx-auto grid max-w-115 grid-cols-4 rounded-(--r-pill) border border-line bg-surface p-1.5 shadow-(--shadow-lg) md:hidden"
     >
       {NAV_ITEMS.map(({ id, icon: Icon, href }) => {
         const active = isActive(id);
@@ -79,27 +64,15 @@ export function BottomNav() {
           <Link
             key={id}
             href={href(locale)}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 2,
-              padding: "8px 0",
-              borderRadius: 999,
-              background: active ? "var(--ink)" : "transparent",
-              color: active ? "var(--bg)" : "var(--ink-3)",
-              transition: "all 200ms",
-              textDecoration: "none",
-              minHeight: 44,
-              justifyContent: "center",
-            }}
+            className={cn(
+              "flex min-h-11 flex-col items-center justify-center gap-0.5 rounded-(--r-pill) py-2 no-underline transition-all duration-200",
+              active ? "bg-ink text-bg" : "text-ink-3 hover:text-ink"
+            )}
             aria-current={active ? "page" : undefined}
             aria-label={label}
           >
             <Icon size={20} />
-            <span
-              style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.04em" }}
-            >
+            <span className="text-[10px] font-bold tracking-[0.04em]">
               {label}
             </span>
           </Link>
