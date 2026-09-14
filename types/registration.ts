@@ -54,6 +54,8 @@ export interface CreateRegistrationRequest {
   estimatedPace?: string;
   afuDonation?: number;
   kidsRegistrations?: CreateKidRegistration[];
+  /** UI locale, so the post-payment return page renders in the same language. */
+  locale?: string;
 }
 
 export interface CreateRegistrationResponse {

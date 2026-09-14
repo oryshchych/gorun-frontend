@@ -348,6 +348,8 @@ export function RegistrationWizard({ event, locale }: RegistrationWizardProps) {
         // e-mail is required by the backend and taken from the signed-in
         // account (the wizard is auth-gated, so it is always present).
         email: user.email,
+        // Carry the UI locale so the payment return page matches it.
+        locale,
         ...(donate > 0 ? { afuDonation: donate } : {}),
         ...(kidsRegistrations.length > 0 ? { kidsRegistrations } : {}),
         ...(appliedPromo ? { promoCode: appliedPromo.code } : {}),
